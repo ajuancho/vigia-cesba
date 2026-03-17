@@ -34,7 +34,7 @@ const Header = ({ onMenuToggle }) => {
 
                 <div className="flex items-center gap-3">
                     <span className="text-[10px] font-medium text-status-green border border-green-200 bg-green-50 px-2.5 py-1 rounded">
-                        ● Datos actualizados
+                        ● Datos de simulación -prueba beta-
                     </span>
 
                     <button className="relative p-1.5 rounded text-text-secondary hover:text-text-primary hover:bg-bg-tertiary transition-colors">
