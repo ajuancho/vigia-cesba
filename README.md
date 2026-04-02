@@ -1,8 +1,8 @@
 # Vigía — Inteligencia Legislativa y Regulatoria
 
-**Plataforma de monitoreo, análisis y alertas sobre normativa argentina en tiempo real.**
+**Plataforma Open Source de inteligencia legislativa y regulatoria argentina en tiempo real.**
 
-Producto de [Colossus Lab](https://colossuslab.com.ar).
+Monitoreo del Boletín Oficial, Congreso y sector público. Un proyecto de código abierto impulsado por [Colossus Lab](https://colossuslab.com.ar).
 
 ---
 
@@ -88,4 +88,4 @@ src/
 
 ## Licencia
 
-Proyecto propiedad de Colossus Lab. Todos los derechos reservados.
+Este proyecto se distribuye bajo la [Licencia MIT](LICENSE).
