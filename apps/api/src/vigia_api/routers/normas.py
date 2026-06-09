@@ -1,0 +1,62 @@
+"""Feed de normas + detalle. Lee de Postgres (poblado por el worker InfoLEG)."""
+from __future__ import annotations
+
+from fastapi import APIRouter, HTTPException, Query
+from sqlalchemy import func, select
+
+from vigia_api.core.db import get_sessionmaker
+from vigia_shared.models import Norma
+from vigia_shared.schemas import NormaDetail, NormaListItem, NormaPage
+
+router = APIRouter(prefix="/normas", tags=["normas"])
+
+
+@router.get("", response_model=NormaPage)
+async def list_normas(
+    tipo: str | None = Query(None, description="DNU|DECRETO|LEY|RESOLUCION|DISPOSICION|PROYECTO|OTRA"),
+    impacto: str | None = Query(None, description="alto|medio|bajo"),
+    sector: str | None = Query(None),
+    limit: int = Query(20, ge=1, le=100),
+    offset: int = Query(0, ge=0, le=100000),
+) -> NormaPage:
+    Session = get_sessionmaker()
+    filters = []
+    if tipo:
+        filters.append(Norma.tipo == tipo)
+    if impacto:
+        filters.append(Norma.impacto == impacto)
+    if sector:
+        filters.append(Norma.sector == sector)
+
+    async with Session() as session:
+        total = (
+            await session.execute(select(func.count()).select_from(Norma).where(*filters))
+        ).scalar_one()
+        rows = (
+            await session.execute(
+                select(Norma)
+                .where(*filters)
+                .order_by(Norma.fecha_publicacion.desc().nullslast(), Norma.id.desc())
+                .limit(limit)
+                .offset(offset)
+            )
+        ).scalars().all()
+
+    return NormaPage(
+        items=[NormaListItem.model_validate(r) for r in rows],
+        total=int(total or 0),
+        limit=limit,
+        offset=offset,
+    )
+
+
+@router.get("/{norma_id}", response_model=NormaDetail)
+async def get_norma(norma_id: int) -> NormaDetail:
+    Session = get_sessionmaker()
+    async with Session() as session:
+        row = (
+            await session.execute(select(Norma).where(Norma.id == norma_id))
+        ).scalar_one_or_none()
+    if row is None:
+        raise HTTPException(status_code=404, detail="Norma no encontrada")
+    return NormaDetail.model_validate(row)

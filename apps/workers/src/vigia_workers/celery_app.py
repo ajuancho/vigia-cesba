@@ -1,0 +1,57 @@
+"""Celery application + beat schedule para la ingesta de Vigía."""
+from __future__ import annotations
+
+import os
+
+from celery import Celery
+from celery.schedules import crontab
+
+REDIS_URL = os.environ.get("REDIS_URL", "redis://localhost:6379/0")
+
+celery_app = Celery(
+    "vigia",
+    broker=REDIS_URL,
+    backend=REDIS_URL,
+    include=["vigia_workers.tasks", "vigia_workers.alerts"],
+)
+
+# Sentry — no-op si falta SENTRY_DSN.
+_sentry_dsn = os.environ.get("SENTRY_DSN")
+if _sentry_dsn:
+    try:
+        import sentry_sdk
+        from sentry_sdk.integrations.celery import CeleryIntegration
+
+        sentry_sdk.init(
+            dsn=_sentry_dsn,
+            integrations=[CeleryIntegration()],
+            traces_sample_rate=0.05,
+            environment=os.environ.get("VIGIA_ENV", "dev"),
+        )
+    except Exception as e:  # pragma: no cover
+        print(f"[sentry] init failed: {e!r}")
+
+celery_app.conf.update(
+    task_acks_late=True,
+    worker_prefetch_multiplier=1,
+    task_default_queue="default",
+    timezone="America/Argentina/Buenos_Aires",
+    enable_utc=False,
+    beat_schedule={
+        # InfoLEG / Boletín Oficial — corpus completo, semanal domingo 02:00 ART.
+        "ingest-infoleg-full": {
+            "task": "vigia_workers.tasks.ingest_infoleg_full",
+            "schedule": crontab(hour=2, minute=0, day_of_week=0),
+        },
+        # Refresco incremental diario 07:00 ART (muestreo, normas recientes).
+        "ingest-infoleg-sample": {
+            "task": "vigia_workers.tasks.ingest_infoleg",
+            "schedule": crontab(hour=7, minute=0),
+        },
+        # Matching de alertas + notificaciones — cada hora.
+        "match-alertas": {
+            "task": "vigia_workers.alerts.match_alertas",
+            "schedule": crontab(minute=15),
+        },
+    },
+)

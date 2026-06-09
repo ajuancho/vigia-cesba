@@ -1,7 +1,67 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+env/
+.uv/
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# Node
 node_modules/
+.pnp.*
+.yarn/
+.next/
+.turbo/
 dist/
+build/
+out/
+.swc/
+*.tsbuildinfo
+next-env.d.ts
+
+# Vercel
+.vercel/
+
+# Env
 .env
 .env.local
-*.log
+.env.*.local
+.env.production
+.env.development
+!.env.example
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.cursor/
+
+# OS
 .DS_Store
 Thumbs.db
+desktop.ini
+*.lnk
+
+# Data / logs / artifacts
+data/
+logs/
+*.log
+*.pid
+
+# Docker
+docker-compose.override.yml
+
+# Alembic transient files (mantener versions/ trackeado)
+db/alembic/*.lock
+
+# Claude/agent transient
+.claude/

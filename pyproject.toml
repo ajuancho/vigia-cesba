@@ -1,0 +1,30 @@
+[project]
+name = "vigia"
+version = "0.1.0"
+description = "Plataforma de inteligencia legislativa y regulatoria argentina"
+readme = "README.md"
+requires-python = ">=3.12"
+
+[tool.uv.workspace]
+members = [
+    "apps/api",
+    "apps/workers",
+    "packages/connectors",
+    "packages/shared",
+]
+
+[tool.uv.sources]
+vigia-connectors = { workspace = true }
+vigia-shared = { workspace = true }
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "ASYNC"]
+ignore = ["E501"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["apps", "packages"]

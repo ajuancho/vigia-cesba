@@ -1,0 +1,91 @@
+# Producción — EC2 + Docker Compose + Caddy (patrón Laboratorio Colossus).
+#
+# El web (apps/web) NO va acá: se despliega en Vercel. Este compose corre el
+# backend Python: API + workers + beat + Caddy (TLS automático).
+#
+# Postgres y Redis se esperan EXTERNOS (RDS + ElastiCache) vía DATABASE_URL /
+# REDIS_URL en .env.production. Para un EC2 all-in-one (sin RDS), levantá
+# también db+redis con:  docker compose -f docker-compose.prod.yml --profile local-data up -d
+#
+# Imágenes: por defecto se buildean local; en CI se publican a GHCR
+# (ghcr.io/colossus-lab/vigia-{api,workers}) — ver .github/workflows/build-images.yml.
+
+services:
+  api:
+    image: ghcr.io/colossus-lab/vigia-api:${VIGIA_TAG:-latest}
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    restart: unless-stopped
+    env_file: .env.production
+    environment:
+      API_CORS_ORIGINS: ${API_CORS_ORIGINS}
+      AUTH_ENABLED: ${AUTH_ENABLED:-true}
+    expose:
+      - "8000"
+    depends_on:
+      - migrate
+
+  # Job one-shot: aplica migraciones Alembic antes de levantar la API.
+  migrate:
+    image: ghcr.io/colossus-lab/vigia-api:${VIGIA_TAG:-latest}
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    env_file: .env.production
+    command: ["alembic", "-c", "db/alembic.ini", "upgrade", "head"]
+    restart: "no"
+
+  worker:
+    image: ghcr.io/colossus-lab/vigia-workers:${VIGIA_TAG:-latest}
+    build:
+      context: .
+      dockerfile: apps/workers/Dockerfile
+    restart: unless-stopped
+    env_file: .env.production
+    command: ["celery", "-A", "vigia_workers", "worker", "--loglevel=info", "--concurrency=2"]
+
+  worker-beat:
+    image: ghcr.io/colossus-lab/vigia-workers:${VIGIA_TAG:-latest}
+    build:
+      context: .
+      dockerfile: apps/workers/Dockerfile
+    restart: unless-stopped
+    env_file: .env.production
+    command: ["celery", "-A", "vigia_workers", "beat", "--loglevel=info"]
+
+  caddy:
+    image: caddy:2
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./infra/caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - api
+
+  # ---- Solo para EC2 all-in-one (perfil opcional) ----
+  db:
+    image: pgvector/pgvector:pg16
+    profiles: ["local-data"]
+    restart: unless-stopped
+    env_file: .env.production
+    volumes:
+      - vigia_pgdata:/var/lib/postgresql/data
+      - ./db/init:/docker-entrypoint-initdb.d:ro
+
+  redis:
+    image: redis:7-alpine
+    profiles: ["local-data"]
+    restart: unless-stopped
+    volumes:
+      - vigia_redisdata:/data
+
+volumes:
+  caddy_data:
+  caddy_config:
+  vigia_pgdata:
+  vigia_redisdata:

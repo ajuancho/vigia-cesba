@@ -1,0 +1,86 @@
+services:
+  db:
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-vigia}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-vigia}
+      POSTGRES_DB: ${POSTGRES_DB:-vigia}
+    ports:
+      - "5432:5432"
+    volumes:
+      - vigia_pgdata:/var/lib/postgresql/data
+      - ./db/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-vigia}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - vigia_redisdata:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    environment:
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-vigia}:${POSTGRES_PASSWORD:-vigia}@db:5432/${POSTGRES_DB:-vigia}
+      REDIS_URL: redis://redis:6379/0
+      API_CORS_ORIGINS: http://localhost:3000
+      AUTH_ENABLED: ${AUTH_ENABLED:-false}
+      AUTH_SECRET: ${AUTH_SECRET:-}
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost:8000
+    ports:
+      - "3000:3000"
+    depends_on:
+      - api
+
+  worker:
+    build:
+      context: .
+      dockerfile: apps/workers/Dockerfile
+    environment:
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-vigia}:${POSTGRES_PASSWORD:-vigia}@db:5432/${POSTGRES_DB:-vigia}
+      REDIS_URL: redis://redis:6379/0
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  worker-beat:
+    build:
+      context: .
+      dockerfile: apps/workers/Dockerfile
+    command: ["celery", "-A", "vigia_workers", "beat", "--loglevel=info"]
+    environment:
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-vigia}:${POSTGRES_PASSWORD:-vigia}@db:5432/${POSTGRES_DB:-vigia}
+      REDIS_URL: redis://redis:6379/0
+    depends_on:
+      - redis
+
+volumes:
+  vigia_pgdata:
+  vigia_redisdata:

@@ -1,0 +1,15 @@
+# Caddy reverse proxy para producción (EC2 + Docker Compose).
+# TLS automático contra Let's Encrypt. Reemplazar api.vigia.legal por el dominio real.
+#
+# Uso: montar este archivo en el contenedor caddy y exponer 80/443.
+#   caddy:
+#     image: caddy:2
+#     ports: ["80:80", "443:443"]
+#     volumes:
+#       - ./infra/caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+#       - caddy_data:/data
+
+api.vigia.legal {
+	reverse_proxy api:8000
+	encode gzip
+}

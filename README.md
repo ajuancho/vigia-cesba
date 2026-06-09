@@ -32,57 +32,93 @@ Vigía es una herramienta de inteligencia legislativa que centraliza, analiza y 
 
 ## Stack técnico
 
-| Componente | Tecnología |
+Monorepo (calcado del patrón de InvestArg / Colossus Lab):
+
+| Capa | Tecnología |
 |---|---|
-| Frontend | React 19 + Vite 7 |
-| Estilos | Tailwind CSS v4 |
-| Gráficos | Recharts |
-| Routing | React Router v7 |
+| Backend API | FastAPI 0.115 async · SQLAlchemy 2.0 · Pydantic v2 |
+| Base de datos | PostgreSQL 16 + pgvector · Alembic |
+| Búsqueda | Postgres FTS con GIN (español) sobre `norma.search_vector` |
+| Broker / cache | Redis 7 |
+| Workers | Celery 5 + beat (cron de ingesta) |
+| Frontend | Next.js 16 App Router · React 19 · Tailwind 4 · Recharts |
 | Iconos | Lucide React |
-| Tipografía | Inter + JetBrains Mono |
+| Conectores | InfoLEG / Boletín Oficial (live) · HCDN/Senado (roadmap) |
+| Despliegue | Vercel (web) + AWS (api+workers+db+redis) |
 
-## Instalación
+## Instalación (desarrollo)
 
-```bash
-# Clonar el repositorio
-git clone https://github.com/ColossusLab/Vigia-normativo-Colossus-Lab.git
-cd Vigia-normativo-Colossus-Lab
+Requisitos: Python 3.12+, Node 20+ con pnpm 9+, Docker Desktop.
 
-# Instalar dependencias
-npm install
+```powershell
+# 1. Levantar Postgres (pgvector) + Redis
+docker compose up -d db redis
 
-# Ejecutar en desarrollo
-npm run dev
+# 2. Crear venv e instalar packages Python editables
+python -m venv .venv
+.venv\Scripts\pip install -e packages\shared -e packages\connectors -e apps\workers -e apps\api
+
+# 3. Migraciones
+$env:DATABASE_URL="postgresql+asyncpg://vigia:vigia@localhost:5432/vigia"
+.venv\Scripts\alembic -c db\alembic.ini upgrade head
+
+# 4. Carga inicial de datos reales (muestreo InfoLEG ~990 normas)
+.venv\Scripts\python -c "from vigia_workers.tasks import ingest_infoleg as t; print(t())"
+
+# 5. API (http://localhost:8000/docs)
+.venv\Scripts\python -m uvicorn vigia_api.main:app --reload --port 8000
+
+# 6. Web (otra terminal — http://localhost:3000)
+cd apps\web; pnpm install; pnpm dev
 ```
+
+## Activar autenticación (Fase 2)
+
+Por defecto la app corre en **modo demo** (datos públicos, sin login). Para
+activar Google OAuth + multi-tenant, seteá en `.env` (API) y `apps/web/.env.local` (web):
+
+```
+AUTH_ENABLED=true                  # API
+NEXT_PUBLIC_AUTH_ENABLED=true      # web
+AUTH_SECRET=<openssl rand -hex 32> # compartido entre API y web
+AUTH_GOOGLE_ID=<google client id>
+AUTH_GOOGLE_SECRET=<google client secret>
+```
+
+Redirect URI de Google: `http://localhost:3000/api/auth/callback/google`.
+Los endpoints de datos (`/normas`, `/search`, `/stats`) son públicos siempre;
+la auth aplica a `/workspaces`, invitaciones y (Fase 3) alertas.
 
 ## Estructura del proyecto
 
 ```
-src/
-├── components/
-│   ├── Sidebar.jsx         # Navegación principal
-│   └── Header.jsx          # Barra superior
-├── data/
-│   └── mockData.js         # Datos simulados
-├── views/
-│   ├── FeedView.jsx        # Feed de normativa
-│   ├── DashboardView.jsx   # Estadísticas y KPIs
-│   ├── SearchView.jsx      # Buscador con filtros
-│   ├── AlertsView.jsx      # Gestión de alertas
-│   ├── NormDetailView.jsx  # Detalle de norma
-│   └── DNUTrackerView.jsx  # Tracker de DNU
-├── App.jsx                 # Router + Layout
-├── index.css               # Design system
-└── main.jsx                # Entry point
+vigia/
+├── apps/
+│   ├── api/          FastAPI (vigia_api) — /normas, /search, /stats, /health
+│   ├── web/          Next.js 16 (App Router) — Feed, Dashboard, Buscador, Alertas, DNU
+│   └── workers/      Celery + beat (vigia_workers) — ingesta InfoLEG
+├── packages/
+│   ├── connectors/   vigia_connectors — conector InfoLEG / Boletín Oficial
+│   └── shared/       vigia_shared — modelos SQLAlchemy + schemas Pydantic + constantes
+├── db/
+│   ├── alembic/      migraciones (0001 inicial)
+│   └── init/         extensiones pgvector, pg_trgm, unaccent
+├── infra/caddy/      reverse proxy para prod
+└── docker-compose.yml
 ```
+
+> Nota: los archivos del SPA Vite original (`src/`, `index.html`, `vite.config.js`,
+> `mockData.js`) quedaron en la raíz tras la migración a `apps/web` y ya no se usan;
+> se pueden borrar con seguridad.
 
 ## Roadmap
 
-- [ ] Backend: scrapers para BORA, Congreso, InfoLEG
-- [ ] IA: reemplazar análisis simulados con NLP real
-- [ ] Auth: login con Firebase para alertas persistentes
-- [ ] Datos reales: conectar APIs de datos abiertos
-- [ ] Deploy: hosting en producción
+- [x] **Fase 0** — Scaffold del monorepo (Docker, Postgres+pgvector, Alembic)
+- [x] **Fase 1** — Datos reales end-to-end: conector InfoLEG → Postgres → API → web Next.js (sin mock)
+- [x] **Fase 2** — Auth + multi-tenant: NextAuth + Google OAuth, `/auth/sync`, workspaces B2C/B2B, miembros e invitaciones (dormido en modo demo hasta setear credenciales)
+- [x] **Fase 3** — Alertas persistentes por workspace + matching FTS + digest por email (Resend; no-op sin API key)
+- [~] **Fase 4** — Deploy producción: config lista y verificada (Dockerfiles, `docker-compose.prod.yml`, CI a GHCR, Caddy, runbook [`infra/DEPLOY.md`](infra/DEPLOY.md)). Falta el push a AWS/Vercel (requiere credenciales)
+- [ ] **Fase 5** — IA (resúmenes + NER), embeddings pgvector, scrapers BORA directo / Congreso
 
 ---
 
