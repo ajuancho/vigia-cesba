@@ -178,5 +178,7 @@ async def dnu_stats() -> DnuStats:
         aprobados=by.get("aprobado", 0),
         rechazados=by.get("rechazado", 0),
         pendientes=by.get("pendiente", 0),
+        dictaminados=by.get("dictaminado", 0),
+        sin_tratamiento=by.get("sin_tratamiento", 0),
         historico=[DnuAnio(anio=int(r[0]), cantidad=int(r[1])) for r in historico],
     )

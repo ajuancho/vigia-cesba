@@ -13,6 +13,15 @@ from vigia_shared.db import session_scope
 from vigia_shared.models import DnuTracking, Norma, SourceCatalog
 
 
+async def ensure_source(code: str) -> None:
+    """Garantiza la fila de source_catalog para fuentes que no upsertean normas
+    (p.ej. tracking bicameral): sin esto, mark_source_run sería un no-op."""
+    from vigia_shared.sources import catalog_fields
+
+    async with session_scope() as session:
+        await _upsert_source(session, **catalog_fields(code))
+
+
 async def mark_source_run(
     source_code: str, *, status: str = "ok", error: str | None = None
 ) -> None:

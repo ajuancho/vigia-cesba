@@ -13,6 +13,7 @@ TIPOS_NORMA: dict[str, dict[str, str]] = {
     "RESOLUCION": {"label": "Resolución", "description": "Resolución ministerial"},
     "DISPOSICION": {"label": "Disposición", "description": "Disposición administrativa"},
     "PROYECTO": {"label": "Proyecto", "description": "Proyecto de ley en trámite"},
+    "COMUNICACION": {"label": "Comunicación", "description": "Comunicación del BCRA (serie A)"},
     "OTRA": {"label": "Otra", "description": "Otra norma"},
 }
 

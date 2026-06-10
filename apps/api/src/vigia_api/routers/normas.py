@@ -5,7 +5,7 @@ from fastapi import APIRouter, HTTPException, Query
 from sqlalchemy import func, select
 
 from vigia_api.core.db import get_sessionmaker
-from vigia_shared.models import Norma, SourceCatalog
+from vigia_shared.models import DnuTracking, Norma, SourceCatalog
 from vigia_shared.schemas import NormaDetail, NormaListItem, NormaPage
 
 router = APIRouter(prefix="/normas", tags=["normas"])
@@ -13,7 +13,7 @@ router = APIRouter(prefix="/normas", tags=["normas"])
 
 @router.get("", response_model=NormaPage)
 async def list_normas(
-    tipo: str | None = Query(None, description="DNU|DECRETO|LEY|RESOLUCION|DISPOSICION|PROYECTO|OTRA"),
+    tipo: str | None = Query(None, description="DNU|DECRETO|LEY|RESOLUCION|DISPOSICION|PROYECTO|COMUNICACION|OTRA"),
     impacto: str | None = Query(None, description="alto|medio|bajo"),
     sector: str | None = Query(None),
     limit: int = Query(20, ge=1, le=100),
@@ -32,22 +32,31 @@ async def list_normas(
         total = (
             await session.execute(select(func.count()).select_from(Norma).where(*filters))
         ).scalar_one()
-        rows = (
-            await session.execute(
-                select(Norma)
-                .where(*filters)
-                .order_by(Norma.fecha_publicacion.desc().nullslast(), Norma.id.desc())
-                .limit(limit)
-                .offset(offset)
-            )
-        ).scalars().all()
+        query = (
+            select(Norma)
+            .where(*filters)
+            .order_by(Norma.fecha_publicacion.desc().nullslast(), Norma.id.desc())
+            .limit(limit)
+            .offset(offset)
+        )
+        if tipo == "DNU":
+            # El tracker bicameral viaja con el listado solo cuando se pide DNU.
+            query = select(Norma, DnuTracking.estado_bicameral).join(
+                DnuTracking, DnuTracking.norma_id == Norma.id, isouter=True
+            ).where(*filters).order_by(
+                Norma.fecha_publicacion.desc().nullslast(), Norma.id.desc()
+            ).limit(limit).offset(offset)
+            rows = (await session.execute(query)).all()
+            items = []
+            for norma, estado_bicameral in rows:
+                item = NormaListItem.model_validate(norma)
+                item.estado_bicameral = estado_bicameral
+                items.append(item)
+        else:
+            rows = (await session.execute(query)).scalars().all()
+            items = [NormaListItem.model_validate(r) for r in rows]
 
-    return NormaPage(
-        items=[NormaListItem.model_validate(r) for r in rows],
-        total=int(total or 0),
-        limit=limit,
-        offset=offset,
-    )
+    return NormaPage(items=items, total=int(total or 0), limit=limit, offset=offset)
 
 
 @router.get("/{norma_id}", response_model=NormaDetail)

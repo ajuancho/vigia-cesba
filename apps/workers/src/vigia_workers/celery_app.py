@@ -17,6 +17,7 @@ celery_app = Celery(
         "vigia_workers.alerts",
         "vigia_workers.freshness",
         "vigia_workers.reconcile",
+        "vigia_workers.bicameral",
     ],
 )
 
@@ -70,6 +71,17 @@ celery_app.conf.update(
         "ingest-hcdn-proyectos": {
             "task": "vigia_workers.tasks.ingest_hcdn_proyectos",
             "schedule": crontab(hour=8, minute=0),
+        },
+        # Dictámenes de la Comisión Bicameral DNU (HCDN CKAN) — diario.
+        # Después de hcdn-proyectos (08:00): el join usa los proyectos del día.
+        "ingest-bicameral-dnu": {
+            "task": "vigia_workers.bicameral.ingest_bicameral_dnu",
+            "schedule": crontab(hour=9, minute=30),
+        },
+        # Comunicaciones A del BCRA — diario post-publicación (patrón InvestArg).
+        "ingest-bcra-comunicaciones": {
+            "task": "vigia_workers.tasks.ingest_bcra_comunicaciones",
+            "schedule": crontab(hour=20, minute=30),
         },
         # Matching de alertas + notificaciones — cada hora.
         "match-alertas": {

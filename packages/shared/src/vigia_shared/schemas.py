@@ -24,6 +24,9 @@ class NormaBase(BaseModel):
     bora_seccion: str | None = None
     tags: list[str] | None = None
     url: str | None = None
+    # Solo poblado para DNU (join a dnu_tracking):
+    # sin_tratamiento | pendiente | dictaminado | aprobado | rechazado
+    estado_bicameral: str | None = None
 
 
 class NormaListItem(NormaBase):
@@ -96,5 +99,7 @@ class DnuStats(BaseModel):
     total: int
     aprobados: int
     rechazados: int
-    pendientes: int
+    pendientes: int  # vigentes a la espera de dictamen (post ley 26.122)
+    dictaminados: int = 0  # con dictamen de la Bicameral, sin resolución de ambas cámaras
+    sin_tratamiento: int = 0  # pre ley 26.122: nunca van a tener dictamen
     historico: list[DnuAnio] = []

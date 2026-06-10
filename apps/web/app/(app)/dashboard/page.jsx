@@ -21,6 +21,7 @@ const SERIE_TIPOS = [
   { key: 'DECRETO', color: '#F6B40E' },
   { key: 'LEY', color: '#34D399' },
   { key: 'DNU', color: '#F87171' },
+  { key: 'COMUNICACION', color: '#F472B6' },
   { key: 'OTRA', color: '#8892A8' },
 ];
 

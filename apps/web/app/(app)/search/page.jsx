@@ -9,7 +9,8 @@ import FadeIn from '@/components/FadeIn';
 
 const TIPO_DOT_COLORS = {
   DNU: '#F87171', DECRETO: '#F6B40E', LEY: '#34D399',
-  RESOLUCION: '#74ACDF', DISPOSICION: '#A78BFA', PROYECTO: '#22D3EE', OTRA: '#8892A8',
+  RESOLUCION: '#74ACDF', DISPOSICION: '#A78BFA', PROYECTO: '#22D3EE',
+  COMUNICACION: '#F472B6', OTRA: '#8892A8',
 };
 
 const SELECT_CLS = 'w-full bg-transparent border-b border-border-light px-1 py-2 text-[12px] text-text-secondary focus:outline-none focus:border-celeste transition-colors';

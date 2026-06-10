@@ -34,11 +34,19 @@ export default function DNUTrackerView() {
   const pico = hist.reduce((m, h) => (h.cantidad > m.cantidad ? h : m), { anio: '—', cantidad: 0 });
 
   const KPIS = [
-    { label: 'Históricos', value: dnu?.total, sub: 'en seguimiento', color: 'text-text-primary' },
+    { label: 'Históricos', value: dnu?.total, sub: `en seguimiento · pico ${pico.anio}`, color: 'text-text-primary' },
     { label: `En ${anioActual}`, value: dnuEsteAnio, sub: 'emitidos este año', color: 'text-status-red' },
-    { label: 'Pendientes', value: dnu?.pendientes, sub: 'sin dictamen bicameral', color: 'text-sol' },
-    { label: `Pico: ${pico.anio}`, value: pico.cantidad, sub: 'el año más intenso', color: 'text-celeste' },
+    { label: 'Pendientes', value: dnu?.pendientes, sub: 'a la espera de dictamen', color: 'text-sol' },
+    { label: 'Dictaminados', value: dnu?.dictaminados, sub: 'con dictamen bicameral', color: 'text-celeste' },
   ];
+
+  const BICAMERAL_BADGE = {
+    aprobado: ['tint-green', 'aprobado'],
+    rechazado: ['tint-red', 'rechazado'],
+    dictaminado: ['tint-blue', 'dictaminado'],
+    sin_tratamiento: ['tint-gray', 'pre-2006 · sin tratamiento'],
+    pendiente: ['tint-amber', 'pendiente bicameral'],
+  };
 
   return (
     <div className="max-w-5xl mx-auto">
@@ -119,7 +127,10 @@ export default function DNUTrackerView() {
                 <div className="flex-1 min-w-0">
                   <div className="flex flex-wrap items-center gap-2 mb-0.5">
                     <span className="text-[9px] font-semibold text-status-red uppercase tracking-[0.1em]">DNU {d.numero || ''}</span>
-                    <span className="px-2 py-0.5 rounded-full text-[9px] font-medium border tint-amber">pendiente bicameral</span>
+                    {(() => {
+                      const [tint, label] = BICAMERAL_BADGE[d.estado_bicameral] || BICAMERAL_BADGE.pendiente;
+                      return <span className={`px-2 py-0.5 rounded-full text-[9px] font-medium border ${tint}`}>{label}</span>;
+                    })()}
                     {d.fecha_publicacion && <span className="text-[10px] text-text-tertiary font-mono ml-auto flex items-center gap-1"><Clock size={9} /> {d.fecha_publicacion}</span>}
                   </div>
                   <h4 className="text-[13px] font-semibold text-text-primary group-hover:text-celeste-bright transition-colors mb-0.5" style={{ fontFamily: 'var(--font-display)' }}>{d.titulo}</h4>

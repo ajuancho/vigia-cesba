@@ -289,6 +289,92 @@ def ingest_bora_primera(dry_run: bool = False, lookback_days: int = 5) -> dict[s
     return result
 
 
+def _comunicacion_to_row(c) -> dict[str, Any]:
+    """Mapea una ComunicacionBcra al shape de la tabla `norma`.
+
+    El excerpt del body va en `resumen` (peso B del FTS): así una alerta por
+    "MULC" o "encaje" matchea el contenido, no solo el título.
+    """
+    return {
+        "external_id": c.external_id,
+        "tipo": "COMUNICACION",
+        "numero": f"{c.serie} {c.numero}",
+        "titulo": c.titulo,
+        "resumen": (c.body or "")[:1500] or None,
+        "fecha_publicacion": c.fecha,
+        "jurisdiccion": "Nacional",
+        "sector": c.detect_sector(),
+        "organismo": "Banco Central de la República Argentina",
+        "estado": "Publicada",
+        "impacto": None,
+        "bora_seccion": None,
+        "entidades": None,
+        "tags": None,
+        "url": c.url,
+        "raw": {"serie": c.serie, "numero": c.numero,
+                "fecha": c.fecha.isoformat() if c.fecha else None},
+    }
+
+
+@celery_app.task(name="vigia_workers.tasks.ingest_bcra_comunicaciones")
+def ingest_bcra_comunicaciones(dry_run: bool = False, backfill: int = 0) -> dict[str, Any]:
+    """Ingesta Comunicaciones "A" del BCRA (PDFs de numeración secuencial).
+
+    Modo normal: sondea hacia adelante desde el cursor (máximo ya ingestado).
+    Primer corrida o `backfill=N`: busca el último número publicado y trae los
+    N más recientes (default 300) — correr con match_alertas(notify=False).
+    """
+    from vigia_connectors import BcraClient
+    from sqlalchemy import text as _text
+    from vigia_shared.db import session_scope
+
+    dry = _is_dry_run(dry_run)
+    SOURCE = catalog_fields("bcra_comunicaciones")
+
+    async def _cursor() -> int | None:
+        async with session_scope() as session:
+            return await session.scalar(
+                _text(
+                    "SELECT MAX((raw->>'numero')::int) FROM norma n "
+                    "JOIN source_catalog s ON s.id = n.source_id "
+                    "WHERE s.code = :code AND n.raw->>'serie' = 'A'"
+                ),
+                {"code": SOURCE["code"]},
+            )
+
+    async def _run() -> dict[str, Any]:
+        totals = _empty_totals()
+        sample: list[dict[str, Any]] = []
+        rows: list[dict[str, Any]] = []
+        async with BcraClient(serie="A") as client:
+            cursor = None if backfill else await _cursor()
+            if cursor:
+                async for c in client.iter_desde(cursor):
+                    rows.append(_comunicacion_to_row(c))
+            else:
+                latest = await client.find_latest_number()
+                if latest is None:
+                    raise RuntimeError("BCRA: no se encontró el último número (¿cambió la URL?)")
+                count = backfill or 300
+                async for c in client.iter_recent(start_number=latest, count=count):
+                    rows.append(_comunicacion_to_row(c))
+        if dry:
+            return {"rows": len(rows), "sample": [_dry_sample_row(r) for r in rows[:_DRY_SAMPLE]]}
+        for i in range(0, len(rows), _FULL_BATCH):
+            _acc(totals, await upsert_normas(SOURCE, rows[i : i + _FULL_BATCH]))
+        return totals
+
+    if dry:
+        result = run_async(_run())
+        return {"source": SOURCE["code"], "dry_run": True, **result}
+
+    async def _wrapped() -> dict[str, Any]:
+        counts = await with_status([SOURCE["code"]], _run)
+        return {"source": SOURCE["code"], **counts}
+
+    return run_async(_wrapped())
+
+
 @celery_app.task(name="vigia_workers.tasks.ingest_infoleg_full")
 def ingest_infoleg_full(dry_run: bool = False) -> dict[str, Any]:
     """Ingesta el corpus completo de InfoLEG (~500k normas) por streaming.

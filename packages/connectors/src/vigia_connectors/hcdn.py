@@ -81,17 +81,21 @@ class HcdnClient:
     async def aclose(self) -> None:
         await self._client.aclose()
 
-    async def resolve_csv_url(self) -> str:
-        """Resuelve la URL vigente del recurso CSV vía package_show."""
-        data = await get_json(self._client, f"/api/3/action/package_show?id={PACKAGE_ID}")
+    async def resolve_csv_url(self, package_id: str = PACKAGE_ID) -> str:
+        """Resuelve la URL vigente del recurso CSV de un package vía package_show.
+
+        Las URLs de recursos cambian de nombre con cada versión (2.0, 3.5, ...),
+        por eso siempre se resuelven en runtime.
+        """
+        data = await get_json(self._client, f"/api/3/action/package_show?id={package_id}")
         for res in data["result"]["resources"]:
             if (res.get("format") or "").upper() == "CSV":
                 return res["url"]
-        raise ValueError(f"No CSV resource in CKAN package {PACKAGE_ID}")
+        raise ValueError(f"No CSV resource in CKAN package {package_id}")
 
-    async def download_csv(self, dest: Path) -> Path:
-        """Stream del CSV completo a disco."""
-        url = await self.resolve_csv_url()
+    async def download_csv(self, dest: Path, package_id: str = PACKAGE_ID) -> Path:
+        """Stream del CSV completo de un package a disco."""
+        url = await self.resolve_csv_url(package_id)
         dest.parent.mkdir(parents=True, exist_ok=True)
         async with self._client.stream("GET", url) as resp:
             resp.raise_for_status()

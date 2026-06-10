@@ -39,6 +39,24 @@ SOURCES: dict[str, dict] = {
         # Publica cada día hábil; 4 días tolera fin de semana largo.
         "freshness_slo_days": 4,
     },
+    "bcra_comunicaciones": {
+        "code": "bcra_comunicaciones",
+        "name": "BCRA — Comunicaciones A (normativa cambiaria y financiera)",
+        "kind": "scrape",
+        "base_url": "https://www.bcra.gob.ar",
+        "cadence_hours": 24,
+        # ~5-10 por semana; 10 días tolera semanas quietas.
+        "freshness_slo_days": 10,
+    },
+    "bicameral_dnu": {
+        "code": "bicameral_dnu",
+        "name": "Comisión Bicameral DNU — dictámenes (datos.hcdn.gob.ar)",
+        "kind": "feed",
+        "base_url": "https://datos.hcdn.gob.ar",
+        "cadence_hours": 24,
+        # No crea normas (actualiza dnu_tracking): sin SLO de frescura propia.
+        "freshness_slo_days": None,
+    },
 }
 
 # Campos que van a la tabla source_catalog (los upserta cada task de ingesta).

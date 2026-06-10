@@ -127,10 +127,12 @@ class DnuTracking(Base):
     )
     estado_bicameral: Mapped[str] = mapped_column(
         String(32), nullable=False, default="pendiente"
-    )  # pendiente | aprobado | rechazado
+    )  # sin_tratamiento | pendiente | dictaminado | aprobado | rechazado
     fecha_dictamen: Mapped[date | None] = mapped_column(Date)
     plazo_limite: Mapped[date | None] = mapped_column(Date)
     notas: Mapped[str | None] = mapped_column(Text)
+    dictamen_url: Mapped[str | None] = mapped_column(String(1024))
+    raw: Mapped[dict[str, Any] | None] = mapped_column(JSONB)  # crudo del dictamen (HCDN)
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False
     )

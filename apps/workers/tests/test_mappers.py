@@ -9,9 +9,14 @@ from __future__ import annotations
 
 from datetime import date
 
-from vigia_connectors import BoraAviso, HcdnProyecto, InfoLegNorm
+from vigia_connectors import BoraAviso, ComunicacionBcra, HcdnProyecto, InfoLegNorm
 from vigia_workers.persistence import _NORMA_UPDATE_COLS
-from vigia_workers.tasks import _aviso_to_row, _norma_to_row, _proyecto_to_row
+from vigia_workers.tasks import (
+    _aviso_to_row,
+    _comunicacion_to_row,
+    _norma_to_row,
+    _proyecto_to_row,
+)
 
 EXPECTED_KEYS = set(_NORMA_UPDATE_COLS) | {"external_id"}
 
@@ -80,3 +85,22 @@ def test_aviso_to_row_shape():
     # Promoción a DNU por texto del detalle (override del tipo).
     row_dnu = _aviso_to_row(a, tipo="DNU")
     assert row_dnu["tipo"] == "DNU"
+
+
+def test_comunicacion_to_row_shape():
+    c = ComunicacionBcra(
+        serie="A",
+        numero=8445,
+        fecha=date(2026, 6, 4),
+        titulo="Ratio de Cobertura de Liquidez. Adecuaciones.",
+        body="Texto del MULC y los encajes. " * 100,
+        url="https://www.bcra.gob.ar/Pdfs/comytexord/A8445.pdf",
+    )
+    row = _comunicacion_to_row(c)
+    assert set(row.keys()) == EXPECTED_KEYS
+    assert row["tipo"] == "COMUNICACION"
+    assert row["external_id"] == "A8445"
+    assert row["numero"] == "A 8445"
+    assert row["organismo"].startswith("Banco Central")
+    assert len(row["resumen"]) <= 1500  # excerpt para FTS, no el body entero
+    assert row["raw"]["numero"] == 8445  # cursor incremental lee de acá
