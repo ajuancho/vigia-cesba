@@ -12,7 +12,7 @@ celery_app = Celery(
     "vigia",
     broker=REDIS_URL,
     backend=REDIS_URL,
-    include=["vigia_workers.tasks", "vigia_workers.alerts"],
+    include=["vigia_workers.tasks", "vigia_workers.alerts", "vigia_workers.freshness"],
 )
 
 # Sentry — no-op si falta SENTRY_DSN.
@@ -54,6 +54,12 @@ celery_app.conf.update(
         "match-alertas": {
             "task": "vigia_workers.alerts.match_alertas",
             "schedule": crontab(minute=15),
+        },
+        # Frescura de fuentes contra SLOs (vigia_shared.sources) — cada 6 h.
+        # Detecta datasets estancados aunque la task corra "ok".
+        "check-sources": {
+            "task": "vigia_workers.freshness.check_sources",
+            "schedule": crontab(hour="*/6", minute=45),
         },
     },
 )

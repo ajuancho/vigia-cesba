@@ -179,6 +179,35 @@ curl "https://api.vigia.legal/normas?limit=1"        # datos reales
 - Web: abrir `https://vigia.legal/feed` → normas reales; login Google → onboarding.
 - Crear una alerta → `match_alertas` corre por beat (o `docker compose ... run --rm worker python -c "from vigia_workers.alerts import match_alertas as t; print(t())"`) → llega email (si `RESEND_API_KEY`).
 
+## Fuentes de datos: runbook de operación
+
+**Observabilidad sin ssh**: `GET /health/sources` — última corrida, status,
+`max_fecha_publicacion` y flag `stale` por fuente (SLOs en
+`packages/shared/src/vigia_shared/sources.py`). El beat `check-sources` (cada
+6 h) marca `stale` y avisa por email si se define `OPS_ALERT_EMAIL`.
+
+**Dry-run de una ingesta** (fetch + parse + conteos, sin tocar la DB):
+
+```bash
+docker compose -f docker-compose.prod.yml run --rm worker \
+  python -c "from vigia_workers.tasks import ingest_infoleg as t; print(t(dry_run=True))"
+```
+
+**Alta de una fuente nueva** (siempre en este orden):
+1. Deploy del código con la task nueva, SIN beat todavía.
+2. Dry-run en el EC2 → revisar conteos y sample.
+3. Backfill real: correr la task una vez.
+4. **Matching silencioso** (evita spamear usuarios con normas viejas):
+   `python -c "from vigia_workers.alerts import match_alertas as t; print(t(notify=False))"`
+5. Habilitar el beat (deploy con la entrada en `celery_app.py`).
+6. Smoke: `/health/sources` muestra la fuente en `ok` con `max_fecha` razonable.
+
+**Rollback universal de una fuente** (cascade limpia matches y tracking):
+
+```sql
+DELETE FROM norma WHERE source_id = (SELECT id FROM source_catalog WHERE code = '<code>');
+```
+
 ## Free trial y membresías
 
 Cada workspace tiene 30 días de prueba desde su creación (`VIGIA_TRIAL_DAYS`

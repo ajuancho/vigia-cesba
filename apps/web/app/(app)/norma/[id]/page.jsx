@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
 import { TIPOS_NORMA } from '@/lib/constants';
-import { ArrowLeft, Clock, Building2, MapPin, Tag, ExternalLink } from 'lucide-react';
+import { ArrowLeft, Clock, Building2, MapPin, Tag, ExternalLink, Database } from 'lucide-react';
 import FadeIn from '@/components/FadeIn';
 
 const TIPO_TINT = {
@@ -41,6 +41,7 @@ export default function NormDetailView() {
     { icon: Building2, label: 'Organismo', value: norma.organismo },
     { icon: MapPin, label: 'Jurisdicción', value: norma.jurisdiccion },
     { icon: Tag, label: 'Sector', value: norma.sector },
+    { icon: Database, label: 'Fuente', value: norma.fuente },
   ].filter((f) => f.value);
 
   return (

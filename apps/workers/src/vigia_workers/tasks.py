@@ -6,37 +6,59 @@ invocar desde CLI:
     python -c "from vigia_workers.tasks import ingest_infoleg as t; print(t())"
 
 …o agendar por celery-beat (ver celery_app.py).
+
+Dry-run (no escribe en la DB; fetch + parse + conteos + sample de filas):
+
+    python -c "from vigia_workers.tasks import ingest_infoleg as t; print(t(dry_run=True))"
+
+…o exportando VIGIA_INGEST_DRY_RUN=1 (aplica a todas las tasks de ingesta).
 """
 from __future__ import annotations
 
 import dataclasses
+import os
 import tempfile
 from datetime import date
 from pathlib import Path
 from typing import Any
 
 from vigia_connectors import HcdnClient, HcdnProyecto, InfoLegClient, InfoLegNorm
+from vigia_shared.sources import catalog_fields
 from vigia_workers.celery_app import celery_app
 from vigia_workers.persistence import run_async, upsert_normas, with_status
 
-INFOLEG_SOURCE = {
-    "code": "infoleg",
-    "name": "InfoLEG — Base de legislación nacional (Min. Justicia)",
-    "kind": "feed",
-    "base_url": "https://datos.jus.gob.ar",
-}
-
-HCDN_SOURCE = {
-    "code": "hcdn_proyectos",
-    "name": "HCDN — Proyectos parlamentarios (datos.hcdn.gob.ar)",
-    "kind": "feed",
-    "base_url": "https://datos.hcdn.gob.ar",
-}
+INFOLEG_SOURCE = catalog_fields("infoleg")
+HCDN_SOURCE = catalog_fields("hcdn_proyectos")
 
 # Cuántos registros por batch al persistir el corpus completo.
 # Tope: asyncpg admite máx 32767 parámetros bind por statement
 # (~17 columnas por fila → 1000 filas ≈ 17k params, margen cómodo).
 _FULL_BATCH = 1000
+
+# Cuántas filas de muestra reporta un dry-run.
+_DRY_SAMPLE = 5
+
+
+def _is_dry_run(flag: bool) -> bool:
+    return flag or os.environ.get("VIGIA_INGEST_DRY_RUN", "").strip().lower() in ("1", "true", "yes")
+
+
+def _dry_sample_row(row: dict[str, Any]) -> dict[str, Any]:
+    """Versión legible de una fila para el reporte de dry-run (sin raw)."""
+    keep = ("external_id", "tipo", "numero", "titulo", "fecha_publicacion", "organismo", "sector")
+    out = {k: row.get(k) for k in keep}
+    if isinstance(out.get("fecha_publicacion"), date):
+        out["fecha_publicacion"] = out["fecha_publicacion"].isoformat()
+    return out
+
+
+def _empty_totals() -> dict[str, int]:
+    return {"rows": 0, "inserted": 0, "updated": 0}
+
+
+def _acc(totals: dict[str, int], part: dict[str, int]) -> None:
+    for k in ("rows", "inserted", "updated"):
+        totals[k] += part[k]
 
 
 def _norma_to_row(n: InfoLegNorm) -> dict[str, Any]:
@@ -66,18 +88,25 @@ def _norma_to_row(n: InfoLegNorm) -> dict[str, Any]:
 
 
 @celery_app.task(name="vigia_workers.tasks.ingest_infoleg")
-def ingest_infoleg() -> dict[str, Any]:
+def ingest_infoleg(dry_run: bool = False) -> dict[str, Any]:
     """Ingesta el muestreo de InfoLEG (~1000 normas). Rápido — bueno para dev."""
+    dry = _is_dry_run(dry_run)
 
-    async def _run() -> int:
+    async def _run() -> dict[str, Any]:
         async with InfoLegClient() as client:
             normas = await client.fetch_sample()
         rows = [_norma_to_row(n) for n in normas]
+        if dry:
+            return {"rows": len(rows), "sample": [_dry_sample_row(r) for r in rows[:_DRY_SAMPLE]]}
         return await upsert_normas(INFOLEG_SOURCE, rows)
 
+    if dry:
+        result = run_async(_run())
+        return {"source": "infoleg", "mode": "sample", "dry_run": True, **result}
+
     async def _wrapped() -> dict[str, Any]:
-        count = await with_status([INFOLEG_SOURCE["code"]], _run)
-        return {"source": "infoleg", "mode": "sample", "rows": count}
+        counts = await with_status([INFOLEG_SOURCE["code"]], _run)
+        return {"source": "infoleg", "mode": "sample", **counts}
 
     result = run_async(_wrapped())
     # Tras ingestar, cruzar contra las alertas activas y notificar.
@@ -110,62 +139,90 @@ def _proyecto_to_row(p: HcdnProyecto) -> dict[str, Any]:
 
 
 @celery_app.task(name="vigia_workers.tasks.ingest_hcdn_proyectos")
-def ingest_hcdn_proyectos() -> dict[str, Any]:
+def ingest_hcdn_proyectos(dry_run: bool = False) -> dict[str, Any]:
     """Ingesta los proyectos parlamentarios de HCDN (CSV completo por streaming).
 
     El dataset se actualiza a diario en datos.hcdn.gob.ar; el upsert es
     idempotente por (source_id, external_id=PROYECTO_ID).
     """
+    dry = _is_dry_run(dry_run)
 
-    async def _run() -> int:
-        total = 0
+    async def _run() -> dict[str, Any]:
+        totals = _empty_totals()
+        sample: list[dict[str, Any]] = []
         with tempfile.TemporaryDirectory() as tmp:
             dest = Path(tmp) / "proyectos.csv"
             async with HcdnClient() as client:
                 await client.download_csv(dest)
             batch: list[dict[str, Any]] = []
             for p in HcdnClient.iter_csv(dest):
-                batch.append(_proyecto_to_row(p))
+                row = _proyecto_to_row(p)
+                if dry:
+                    totals["rows"] += 1
+                    if len(sample) < _DRY_SAMPLE:
+                        sample.append(_dry_sample_row(row))
+                    continue
+                batch.append(row)
                 if len(batch) >= _FULL_BATCH:
-                    total += await upsert_normas(HCDN_SOURCE, batch)
+                    _acc(totals, await upsert_normas(HCDN_SOURCE, batch))
                     batch = []
             if batch:
-                total += await upsert_normas(HCDN_SOURCE, batch)
-        return total
+                _acc(totals, await upsert_normas(HCDN_SOURCE, batch))
+        if dry:
+            return {"rows": totals["rows"], "sample": sample}
+        return totals
+
+    if dry:
+        result = run_async(_run())
+        return {"source": "hcdn_proyectos", "dry_run": True, **result}
 
     async def _wrapped() -> dict[str, Any]:
-        count = await with_status([HCDN_SOURCE["code"]], _run)
-        return {"source": "hcdn_proyectos", "rows": count}
+        counts = await with_status([HCDN_SOURCE["code"]], _run)
+        return {"source": "hcdn_proyectos", **counts}
 
     return run_async(_wrapped())
 
 
 @celery_app.task(name="vigia_workers.tasks.ingest_infoleg_full")
-def ingest_infoleg_full() -> dict[str, Any]:
+def ingest_infoleg_full(dry_run: bool = False) -> dict[str, Any]:
     """Ingesta el corpus completo de InfoLEG (~500k normas) por streaming.
 
     Descarga el ZIP a un temp file y persiste en batches para no cargar todo
     en memoria.
     """
+    dry = _is_dry_run(dry_run)
 
-    async def _run() -> int:
-        total = 0
+    async def _run() -> dict[str, Any]:
+        totals = _empty_totals()
+        sample: list[dict[str, Any]] = []
         with tempfile.TemporaryDirectory() as tmp:
             dest = Path(tmp) / "infoleg_full.zip"
             async with InfoLegClient() as client:
                 await client.download_full_zip(dest)
             batch: list[dict[str, Any]] = []
             for norm in InfoLegClient.iter_full_zip(dest):
-                batch.append(_norma_to_row(norm))
+                row = _norma_to_row(norm)
+                if dry:
+                    totals["rows"] += 1
+                    if len(sample) < _DRY_SAMPLE:
+                        sample.append(_dry_sample_row(row))
+                    continue
+                batch.append(row)
                 if len(batch) >= _FULL_BATCH:
-                    total += await upsert_normas(INFOLEG_SOURCE, batch)
+                    _acc(totals, await upsert_normas(INFOLEG_SOURCE, batch))
                     batch = []
             if batch:
-                total += await upsert_normas(INFOLEG_SOURCE, batch)
-        return total
+                _acc(totals, await upsert_normas(INFOLEG_SOURCE, batch))
+        if dry:
+            return {"rows": totals["rows"], "sample": sample}
+        return totals
+
+    if dry:
+        result = run_async(_run())
+        return {"source": "infoleg", "mode": "full", "dry_run": True, **result}
 
     async def _wrapped() -> dict[str, Any]:
-        count = await with_status([INFOLEG_SOURCE["code"]], _run)
-        return {"source": "infoleg", "mode": "full", "rows": count}
+        counts = await with_status([INFOLEG_SOURCE["code"]], _run)
+        return {"source": "infoleg", "mode": "full", **counts}
 
     return run_async(_wrapped())

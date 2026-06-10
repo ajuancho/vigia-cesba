@@ -18,7 +18,14 @@ from vigia_workers.notifications import render_digest, send_email
 from vigia_workers.persistence import run_async
 
 
-async def _match_all() -> dict[str, Any]:
+async def _match_all(notify: bool = True) -> dict[str, Any]:
+    """Matchea normas contra alertas activas.
+
+    `notify=False` (backfills): registra los matches con notified=true SIN
+    mandar digests — sin esto, el primer backfill de una fuente nueva spamea
+    a los usuarios con miles de normas viejas. Runbook de fuente nueva:
+    backfill → `_match_all(notify=False)` → recién ahí habilitar el beat.
+    """
     new_total = 0
     # email -> (workspace_name, [items])
     digests: dict[str, tuple[str, list[dict]]] = defaultdict(lambda: ("", []))
@@ -73,7 +80,7 @@ async def _match_all() -> dict[str, Any]:
                 text("UPDATE alerta SET last_match_at = now() WHERE id = :aid"), {"aid": a.id}
             )
 
-            if a.user_email:
+            if a.user_email and notify:
                 norma_ids = [r[0] for r in inserted]
                 normas = (
                     await session.execute(
@@ -108,9 +115,9 @@ async def _match_all() -> dict[str, Any]:
         )
         sent += 1
 
-    return {"new_matches": new_total, "emails": sent}
+    return {"new_matches": new_total, "emails": sent, "notify": notify}
 
 
 @celery_app.task(name="vigia_workers.alerts.match_alertas")
-def match_alertas() -> dict[str, Any]:
-    return run_async(_match_all())
+def match_alertas(notify: bool = True) -> dict[str, Any]:
+    return run_async(_match_all(notify=notify))

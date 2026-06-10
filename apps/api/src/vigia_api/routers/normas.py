@@ -5,7 +5,7 @@ from fastapi import APIRouter, HTTPException, Query
 from sqlalchemy import func, select
 
 from vigia_api.core.db import get_sessionmaker
-from vigia_shared.models import Norma
+from vigia_shared.models import Norma, SourceCatalog
 from vigia_shared.schemas import NormaDetail, NormaListItem, NormaPage
 
 router = APIRouter(prefix="/normas", tags=["normas"])
@@ -55,8 +55,16 @@ async def get_norma(norma_id: int) -> NormaDetail:
     Session = get_sessionmaker()
     async with Session() as session:
         row = (
-            await session.execute(select(Norma).where(Norma.id == norma_id))
-        ).scalar_one_or_none()
+            await session.execute(
+                select(Norma, SourceCatalog.name, SourceCatalog.code)
+                .join(SourceCatalog, SourceCatalog.id == Norma.source_id, isouter=True)
+                .where(Norma.id == norma_id)
+            )
+        ).first()
     if row is None:
         raise HTTPException(status_code=404, detail="Norma no encontrada")
-    return NormaDetail.model_validate(row)
+    norma, fuente, fuente_code = row
+    detail = NormaDetail.model_validate(norma)
+    detail.fuente = fuente
+    detail.fuente_code = fuente_code
+    return detail

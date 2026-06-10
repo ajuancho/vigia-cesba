@@ -20,8 +20,23 @@ env:
   IMAGE_PREFIX: ghcr.io/${{ github.repository_owner }}/vigia
 
 jobs:
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install packages
+        run: |
+          pip install -e packages/shared -e packages/connectors -e apps/workers -e apps/api
+          pip install pytest pytest-asyncio respx
+      - name: Run tests
+        run: pytest packages/connectors/tests apps/workers/tests -q
+
   build:
     runs-on: ubuntu-latest
+    needs: tests
     permissions:
       contents: read
       packages: write

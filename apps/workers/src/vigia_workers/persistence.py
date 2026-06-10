@@ -5,7 +5,7 @@ import asyncio
 from datetime import datetime, timezone
 from typing import Any
 
-from sqlalchemy import select, update
+from sqlalchemy import literal_column, select, update
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -56,15 +56,17 @@ _NORMA_UPDATE_COLS = (
 )
 
 
-async def upsert_normas(source: dict, normas: list[dict]) -> int:
+async def upsert_normas(source: dict, normas: list[dict]) -> dict[str, int]:
     """Upsert idempotente por (source_id, external_id).
 
     `normas` es una lista de dicts con las columnas de `Norma` (sin source_id,
-    que se inyecta acá). Devuelve la cantidad de filas procesadas. Para los DNU
-    nuevos se garantiza una fila en `dnu_tracking` (estado pendiente).
+    que se inyecta acá). Devuelve `{"rows", "inserted", "updated"}` — el split
+    insert/update (vía `xmax = 0`) es la señal de "fuente viva": una fuente
+    diaria con 0 inserted por varios días está muerta aunque la task corra ok.
+    Para los DNU nuevos se garantiza una fila en `dnu_tracking` (pendiente).
     """
     if not normas:
-        return 0
+        return {"rows": 0, "inserted": 0, "updated": 0}
     # Dedup por external_id dentro del batch (última gana): Postgres rechaza un
     # ON CONFLICT DO UPDATE que afecte la misma fila dos veces en un comando.
     deduped: dict[str, dict] = {}
@@ -80,7 +82,7 @@ async def upsert_normas(source: dict, normas: list[dict]) -> int:
         stmt = stmt.on_conflict_do_update(
             index_elements=["source_id", "external_id"],
             set_={col: getattr(stmt.excluded, col) for col in _NORMA_UPDATE_COLS},
-        ).returning(Norma.id, Norma.tipo)
+        ).returning(Norma.id, Norma.tipo, literal_column("(xmax = 0)").label("inserted"))
         res = await session.execute(stmt)
         rows = res.fetchall()
 
@@ -98,7 +100,8 @@ async def upsert_normas(source: dict, normas: list[dict]) -> int:
             ]
             session.add_all(nuevos)
 
-        return len(values)
+        inserted = sum(1 for r in rows if r.inserted)
+        return {"rows": len(values), "inserted": inserted, "updated": len(values) - inserted}
 
 
 def run_async(coro):

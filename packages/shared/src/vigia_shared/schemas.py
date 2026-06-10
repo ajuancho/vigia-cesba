@@ -35,6 +35,8 @@ class NormaDetail(NormaBase):
 
     entidades: list[str] | None = None
     ingested_at: datetime | None = None
+    fuente: str | None = None  # source_catalog.name — de dónde salió esta norma
+    fuente_code: str | None = None
 
 
 class NormaPage(BaseModel):
