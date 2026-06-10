@@ -9,7 +9,8 @@ import FadeIn from '@/components/FadeIn';
 
 const TIPO_TINT = {
   DNU: 'tint-red', DECRETO: 'tint-amber', LEY: 'tint-green', RESOLUCION: 'tint-blue',
-  DISPOSICION: 'tint-purple', PROYECTO: 'tint-cyan', COMUNICACION: 'tint-pink', OTRA: 'tint-gray',
+  DISPOSICION: 'tint-purple', PROYECTO: 'tint-cyan', COMUNICACION: 'tint-pink',
+  CONSULTA: 'tint-orange', OTRA: 'tint-gray',
 };
 
 export default function NormDetailView() {

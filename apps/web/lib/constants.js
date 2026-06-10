@@ -7,6 +7,7 @@ export const TIPOS_NORMA = {
   DISPOSICION: { label: 'Disposición', color: '#8b5cf6', description: 'Disposición administrativa' },
   PROYECTO: { label: 'Proyecto', color: '#06b6d4', description: 'Proyecto de ley en trámite' },
   COMUNICACION: { label: 'Comunicación', color: '#f472b6', description: 'Comunicación del BCRA (serie A)' },
+  CONSULTA: { label: 'Consulta', color: '#fb923c', description: 'Consulta pública / anteproyecto en consulta' },
   OTRA: { label: 'Otra', color: '#64748b', description: 'Otra norma' },
 };
 

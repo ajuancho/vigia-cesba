@@ -24,6 +24,8 @@ export const api = {
   dnuStats: () => get('/stats/dnu'),
   series: (params) => get(`/stats/series${qs(params)}`),
   organismos: (params) => get(`/stats/organismos${qs(params)}`),
+  listAvisos: (params) => get(`/avisos${qs(params)}`),
+  avisosRubros: (params) => get(`/avisos/rubros${qs(params)}`),
 };
 
 export { BASE as API_BASE };

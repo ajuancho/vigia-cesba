@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Newspaper, BarChart3, Search, Bell, Shield, X, Eye, Landmark } from 'lucide-react';
+import { Newspaper, BarChart3, Search, Bell, Shield, X, Eye, Landmark, Building2 } from 'lucide-react';
 
 const NAV_ITEMS = [
   { to: '/feed', label: 'Feed Normativo', icon: Newspaper },
@@ -10,6 +10,7 @@ const NAV_ITEMS = [
   { to: '/search', label: 'Buscador', icon: Search },
   { to: '/alerts', label: 'Alertas', icon: Bell },
   { to: '/dnu', label: 'Tracker DNU', icon: Shield },
+  { to: '/avisos', label: 'Radar societario', icon: Building2 },
 ];
 
 export default function Sidebar({ open, onClose }) {

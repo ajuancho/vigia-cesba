@@ -192,6 +192,12 @@
     border-color: rgba(244, 114, 182, 0.30);
   }
 
+  .tint-orange {
+    background: rgba(251, 146, 60, 0.10);
+    color: #FB923C;
+    border-color: rgba(251, 146, 60, 0.30);
+  }
+
   /* CTA primario celeste (OpenArg .hero-cta / .chat-send-btn) */
   .btn-celeste {
     background: var(--color-celeste);

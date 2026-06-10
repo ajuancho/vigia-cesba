@@ -6,7 +6,17 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from vigia_api.core.settings import get_settings
-from vigia_api.routers import alerts, auth, health, invitations, normas, search, stats, workspaces
+from vigia_api.routers import (
+    alerts,
+    auth,
+    avisos,
+    health,
+    invitations,
+    normas,
+    search,
+    stats,
+    workspaces,
+)
 
 # Sentry — no-op si falta SENTRY_DSN.
 _sentry_dsn = os.environ.get("SENTRY_DSN")
@@ -48,6 +58,7 @@ def create_app() -> FastAPI:
     app.include_router(normas.router)
     app.include_router(search.router)
     app.include_router(stats.router)
+    app.include_router(avisos.router)
     return app
 
 

@@ -43,12 +43,13 @@ _DNU_RE = re.compile(
 
 @dataclass(slots=True)
 class BoraAviso:
-    aviso_id: str
+    aviso_id: str  # numérico en 1ª; alfanumérico en 2ª (p.ej. "A1500779")
     seccion: str  # "primera" | "segunda" | "tercera"
     fecha: Date
-    organismo: str | None
+    organismo: str | None  # 1ª: organismo emisor; 2ª: razón social
     tipo_linea: str | None  # "Decreto 436/2026", "Resolución 52/2026", ...
     sumario: str | None
+    rubro: str | None = None  # header h5.seccion-rubro vigente ("CONVOCATORIAS", ...)
 
     @property
     def url(self) -> str:
@@ -89,13 +90,21 @@ def looks_like_dnu(texto: str | None) -> bool:
 
 
 def parse_seccion_html(html: str, seccion: str, fecha: Date) -> list[BoraAviso]:
-    """Parsea el listado de una sección. Función pura — testeable con fixtures."""
+    """Parsea el listado de una sección. Función pura — testeable con fixtures.
+
+    Los rubros vienen como headers ``h5.seccion-rubro`` intercalados entre los
+    avisos: se trackean en orden de documento y se asignan al aviso siguiente.
+    """
     soup = BeautifulSoup(html, "lxml")
     avisos: list[BoraAviso] = []
     prefix = f"/detalleAviso/{seccion}/"
-    for a in soup.select(f'a[href^="{prefix}"]'):
-        href = a.get("href", "")
-        m = re.match(rf"{re.escape(prefix)}(\d+)/(\d{{8}})", href)
+    rubro: str | None = None
+    for el in soup.select(f'h5.seccion-rubro, a[href^="{prefix}"]'):
+        if el.name == "h5":
+            rubro = el.get_text(" ", strip=True) or rubro
+            continue
+        href = el.get("href", "")
+        m = re.match(rf"{re.escape(prefix)}([A-Za-z]?\d+)/(\d{{8}})", href)
         if not m:
             continue
         aviso_id, fecha_str = m.group(1), m.group(2)
@@ -103,8 +112,8 @@ def parse_seccion_html(html: str, seccion: str, fecha: Date) -> list[BoraAviso]:
             fecha_aviso = datetime.strptime(fecha_str, "%Y%m%d").date()
         except ValueError:
             fecha_aviso = fecha
-        organismo_el = a.select_one("p.item")
-        detalles = [el.get_text(" ", strip=True) for el in a.select("p.item-detalle")]
+        organismo_el = el.select_one("p.item")
+        detalles = [d.get_text(" ", strip=True) for d in el.select("p.item-detalle")]
         if organismo_el is None and not detalles:
             continue  # link de navegación/banner sin contenido de aviso
         avisos.append(
@@ -115,6 +124,7 @@ def parse_seccion_html(html: str, seccion: str, fecha: Date) -> list[BoraAviso]:
                 organismo=organismo_el.get_text(" ", strip=True) if organismo_el else None,
                 tipo_linea=detalles[0] if detalles else None,
                 sumario=detalles[1] if len(detalles) > 1 else (detalles[0] if detalles else None),
+                rubro=rubro,
             )
         )
     # El mismo aviso puede aparecer dos veces (link con ?anexos=1): dedup por id.

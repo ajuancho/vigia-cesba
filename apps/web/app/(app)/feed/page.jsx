@@ -11,12 +11,14 @@ import CountUp from '@/components/CountUp';
 
 const TIPO_TINT = {
   DNU: 'tint-red', DECRETO: 'tint-amber', LEY: 'tint-green', RESOLUCION: 'tint-blue',
-  DISPOSICION: 'tint-purple', PROYECTO: 'tint-cyan', COMUNICACION: 'tint-pink', OTRA: 'tint-gray',
+  DISPOSICION: 'tint-purple', PROYECTO: 'tint-cyan', COMUNICACION: 'tint-pink',
+  CONSULTA: 'tint-orange', OTRA: 'tint-gray',
 };
 
 const TIPO_DOT = {
   DNU: '#F87171', DECRETO: '#F6B40E', LEY: '#34D399', RESOLUCION: '#74ACDF',
-  DISPOSICION: '#A78BFA', PROYECTO: '#22D3EE', COMUNICACION: '#F472B6', OTRA: '#8892A8',
+  DISPOSICION: '#A78BFA', PROYECTO: '#22D3EE', COMUNICACION: '#F472B6',
+  CONSULTA: '#FB923C', OTRA: '#8892A8',
 };
 
 const IMPACTO_TINT = { alto: 'tint-red', medio: 'tint-amber', bajo: 'tint-gray' };

@@ -375,6 +375,69 @@ def ingest_bcra_comunicaciones(dry_run: bool = False, backfill: int = 0) -> dict
     return run_async(_wrapped())
 
 
+def _consulta_to_row(c) -> dict[str, Any]:
+    """Mapea una ConsultaPublica al shape de `norma` (tipo CONSULTA).
+
+    El estado Abierta→Cerrada lo flipea el re-scrape diario vía upsert.
+    """
+    return {
+        "external_id": c.forum_id,
+        "tipo": "CONSULTA",
+        "numero": None,
+        "titulo": c.titulo,
+        "resumen": c.resumen,
+        "fecha_publicacion": c.fecha_creacion,
+        "jurisdiccion": "Nacional",
+        "sector": c.detect_sector(),
+        "organismo": c.organismo,
+        "estado": c.estado(),
+        "impacto": None,
+        "bora_seccion": None,
+        "entidades": None,
+        "tags": ["consulta_publica"],
+        "url": c.url,
+        "raw": {
+            "name": c.name,
+            "fecha_cierre": c.fecha_cierre.isoformat() if c.fecha_cierre else None,
+        },
+    }
+
+
+@celery_app.task(name="vigia_workers.tasks.ingest_consultas_publicas")
+def ingest_consultas_publicas(dry_run: bool = False) -> dict[str, Any]:
+    """Ingesta consultas públicas (DemocracyOS) — señal regulatoria temprana.
+
+    Volumen ínfimo: se re-scrapea todo en cada corrida (el upsert flipea
+    estados de cierre). Una alerta FTS matchea el anteproyecto ANTES de que
+    sea norma.
+    """
+    from vigia_connectors.consultas import ConsultasClient
+
+    dry = _is_dry_run(dry_run)
+    SOURCE = catalog_fields("consultas_publicas")
+
+    async def _run() -> dict[str, Any]:
+        async with ConsultasClient() as client:
+            consultas = await client.fetch_all()
+        rows = [_consulta_to_row(c) for c in consultas]
+        if dry:
+            return {"rows": len(rows), "sample": [_dry_sample_row(r) for r in rows[:_DRY_SAMPLE]]}
+        totals = _empty_totals()
+        for i in range(0, len(rows), _FULL_BATCH):
+            _acc(totals, await upsert_normas(SOURCE, rows[i : i + _FULL_BATCH]))
+        return totals
+
+    if dry:
+        result = run_async(_run())
+        return {"source": SOURCE["code"], "dry_run": True, **result}
+
+    async def _wrapped() -> dict[str, Any]:
+        counts = await with_status([SOURCE["code"]], _run)
+        return {"source": SOURCE["code"], **counts}
+
+    return run_async(_wrapped())
+
+
 @celery_app.task(name="vigia_workers.tasks.ingest_infoleg_full")
 def ingest_infoleg_full(dry_run: bool = False) -> dict[str, Any]:
     """Ingesta el corpus completo de InfoLEG (~500k normas) por streaming.

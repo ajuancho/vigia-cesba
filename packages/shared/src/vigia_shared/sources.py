@@ -57,6 +57,25 @@ SOURCES: dict[str, dict] = {
         # ~5-10 por semana; 10 días tolera semanas quietas.
         "freshness_slo_days": 10,
     },
+    "bora_segunda": {
+        "code": "bora_segunda",
+        "name": "Boletín Oficial — Segunda Sección (avisos societarios)",
+        "kind": "scrape",
+        "base_url": "https://www.boletinoficial.gob.ar",
+        "cadence_hours": 24,
+        # Escribe en aviso_societario (no en norma): el SLO de frescura por
+        # MAX(fecha_publicacion) no aplica acá; vale el chequeo de cadencia.
+        "freshness_slo_days": None,
+    },
+    "consultas_publicas": {
+        "code": "consultas_publicas",
+        "name": "Consultas públicas — consultapublica.argentina.gob.ar",
+        "kind": "api",
+        "base_url": "https://consultapublica.argentina.gob.ar",
+        "cadence_hours": 24,
+        # ~5-15/mes: una nueva por mes ya es ritmo normal.
+        "freshness_slo_days": 60,
+    },
     "bicameral_dnu": {
         "code": "bicameral_dnu",
         "name": "Comisión Bicameral DNU — dictámenes (datos.hcdn.gob.ar)",

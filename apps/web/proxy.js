@@ -13,6 +13,7 @@ const PROTECTED_PREFIXES = [
   '/alerts',
   '/dnu',
   '/norma',
+  '/avisos',
   '/onboarding',
   '/settings',
 ];

@@ -19,6 +19,7 @@ celery_app = Celery(
         "vigia_workers.reconcile",
         "vigia_workers.bicameral",
         "vigia_workers.movimientos",
+        "vigia_workers.societario",
     ],
 )
 
@@ -85,6 +86,17 @@ celery_app.conf.update(
         "ingest-bicameral-dnu": {
             "task": "vigia_workers.bicameral.ingest_bicameral_dnu",
             "schedule": crontab(hour=9, minute=30),
+        },
+        # BORA 2ª sección → aviso_societario (Radar societario) — diario,
+        # separado de la 1ª para aislar fallos y carga.
+        "ingest-bora-segunda": {
+            "task": "vigia_workers.societario.ingest_bora_segunda",
+            "schedule": crontab(hour=10, minute=30),
+        },
+        # Consultas públicas (señal temprana) — diario al mediodía.
+        "ingest-consultas-publicas": {
+            "task": "vigia_workers.tasks.ingest_consultas_publicas",
+            "schedule": crontab(hour=12, minute=0),
         },
         # Comunicaciones A del BCRA — diario post-publicación (patrón InvestArg).
         "ingest-bcra-comunicaciones": {

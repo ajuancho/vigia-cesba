@@ -22,6 +22,7 @@ const SERIE_TIPOS = [
   { key: 'LEY', color: '#34D399' },
   { key: 'DNU', color: '#F87171' },
   { key: 'COMUNICACION', color: '#F472B6' },
+  { key: 'CONSULTA', color: '#FB923C' },
   { key: 'OTRA', color: '#8892A8' },
 ];
 

@@ -115,6 +115,34 @@ class Norma(Base):
     )
 
 
+class AvisoSocietario(Base):
+    """BORA 2ª sección: constituciones, asambleas, edictos (módulo Radar societario).
+
+    Tabla propia a propósito: ~200-400 avisos/día contaminarían el corpus
+    `norma` (feed, stats y alertas FTS). Tiene su propio tsvector (migración
+    0005) con peso A en razón social — "vigilar una empresa" es la feature.
+    """
+
+    __tablename__ = "aviso_societario"
+    __table_args__ = (
+        Index("ix_aviso_fecha", "fecha"),
+        Index("ix_aviso_rubro", "rubro"),
+    )
+
+    id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    aviso_id: Mapped[str] = mapped_column(String(32), unique=True, nullable=False)
+    fecha: Mapped[date] = mapped_column(Date, nullable=False)
+    razon_social: Mapped[str | None] = mapped_column(String(512))
+    rubro: Mapped[str | None] = mapped_column(String(255))
+    texto: Mapped[str | None] = mapped_column(Text)  # cuerpo del aviso (detalle)
+    url: Mapped[str | None] = mapped_column(String(1024))
+    raw: Mapped[dict[str, Any] | None] = mapped_column(JSONB)
+    search_vector: Mapped[str | None] = mapped_column(TSVECTOR)  # GENERATED (0005)
+    ingested_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), nullable=False
+    )
+
+
 class DnuTracking(Base):
     """Seguimiento del tratamiento bicameral de un DNU (Comisión Bicameral)."""
 
