@@ -54,10 +54,40 @@ class TipoStat(BaseModel):
     cantidad: int
 
 
+class RecentStats(BaseModel):
+    """Conteos de actividad reciente con su período anterior para deltas."""
+
+    semana: int
+    semana_anterior: int
+    mes: int
+    mes_anterior: int
+    proyectos_30d: int
+    dnu_anio: int
+
+
 class DashboardStats(BaseModel):
     total_normas: int
     por_tipo: list[TipoStat]
     por_sector: list[SectorStat]
+    recientes: RecentStats | None = None
+
+
+class SeriesPoint(BaseModel):
+    """Un mes de la serie temporal; counts por tipo + total."""
+
+    mes: str  # YYYY-MM
+    total: int
+    por_tipo: dict[str, int]
+
+
+class OrganismoStat(BaseModel):
+    organismo: str
+    cantidad: int
+
+
+class DnuAnio(BaseModel):
+    anio: int
+    cantidad: int
 
 
 class DnuStats(BaseModel):
@@ -65,3 +95,4 @@ class DnuStats(BaseModel):
     aprobados: int
     rechazados: int
     pendientes: int
+    historico: list[DnuAnio] = []

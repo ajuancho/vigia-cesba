@@ -22,6 +22,8 @@ export const api = {
   search: (params) => get(`/search${qs(params)}`),
   dashboard: () => get('/stats/dashboard'),
   dnuStats: () => get('/stats/dnu'),
+  series: (params) => get(`/stats/series${qs(params)}`),
+  organismos: (params) => get(`/stats/organismos${qs(params)}`),
 };
 
 export { BASE as API_BASE };
