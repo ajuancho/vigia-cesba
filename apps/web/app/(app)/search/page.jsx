@@ -7,8 +7,8 @@ import { TIPOS_NORMA, SECTORES, JURISDICCIONES } from '@/lib/constants';
 import { Search as SearchIcon, SlidersHorizontal, ArrowRight } from 'lucide-react';
 
 const TIPO_DOT_COLORS = {
-  DNU: '#dc2626', DECRETO: '#d97706', LEY: '#059669',
-  RESOLUCION: '#2563eb', DISPOSICION: '#7c3aed', PROYECTO: '#0891b2', OTRA: '#64748b',
+  DNU: '#F87171', DECRETO: '#F6B40E', LEY: '#34D399',
+  RESOLUCION: '#74ACDF', DISPOSICION: '#A78BFA', PROYECTO: '#22D3EE', OTRA: '#8892A8',
 };
 
 export default function SearchView() {
@@ -56,7 +56,7 @@ export default function SearchView() {
         />
         <button
           onClick={() => setShowFilters(!showFilters)}
-          className={`p-2 rounded transition-colors ${showFilters ? 'bg-navy-800 text-white' : 'text-text-tertiary hover:bg-bg-secondary'}`}
+          className={`p-2 rounded-lg transition-colors ${showFilters ? 'bg-celeste/15 text-celeste' : 'text-text-tertiary hover:bg-bg-tertiary'}`}
         >
           <SlidersHorizontal size={14} />
         </button>
@@ -66,21 +66,21 @@ export default function SearchView() {
         <div className="card p-4 mb-3 grid grid-cols-1 md:grid-cols-3 gap-3 animate-slide-up">
           <div>
             <label className="text-[10px] font-semibold text-text-tertiary uppercase tracking-wide mb-1 block">Tipo</label>
-            <select value={tipo} onChange={(e) => setTipo(e.target.value)} className="w-full bg-white border border-border-light rounded px-3 py-2 text-[12px] text-text-secondary focus:outline-none focus:border-inst-accent">
+            <select value={tipo} onChange={(e) => setTipo(e.target.value)} className="w-full bg-bg-primary border border-border-light rounded-lg px-3 py-2 text-[12px] text-text-secondary focus:outline-none focus:border-inst-accent">
               <option value="">Todos</option>
               {Object.entries(TIPOS_NORMA).map(([key, val]) => <option key={key} value={key}>{val.label}</option>)}
             </select>
           </div>
           <div>
             <label className="text-[10px] font-semibold text-text-tertiary uppercase tracking-wide mb-1 block">Sector</label>
-            <select value={sector} onChange={(e) => setSector(e.target.value)} className="w-full bg-white border border-border-light rounded px-3 py-2 text-[12px] text-text-secondary focus:outline-none focus:border-inst-accent">
+            <select value={sector} onChange={(e) => setSector(e.target.value)} className="w-full bg-bg-primary border border-border-light rounded-lg px-3 py-2 text-[12px] text-text-secondary focus:outline-none focus:border-inst-accent">
               <option value="">Todos</option>
               {SECTORES.map((s) => <option key={s} value={s}>{s}</option>)}
             </select>
           </div>
           <div>
             <label className="text-[10px] font-semibold text-text-tertiary uppercase tracking-wide mb-1 block">Jurisdicción</label>
-            <select value={jurisdiccion} onChange={(e) => setJurisdiccion(e.target.value)} className="w-full bg-white border border-border-light rounded px-3 py-2 text-[12px] text-text-secondary focus:outline-none focus:border-inst-accent">
+            <select value={jurisdiccion} onChange={(e) => setJurisdiccion(e.target.value)} className="w-full bg-bg-primary border border-border-light rounded-lg px-3 py-2 text-[12px] text-text-secondary focus:outline-none focus:border-inst-accent">
               <option value="">Todas</option>
               {JURISDICCIONES.map((j) => <option key={j} value={j}>{j}</option>)}
             </select>

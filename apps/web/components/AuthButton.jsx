@@ -12,7 +12,7 @@ export default function AuthButton() {
   // Modo demo (sin credenciales OAuth): avatar estático, sin login.
   if (!AUTH_ENABLED) {
     return (
-      <div className="w-7 h-7 rounded bg-navy-800 flex items-center justify-center text-white text-[10px] font-bold" title="Modo demo">
+      <div className="w-7 h-7 rounded-lg bg-celeste/10 border border-celeste/30 flex items-center justify-center text-celeste text-[10px] font-bold font-mono" title="Modo demo">
         CL
       </div>
     );
@@ -24,7 +24,7 @@ export default function AuthButton() {
 
   if (!session) {
     return (
-      <button onClick={() => signIn('google')} className="flex items-center gap-1.5 px-3 py-1.5 bg-navy-800 text-white rounded text-[11px] font-medium hover:bg-navy-700 transition-colors">
+      <button onClick={() => signIn('google')} className="flex items-center gap-1.5 px-3 py-1.5 btn-celeste rounded-full text-[11px] font-bold">
         <LogIn size={13} /> Iniciar sesión
       </button>
     );
@@ -39,7 +39,7 @@ export default function AuthButton() {
       <button onClick={() => signOut()} className="p-1.5 rounded text-text-secondary hover:text-status-red hover:bg-red-50 transition-colors" title="Cerrar sesión">
         <LogOut size={16} />
       </button>
-      <div className="w-7 h-7 rounded bg-navy-800 flex items-center justify-center text-white text-[10px] font-bold" title={session.user?.email}>
+      <div className="w-7 h-7 rounded-lg bg-celeste/10 border border-celeste/30 flex items-center justify-center text-celeste text-[10px] font-bold font-mono" title={session.user?.email}>
         {initials}
       </div>
     </div>

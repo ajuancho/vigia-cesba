@@ -10,13 +10,13 @@ import {
 } from 'lucide-react';
 
 const TIPO_BADGE = {
-  DNU: 'bg-red-50 text-red-800 border-red-200',
-  DECRETO: 'bg-amber-50 text-amber-800 border-amber-200',
-  LEY: 'bg-green-50 text-green-800 border-green-200',
-  RESOLUCION: 'bg-blue-50 text-blue-800 border-blue-200',
-  DISPOSICION: 'bg-purple-50 text-purple-800 border-purple-200',
-  PROYECTO: 'bg-cyan-50 text-cyan-800 border-cyan-200',
-  OTRA: 'bg-gray-50 text-gray-700 border-gray-200',
+  DNU: 'tint-red',
+  DECRETO: 'tint-amber',
+  LEY: 'tint-green',
+  RESOLUCION: 'tint-blue',
+  DISPOSICION: 'tint-purple',
+  PROYECTO: 'tint-cyan',
+  OTRA: 'tint-gray',
 };
 
 export default function NormDetailView() {
@@ -44,10 +44,10 @@ export default function NormDetailView() {
   const tipoMeta = TIPOS_NORMA[norma.tipo] || TIPOS_NORMA.OTRA;
   const estado = norma.estado || '';
   const estadoStyle = estado.includes('Vigente') || estado.includes('Publicada')
-    ? 'bg-green-50 text-green-800 border-green-200'
+    ? 'tint-green'
     : estado.includes('comisión')
-      ? 'bg-amber-50 text-amber-800 border-amber-200'
-      : 'bg-blue-50 text-blue-800 border-blue-200';
+      ? 'tint-amber'
+      : 'tint-blue';
 
   return (
     <div className="max-w-3xl mx-auto animate-fade-in">
@@ -89,7 +89,7 @@ export default function NormDetailView() {
           <div className="flex items-center gap-2 mb-3">
             <FileText size={14} className="text-inst-blue" />
             <h3 className="text-sm font-semibold text-text-primary">Análisis automático</h3>
-            <span className="text-[9px] font-medium text-inst-blue bg-blue-50 px-2 py-0.5 rounded border border-blue-200 ml-auto">Vigía AI</span>
+            <span className="text-[9px] font-medium tint-blue px-2 py-0.5 rounded-full border ml-auto">Vigía AI</span>
           </div>
           <div className="bg-bg-secondary border border-border-light rounded p-4">
             <p className="text-[13px] text-text-secondary leading-relaxed">{norma.resumen_ia}</p>
@@ -120,7 +120,7 @@ export default function NormDetailView() {
           <div className="flex items-center gap-2 mb-3">
             <Users size={14} className="text-text-tertiary" />
             <h3 className="text-sm font-semibold text-text-primary">Entidades identificadas</h3>
-            <span className="text-[9px] font-medium text-status-green bg-green-50 px-2 py-0.5 rounded border border-green-200 ml-auto">NER</span>
+            <span className="text-[9px] font-medium tint-green px-2 py-0.5 rounded-full border ml-auto">NER</span>
           </div>
           <div className="flex flex-wrap gap-2">
             {norma.entidades.map((ent) => (
@@ -138,7 +138,7 @@ export default function NormDetailView() {
           </div>
           <div className="flex flex-wrap gap-1.5">
             {norma.tags.map((tag) => (
-              <span key={tag} className="px-2.5 py-1 bg-navy-800 text-white rounded text-[10px] font-medium">#{tag}</span>
+              <span key={tag} className="px-2.5 py-1 bg-celeste/10 text-celeste-bright border border-celeste/30 rounded-full text-[10px] font-medium">#{tag}</span>
             ))}
           </div>
         </div>

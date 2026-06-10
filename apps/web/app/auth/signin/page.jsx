@@ -11,10 +11,11 @@ function SignInInner() {
   const callbackUrl = params.get('callbackUrl') || '/feed';
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-navy-900 p-4">
+    <div className="min-h-screen flex flex-col items-center justify-center p-4">
+      <div className="flag-stripe fixed top-0 inset-x-0 z-[60]" />
       <div className="card p-8 max-w-sm w-full text-center">
-        <div className="w-12 h-12 rounded-lg bg-navy-800 flex items-center justify-center mx-auto mb-4">
-          <Eye size={24} className="text-white" />
+        <div className="w-12 h-12 rounded-lg bg-celeste/10 border border-celeste/30 flex items-center justify-center mx-auto mb-4">
+          <Eye size={24} className="text-celeste" />
         </div>
         <h1 className="text-lg font-bold text-text-primary mb-1">VIGÍA</h1>
         <p className="text-[12px] text-text-tertiary mb-6">Inteligencia Legislativa y Regulatoria</p>
@@ -22,7 +23,7 @@ function SignInInner() {
         {AUTH_ENABLED ? (
           <button
             onClick={() => signIn('google', { callbackUrl })}
-            className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-navy-800 text-white rounded text-[13px] font-medium hover:bg-navy-700 transition-colors"
+            className="w-full flex items-center justify-center gap-2 px-4 py-2.5 btn-celeste rounded-full text-[13px] font-bold"
           >
             <LogIn size={15} /> Continuar con Google
           </button>

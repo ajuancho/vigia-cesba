@@ -7,19 +7,19 @@ import { TIPOS_NORMA } from '@/lib/constants';
 import { Clock, ArrowRight, Filter, Tag, Building2, MapPin } from 'lucide-react';
 
 const IMPACTO_STYLES = {
-  alto: 'bg-red-50 text-status-red border-red-200',
-  medio: 'bg-amber-50 text-status-amber border-amber-200',
-  bajo: 'bg-gray-50 text-text-tertiary border-gray-200',
+  alto: 'tint-red',
+  medio: 'tint-amber',
+  bajo: 'tint-gray',
 };
 
 const TIPO_STYLES = {
-  DNU: 'bg-red-50 text-red-800 border-red-200',
-  DECRETO: 'bg-amber-50 text-amber-800 border-amber-200',
-  LEY: 'bg-green-50 text-green-800 border-green-200',
-  RESOLUCION: 'bg-blue-50 text-blue-800 border-blue-200',
-  DISPOSICION: 'bg-purple-50 text-purple-800 border-purple-200',
-  PROYECTO: 'bg-cyan-50 text-cyan-800 border-cyan-200',
-  OTRA: 'bg-gray-50 text-gray-700 border-gray-200',
+  DNU: 'tint-red',
+  DECRETO: 'tint-amber',
+  LEY: 'tint-green',
+  RESOLUCION: 'tint-blue',
+  DISPOSICION: 'tint-purple',
+  PROYECTO: 'tint-cyan',
+  OTRA: 'tint-gray',
 };
 
 function NormCard({ norma, onClick }) {
@@ -104,10 +104,10 @@ export default function FeedView() {
           <button
             key={tipo}
             onClick={() => setFilterTipo(tipo)}
-            className={`px-2.5 py-1 rounded text-[11px] font-medium transition-colors border ${
+            className={`px-2.5 py-1 rounded-full text-[11px] font-medium transition-colors border ${
               filterTipo === tipo
-                ? 'bg-navy-800 text-white border-navy-800'
-                : 'bg-white text-text-secondary border-border-light hover:bg-bg-secondary'
+                ? 'bg-celeste/10 text-celeste-bright border-celeste/40'
+                : 'bg-bg-primary text-text-secondary border-border-light hover:bg-bg-tertiary hover:text-text-primary'
             }`}
           >
             {tipo === 'TODOS' ? 'Todos' : TIPOS_NORMA[tipo].label}
@@ -116,7 +116,7 @@ export default function FeedView() {
         <select
           value={filterImpacto}
           onChange={(e) => setFilterImpacto(e.target.value)}
-          className="ml-auto bg-white border border-border-light rounded px-2.5 py-1 text-[11px] text-text-secondary focus:outline-none focus:border-inst-accent"
+          className="ml-auto bg-bg-primary border border-border-light rounded-lg px-2.5 py-1 text-[11px] text-text-secondary focus:outline-none focus:border-inst-accent"
         >
           <option value="todos">Todo impacto</option>
           <option value="alto">Alto impacto</option>

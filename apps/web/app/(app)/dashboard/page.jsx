@@ -9,7 +9,7 @@ import { api } from '@/lib/api';
 import { TIPOS_NORMA } from '@/lib/constants';
 import { FileText, Shield, Scale, Gavel } from 'lucide-react';
 
-const COLORS = ['#1e3a5f', '#2563eb', '#059669', '#d97706', '#dc2626', '#7c3aed', '#db2777', '#64748b'];
+const COLORS = ['#74ACDF', '#F6B40E', '#34D399', '#A78BFA', '#F87171', '#93C5F8', '#FFD04A', '#8892A8'];
 
 function StatCard({ title, value, subtitle, icon: Icon }) {
   return (
@@ -19,7 +19,7 @@ function StatCard({ title, value, subtitle, icon: Icon }) {
           <Icon size={16} className="text-inst-blue" />
         </div>
       </div>
-      <p className="text-2xl font-bold text-text-primary mb-0.5">{value}</p>
+      <p className="text-2xl font-bold text-text-primary mb-0.5 font-mono">{value}</p>
       <p className="text-[12px] font-medium text-text-primary">{title}</p>
       <p className="text-[11px] text-text-tertiary">{subtitle}</p>
     </div>
@@ -29,7 +29,7 @@ function StatCard({ title, value, subtitle, icon: Icon }) {
 function ChartTooltip({ active, payload, label }) {
   if (!active || !payload?.length) return null;
   return (
-    <div className="bg-white border border-border-light rounded-lg p-3 shadow-lg">
+    <div className="bg-navy-700 border border-border-medium rounded-lg p-3 shadow-lg">
       <p className="text-xs font-semibold text-text-primary mb-1">{label}</p>
       {payload.map((entry, i) => (
         <p key={i} className="text-[11px] text-text-secondary">
@@ -78,11 +78,11 @@ export default function DashboardView() {
           <p className="text-[11px] text-text-tertiary mb-5">Distribución del corpus actual</p>
           <ResponsiveContainer width="100%" height={260}>
             <BarChart data={tipoData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#ebeef3" />
+              <CartesianGrid strokeDasharray="3 3" stroke="rgba(116, 172, 223, 0.10)" />
               <XAxis dataKey="tipo" tick={{ fill: '#9ca3af', fontSize: 10 }} axisLine={false} tickLine={false} />
               <YAxis tick={{ fill: '#9ca3af', fontSize: 10 }} axisLine={false} tickLine={false} />
               <Tooltip content={<ChartTooltip />} />
-              <Bar dataKey="cantidad" name="Normas" fill="#1e3a5f" radius={[4, 4, 0, 0]} barSize={36} />
+              <Bar dataKey="cantidad" name="Normas" fill="#74ACDF" radius={[4, 4, 0, 0]} barSize={36} />
             </BarChart>
           </ResponsiveContainer>
         </div>
@@ -116,10 +116,10 @@ export default function DashboardView() {
         <p className="text-[11px] text-text-tertiary mb-5">Seguimiento bicameral</p>
         <div className="space-y-4">
           {[
-            { label: 'Total en seguimiento', value: dnu?.total ?? 0, color: '#1e3a5f' },
-            { label: 'Pendientes', value: dnu?.pendientes ?? 0, color: '#d97706' },
-            { label: 'Aprobados', value: dnu?.aprobados ?? 0, color: '#059669' },
-            { label: 'Rechazados', value: dnu?.rechazados ?? 0, color: '#dc2626' },
+            { label: 'Total en seguimiento', value: dnu?.total ?? 0, color: '#74ACDF' },
+            { label: 'Pendientes', value: dnu?.pendientes ?? 0, color: '#F6B40E' },
+            { label: 'Aprobados', value: dnu?.aprobados ?? 0, color: '#34D399' },
+            { label: 'Rechazados', value: dnu?.rechazados ?? 0, color: '#F87171' },
           ].map((item) => {
             const total = dnu?.total || 0;
             const pct = total ? (item.value / total) * 100 : 0;

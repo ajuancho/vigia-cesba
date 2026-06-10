@@ -75,7 +75,7 @@ export default function WorkspaceSettings() {
       {ws && (
         <div className="card p-5 mb-5">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded bg-navy-800 flex items-center justify-center"><Building2 size={18} className="text-white" /></div>
+            <div className="w-10 h-10 rounded-lg bg-celeste/10 border border-celeste/30 flex items-center justify-center"><Building2 size={18} className="text-celeste" /></div>
             <div>
               <h3 className="text-sm font-semibold text-text-primary">{ws.name}</h3>
               <p className="text-[11px] text-text-tertiary">{ws.seats_used}/{ws.seat_limit} asientos · plan {ws.plan} · tu rol: {ws.role}</p>
@@ -87,12 +87,12 @@ export default function WorkspaceSettings() {
       <div className="card p-5 mb-5">
         <h3 className="text-sm font-semibold text-text-primary mb-3 flex items-center gap-2"><Plus size={14} /> Invitar miembro</h3>
         <div className="flex flex-col md:flex-row gap-2">
-          <input value={email} onChange={(e) => setEmail(e.target.value)} placeholder="email@empresa.com" className="flex-1 bg-white border border-border-light rounded px-3 py-2 text-[13px] focus:outline-none focus:border-inst-accent" />
-          <select value={role} onChange={(e) => setRole(e.target.value)} className="bg-white border border-border-light rounded px-3 py-2 text-[13px] text-text-secondary focus:outline-none focus:border-inst-accent">
+          <input value={email} onChange={(e) => setEmail(e.target.value)} placeholder="email@empresa.com" className="flex-1 bg-bg-primary border border-border-light rounded-lg px-3 py-2 text-[13px] focus:outline-none focus:border-inst-accent" />
+          <select value={role} onChange={(e) => setRole(e.target.value)} className="bg-bg-primary border border-border-light rounded-lg px-3 py-2 text-[13px] text-text-secondary focus:outline-none focus:border-inst-accent">
             <option value="viewer">Viewer</option>
             <option value="admin">Admin</option>
           </select>
-          <button onClick={invite} className="px-3 py-2 bg-navy-800 text-white rounded text-[12px] font-medium hover:bg-navy-700 transition-colors">Invitar</button>
+          <button onClick={invite} className="px-3 py-2 btn-celeste rounded-full text-[12px] font-bold">Invitar</button>
         </div>
       </div>
 
@@ -106,7 +106,7 @@ export default function WorkspaceSettings() {
                 <p className="text-[11px] text-text-tertiary">{m.email} · {m.role}</p>
               </div>
               {m.role !== 'owner' && (
-                <button onClick={() => removeMember(m.user_id)} className="p-1.5 rounded text-text-tertiary hover:text-status-red hover:bg-red-50 transition-colors"><Trash2 size={14} /></button>
+                <button onClick={() => removeMember(m.user_id)} className="p-1.5 rounded text-text-tertiary hover:text-status-red hover:bg-status-red/10 transition-colors"><Trash2 size={14} /></button>
               )}
             </div>
           ))}

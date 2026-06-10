@@ -75,7 +75,7 @@ export default function AlertsView() {
           <h2 className="text-xl font-bold text-text-primary tracking-tight mb-0.5">Alertas</h2>
           <p className="text-sm text-text-tertiary">Monitoreo por keywords y sectores</p>
         </div>
-        <button onClick={() => setShowForm(!showForm)} className="flex items-center gap-1.5 px-3 py-2 bg-navy-800 text-white rounded text-[11px] font-medium hover:bg-navy-700 transition-colors">
+        <button onClick={() => setShowForm(!showForm)} className="flex items-center gap-1.5 px-3 py-2 btn-celeste rounded-full text-[11px] font-bold">
           <Plus size={13} /> Nueva alerta
         </button>
       </div>
@@ -114,18 +114,18 @@ export default function AlertsView() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
             <div>
               <label className="text-[10px] font-semibold text-text-tertiary uppercase tracking-wide mb-1 block">Keyword</label>
-              <input type="text" value={newKeyword} onChange={(e) => setNewKeyword(e.target.value)} placeholder="ej: litio, ciberseguridad, energia..." className="w-full bg-white border border-border-light rounded px-3 py-2 text-[13px] text-text-primary placeholder-text-tertiary focus:outline-none focus:border-inst-accent" />
+              <input type="text" value={newKeyword} onChange={(e) => setNewKeyword(e.target.value)} placeholder="ej: litio, ciberseguridad, energia..." className="w-full bg-bg-primary border border-border-light rounded-lg px-3 py-2 text-[13px] text-text-primary placeholder-text-tertiary focus:outline-none focus:border-inst-accent" />
             </div>
             <div>
               <label className="text-[10px] font-semibold text-text-tertiary uppercase tracking-wide mb-1 block">Sector</label>
-              <select value={newSector} onChange={(e) => setNewSector(e.target.value)} className="w-full bg-white border border-border-light rounded px-3 py-2 text-[13px] text-text-secondary focus:outline-none focus:border-inst-accent">
+              <select value={newSector} onChange={(e) => setNewSector(e.target.value)} className="w-full bg-bg-primary border border-border-light rounded-lg px-3 py-2 text-[13px] text-text-secondary focus:outline-none focus:border-inst-accent">
                 <option value="">Todos</option>
                 {SECTORES.map((s) => <option key={s} value={s}>{s}</option>)}
               </select>
             </div>
           </div>
           <div className="flex gap-2">
-            <button onClick={addAlerta} className="px-3 py-1.5 bg-navy-800 text-white rounded text-[11px] font-medium hover:bg-navy-700 transition-colors">Crear</button>
+            <button onClick={addAlerta} className="px-3 py-1.5 btn-celeste rounded-full text-[11px] font-bold">Crear</button>
             <button onClick={() => setShowForm(false)} className="px-3 py-1.5 text-text-secondary text-[11px] font-medium hover:text-text-primary transition-colors">Cancelar</button>
           </div>
         </div>
@@ -140,7 +140,7 @@ export default function AlertsView() {
                 <div>
                   <div className="flex items-center gap-2 mb-0.5">
                     <h4 className="text-[13px] font-semibold text-text-primary">&quot;{alerta.keyword}&quot;</h4>
-                    {alerta.activa && <span className="text-[9px] font-medium text-status-green bg-green-50 px-1.5 py-0.5 rounded border border-green-200">Activa</span>}
+                    {alerta.activa && <span className="text-[9px] font-medium tint-green px-1.5 py-0.5 rounded-full border">Activa</span>}
                   </div>
                   <div className="flex items-center gap-3 text-[10px] text-text-tertiary">
                     <span className="flex items-center gap-1"><Tag size={9} /> {alerta.sector || 'Todos'}</span>
@@ -150,10 +150,10 @@ export default function AlertsView() {
                 </div>
               </div>
               <div className="flex items-center gap-1">
-                <button onClick={() => toggleAlerta(alerta)} className={`p-1.5 rounded transition-colors ${alerta.activa ? 'text-status-green hover:bg-green-50' : 'text-text-tertiary hover:bg-bg-tertiary'}`}>
+                <button onClick={() => toggleAlerta(alerta)} className={`p-1.5 rounded transition-colors ${alerta.activa ? 'text-status-green hover:bg-status-green/10' : 'text-text-tertiary hover:bg-bg-tertiary'}`}>
                   {alerta.activa ? <Power size={14} /> : <PowerOff size={14} />}
                 </button>
-                <button onClick={() => deleteAlerta(alerta)} className="p-1.5 rounded text-text-tertiary hover:text-status-red hover:bg-red-50 transition-colors">
+                <button onClick={() => deleteAlerta(alerta)} className="p-1.5 rounded text-text-tertiary hover:text-status-red hover:bg-status-red/10 transition-colors">
                   <Trash2 size={14} />
                 </button>
               </div>

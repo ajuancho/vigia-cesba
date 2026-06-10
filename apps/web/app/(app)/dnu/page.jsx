@@ -22,7 +22,7 @@ export default function DNUTrackerView() {
         <p className="text-sm text-text-tertiary">Seguimiento de Decretos de Necesidad y Urgencia — Comisión Bicameral</p>
       </div>
 
-      <div className="card p-5 mb-5 border-l-4 border-l-amber-400">
+      <div className="card p-5 mb-5 border-l-4 border-l-sol">
         <div className="flex items-start gap-3">
           <Scale size={16} className="text-status-amber shrink-0 mt-0.5" />
           <div>
@@ -48,7 +48,7 @@ export default function DNUTrackerView() {
               <Icon size={14} className="text-text-tertiary" />
               <span className="text-[9px] font-semibold text-text-tertiary uppercase tracking-wide">{label}</span>
             </div>
-            <p className={`text-2xl font-bold ${color}`}>{value}</p>
+            <p className={`text-2xl font-bold font-mono ${color}`}>{value}</p>
             <p className="text-[10px] text-text-tertiary">{sub}</p>
           </div>
         ))}
@@ -70,7 +70,7 @@ export default function DNUTrackerView() {
                 <div className="flex-1 min-w-0">
                   <div className="flex flex-wrap items-center gap-2 mb-0.5">
                     <span className="text-[10px] font-semibold text-status-red uppercase">DNU {d.numero || ''}</span>
-                    <span className={`text-[9px] font-medium px-2 py-0.5 rounded border ${pendiente ? 'bg-amber-50 text-status-amber border-amber-200' : 'bg-green-50 text-status-green border-green-200'}`}>
+                    <span className={`text-[9px] font-medium px-2 py-0.5 rounded-full border ${pendiente ? 'tint-amber' : 'tint-green'}`}>
                       {pendiente ? 'Pendiente Bicameral' : 'Vigente'}
                     </span>
                   </div>

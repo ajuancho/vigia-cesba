@@ -1,30 +1,44 @@
 @import "tailwindcss";
 
+/* ============================================================
+   Vigía — Design System (familia OpenArg)
+   Dark cinematic · paleta Argentina (celeste + sol) · data-mono
+   Tokens calcados de openarg_frontend/src/app/globals.css
+   ============================================================ */
+
 @theme {
-  /* Institutional palette — reserved, professional */
-  --color-navy-950: #0c1425;
-  --color-navy-900: #111d35;
-  --color-navy-800: #1a2d4d;
-  --color-navy-700: #253d66;
-  --color-navy-600: #2e4a7a;
+  /* ── Argentina ─────────────────────────────────────────── */
+  --color-celeste: #74ACDF;
+  --color-celeste-bright: #93C5F8;
+  --color-celeste-muted: #5A8FBD;
+  --color-sol: #F6B40E;
+  --color-sol-bright: #FFD04A;
 
-  --color-bg-primary: #ffffff;
-  --color-bg-secondary: #f4f6f9;
-  --color-bg-tertiary: #ebeef3;
+  /* ── Surfaces (mapeadas sobre los nombres legacy de Vigía) ── */
+  --color-bg-primary: #0D1117;   /* cards / surface */
+  --color-bg-secondary: #06090F; /* page background */
+  --color-bg-tertiary: #1A2030;  /* elevated / hover */
 
-  --color-border-light: #dfe3ea;
-  --color-border-medium: #c8ced8;
+  --color-border-light: rgba(136, 146, 168, 0.12);
+  --color-border-medium: rgba(116, 172, 223, 0.25);
 
-  --color-text-primary: #111827;
-  --color-text-secondary: #4b5563;
-  --color-text-tertiary: #9ca3af;
+  --color-text-primary: #E8ECF4;
+  --color-text-secondary: #8892A8;
+  --color-text-tertiary: #636E85;
 
-  --color-inst-blue: #1e3a5f;
-  --color-inst-accent: #2563eb;
+  /* navy-* re-mapeado a superficies dark (botones/sidebar legacy) */
+  --color-navy-950: #06090F;
+  --color-navy-900: #0D1117;
+  --color-navy-800: #1A2030;
+  --color-navy-700: #242D42;
+  --color-navy-600: #2E3A55;
 
-  --color-status-green: #15803d;
-  --color-status-amber: #b45309;
-  --color-status-red: #b91c1c;
+  --color-inst-blue: #74ACDF;
+  --color-inst-accent: #74ACDF;
+
+  --color-status-green: #34D399;
+  --color-status-amber: #F6B40E;
+  --color-status-red: #F87171;
 
   --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
   --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
@@ -33,13 +47,38 @@
 @layer base {
   body {
     background-color: var(--color-bg-secondary);
+    /* Glow celeste top-left + sol bottom-right, anclados al viewport (OpenArg) */
+    background-image:
+      radial-gradient(ellipse 1400px 900px at 12% -10%, rgba(116, 172, 223, 0.10), transparent 55%),
+      radial-gradient(ellipse 1100px 800px at 100% 105%, rgba(246, 180, 14, 0.05), transparent 60%);
+    background-attachment: fixed;
     color: var(--color-text-primary);
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
   }
 
+  /* Grid arquitectónica sutil, fija al viewport, difuminada hacia los bordes */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background-image:
+      linear-gradient(rgba(136, 146, 168, 0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(136, 146, 168, 0.03) 1px, transparent 1px);
+    background-size: 60px 60px;
+    mask-image: radial-gradient(ellipse at 50% 40%, black 20%, transparent 75%);
+    -webkit-mask-image: radial-gradient(ellipse at 50% 40%, black 20%, transparent 75%);
+  }
+
+  body > * {
+    position: relative;
+    z-index: 1;
+  }
+
   ::selection {
-    background-color: #2563eb22;
+    background-color: rgba(116, 172, 223, 0.25);
   }
 
   ::-webkit-scrollbar {
@@ -51,29 +90,101 @@
   }
 
   ::-webkit-scrollbar-thumb {
-    background: #c8ced8;
+    background: rgba(136, 146, 168, 0.15);
     border-radius: 3px;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    background: #9ca3af;
+    background: rgba(136, 146, 168, 0.25);
   }
 
   select {
-    color-scheme: light;
+    color-scheme: dark;
+  }
+
+  input, textarea {
+    color-scheme: dark;
   }
 }
 
 @layer utilities {
+  /* Card = glass dark de OpenArg */
   .card {
     background: var(--color-bg-primary);
     border: 1px solid var(--color-border-light);
-    border-radius: 8px;
+    border-radius: 10px;
   }
 
   .card-hover:hover {
     border-color: var(--color-border-medium);
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  }
+
+  /* Franja-bandera ceremonial (OpenArg .flag-stripe) */
+  .flag-stripe {
+    height: 2px;
+    background: linear-gradient(90deg, #74ACDF 33%, #FFFFFF 33%, #FFFFFF 66%, #74ACDF 66%);
+    opacity: 0.85;
+  }
+
+  /* Tints semánticos para badges/chips (idioma rgba de OpenArg) */
+  .tint-red {
+    background: rgba(239, 68, 68, 0.10);
+    color: #F87171;
+    border-color: rgba(239, 68, 68, 0.30);
+  }
+
+  .tint-amber {
+    background: rgba(246, 180, 14, 0.10);
+    color: #F6B40E;
+    border-color: rgba(246, 180, 14, 0.30);
+  }
+
+  .tint-green {
+    background: rgba(52, 211, 153, 0.10);
+    color: #34D399;
+    border-color: rgba(52, 211, 153, 0.30);
+  }
+
+  .tint-blue {
+    background: rgba(116, 172, 223, 0.10);
+    color: #74ACDF;
+    border-color: rgba(116, 172, 223, 0.30);
+  }
+
+  .tint-purple {
+    background: rgba(167, 139, 250, 0.10);
+    color: #A78BFA;
+    border-color: rgba(167, 139, 250, 0.30);
+  }
+
+  .tint-cyan {
+    background: rgba(34, 211, 238, 0.10);
+    color: #22D3EE;
+    border-color: rgba(34, 211, 238, 0.30);
+  }
+
+  .tint-gray {
+    background: rgba(136, 146, 168, 0.08);
+    color: #8892A8;
+    border-color: rgba(136, 146, 168, 0.25);
+  }
+
+  /* CTA primario celeste (OpenArg .hero-cta / .chat-send-btn) */
+  .btn-celeste {
+    background: var(--color-celeste);
+    color: #06090F;
+    transition: background 0.2s ease, transform 0.15s ease, box-shadow 0.25s ease;
+    box-shadow: 0 2px 12px rgba(116, 172, 223, 0.25), 0 1px 3px rgba(0, 0, 0, 0.2);
+  }
+
+  .btn-celeste:hover {
+    background: var(--color-celeste-bright);
+    transform: translateY(-1px);
+  }
+
+  .btn-celeste:active {
+    transform: translateY(1px) scale(0.95);
   }
 
   .animate-fade-in {

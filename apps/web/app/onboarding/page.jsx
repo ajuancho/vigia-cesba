@@ -30,11 +30,12 @@ export default function OnboardingPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-bg-secondary p-4">
+    <div className="min-h-screen flex flex-col items-center justify-center p-4">
+      <div className="flag-stripe fixed top-0 inset-x-0 z-[60]" />
       <div className="card p-8 max-w-lg w-full">
         <div className="flex items-center gap-2.5 mb-6">
-          <div className="w-9 h-9 rounded-lg bg-navy-800 flex items-center justify-center">
-            <Eye size={18} className="text-white" />
+          <div className="w-9 h-9 rounded-lg bg-celeste/10 border border-celeste/30 flex items-center justify-center">
+            <Eye size={18} className="text-celeste" />
           </div>
           <div>
             <h1 className="text-base font-bold text-text-primary">Configurá tu workspace</h1>
@@ -47,7 +48,7 @@ export default function OnboardingPage() {
           value={name}
           onChange={(e) => setName(e.target.value)}
           placeholder={session?.workspace?.name || 'Mi organización'}
-          className="w-full bg-white border border-border-light rounded px-3 py-2 text-[13px] mb-5 focus:outline-none focus:border-inst-accent"
+          className="w-full bg-bg-primary border border-border-light rounded-lg px-3 py-2 text-[13px] mb-5 focus:outline-none focus:border-inst-accent"
         />
 
         <label className="text-[10px] font-semibold text-text-tertiary uppercase tracking-wide mb-2 block">Sectores de interés</label>
@@ -56,10 +57,10 @@ export default function OnboardingPage() {
             <button
               key={s}
               onClick={() => toggle(s)}
-              className={`px-2.5 py-1 rounded text-[11px] font-medium border transition-colors flex items-center gap-1 ${
+              className={`px-2.5 py-1 rounded-full text-[11px] font-medium border transition-colors flex items-center gap-1 ${
                 selected.includes(s)
-                  ? 'bg-navy-800 text-white border-navy-800'
-                  : 'bg-white text-text-secondary border-border-light hover:bg-bg-secondary'
+                  ? 'bg-celeste/10 text-celeste-bright border-celeste/40'
+                  : 'bg-bg-primary text-text-secondary border-border-light hover:bg-bg-tertiary'
               }`}
             >
               {selected.includes(s) && <Check size={11} />} {s}
@@ -70,7 +71,7 @@ export default function OnboardingPage() {
         <button
           onClick={submit}
           disabled={saving}
-          className="w-full px-4 py-2.5 bg-navy-800 text-white rounded text-[13px] font-medium hover:bg-navy-700 transition-colors disabled:opacity-50"
+          className="w-full px-4 py-2.5 btn-celeste rounded-full text-[13px] font-bold disabled:opacity-50"
         >
           {saving ? 'Guardando…' : 'Continuar'}
         </button>
