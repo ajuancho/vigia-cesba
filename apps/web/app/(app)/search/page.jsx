@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { api } from '@/lib/api';
 import { TIPOS_NORMA, SECTORES, JURISDICCIONES } from '@/lib/constants';
 import { Search as SearchIcon, SlidersHorizontal, ArrowRight } from 'lucide-react';
@@ -11,9 +11,10 @@ const TIPO_DOT_COLORS = {
   RESOLUCION: '#74ACDF', DISPOSICION: '#A78BFA', PROYECTO: '#22D3EE', OTRA: '#8892A8',
 };
 
-export default function SearchView() {
+function SearchView() {
   const router = useRouter();
-  const [query, setQuery] = useState('');
+  const params = useSearchParams();
+  const [query, setQuery] = useState(params.get('q') || '');
   const [tipo, setTipo] = useState('');
   const [sector, setSector] = useState('');
   const [jurisdiccion, setJurisdiccion] = useState('');
@@ -124,5 +125,13 @@ export default function SearchView() {
         ))}
       </div>
     </div>
+  );
+}
+
+export default function SearchPage() {
+  return (
+    <Suspense fallback={null}>
+      <SearchView />
+    </Suspense>
   );
 }

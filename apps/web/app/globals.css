@@ -42,9 +42,14 @@
 
   --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
   --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+  --font-display: 'Familjen Grotesk', 'Inter', system-ui, sans-serif;
 }
 
 @layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
   body {
     background-color: var(--color-bg-secondary);
     /* Glow celeste top-left + sol bottom-right, anclados al viewport (OpenArg) */
@@ -104,6 +109,17 @@
 
   input, textarea {
     color-scheme: dark;
+  }
+
+  /* Headlines en display (Familjen Grotesk — herencia Ulm/OpenArg) */
+  h1, h2, h3 {
+    font-family: var(--font-display);
+    letter-spacing: -0.02em;
+  }
+
+  /* Números siempre tabulares (no saltan al animar) */
+  .font-mono {
+    font-variant-numeric: tabular-nums;
   }
 }
 
@@ -193,6 +209,138 @@
 
   .animate-slide-up {
     animation: slideUp 0.3s ease-out forwards;
+  }
+
+  /* ── Tipografía editorial (OpenArg) ─────────────────────── */
+
+  /* Título hero monumental */
+  .display-hero {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(2.6rem, 7vw, 5.5rem);
+    line-height: 0.98;
+    letter-spacing: -0.045em;
+    text-wrap: balance;
+  }
+
+  .display-section {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(1.5rem, 2.8vw, 2.2rem);
+    line-height: 1.1;
+    letter-spacing: -0.022em;
+    text-wrap: balance;
+  }
+
+  /* Énfasis editorial: italic + sol (convención <em> de OpenArg) */
+  .display-hero em, .display-section em {
+    font-style: italic;
+    color: var(--color-sol);
+  }
+
+  .eyebrow {
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--color-text-secondary);
+  }
+
+  .eyebrow-num {
+    font-family: var(--font-mono);
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    color: var(--color-celeste);
+  }
+
+  /* Texto degradé (OpenArg .gradient-text) */
+  .gradient-text {
+    background: linear-gradient(135deg, var(--color-celeste-bright) 0%, var(--color-celeste) 100%);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .gradient-text-sol {
+    background: linear-gradient(135deg, var(--color-sol) 0%, var(--color-sol-bright) 50%, var(--color-celeste-bright) 100%);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  /* ── Motion: reveal on-scroll (componente FadeIn) ────────── */
+  .reveal {
+    opacity: 0;
+    transform: translateY(12px);
+    transition: opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1), transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+    will-change: opacity, transform;
+  }
+
+  .reveal.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* ── Motion: transición entre páginas (template.jsx) ─────── */
+  .page-transition {
+    animation: pageIn 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  /* Caret de tipeo (OpenArg ed-caret) */
+  .caret {
+    display: inline-block;
+    width: 2px;
+    height: 1.1em;
+    margin-left: 2px;
+    vertical-align: text-bottom;
+    background: var(--color-celeste);
+    animation: caretBlink 1.05s steps(2, jump-none) infinite;
+  }
+
+  /* Link editorial con flecha que se desliza */
+  .textlink {
+    color: var(--color-celeste);
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+
+  .textlink:hover {
+    color: var(--color-sol);
+  }
+
+  .textlink .arrow {
+    display: inline-block;
+    transition: transform 0.2s ease;
+  }
+
+  .textlink:hover .arrow {
+    transform: translateX(4px);
+  }
+}
+
+@keyframes pageIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes caretBlink {
+  50% { opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+  .page-transition {
+    animation: none;
+  }
+  .caret {
+    animation: none;
+  }
+  .animate-fade-in, .animate-slide-up {
+    animation-duration: 0.01s;
   }
 }
 

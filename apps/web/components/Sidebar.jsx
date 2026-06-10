@@ -26,15 +26,15 @@ export default function Sidebar({ open, onClose }) {
         {/* Logo */}
         <div className="px-5 py-5 border-b border-border-light">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-lg bg-celeste/10 border border-celeste/30 flex items-center justify-center">
+            <Link href="/" className="flex items-center gap-2.5 group">
+              <div className="w-8 h-8 rounded-lg bg-celeste/10 border border-celeste/30 flex items-center justify-center group-hover:bg-celeste/20 transition-colors">
                 <Eye size={16} className="text-celeste" />
               </div>
               <div>
                 <h1 className="text-sm font-bold text-text-primary tracking-wide">VIGÍA</h1>
                 <p className="text-[9px] text-text-tertiary uppercase tracking-[0.15em] font-mono">por OpenArg</p>
               </div>
-            </div>
+            </Link>
             <button onClick={onClose} className="lg:hidden text-text-tertiary hover:text-text-primary">
               <X size={18} />
             </button>
