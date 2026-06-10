@@ -29,3 +29,10 @@ SECTORES: list[str] = [
 ]
 
 IMPACTOS: list[str] = ["alto", "medio", "bajo"]
+
+# Estados de tramitación de PROYECTO derivados de los movimientos HCDN
+# (vigia_connectors.hcdn.derivar_estado). "En trámite" es el default al ingestar.
+ESTADOS_PROYECTO: list[str] = [
+    "En trámite", "En comisión", "Archivado", "Con dictamen",
+    "Aprobado", "Media sanción", "Sancionado",
+]

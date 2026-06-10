@@ -18,6 +18,7 @@ celery_app = Celery(
         "vigia_workers.freshness",
         "vigia_workers.reconcile",
         "vigia_workers.bicameral",
+        "vigia_workers.movimientos",
     ],
 )
 
@@ -71,6 +72,13 @@ celery_app.conf.update(
         "ingest-hcdn-proyectos": {
             "task": "vigia_workers.tasks.ingest_hcdn_proyectos",
             "schedule": crontab(hour=8, minute=0),
+        },
+        # Movimientos de proyectos HCDN — DEBE correr después de
+        # ingest-hcdn-proyectos (08:00), que pisa `estado` con "En trámite";
+        # esta task lo re-deriva (el pisado se auto-repara a diario).
+        "ingest-hcdn-movimientos": {
+            "task": "vigia_workers.movimientos.ingest_hcdn_movimientos",
+            "schedule": crontab(hour=8, minute=30),
         },
         # Dictámenes de la Comisión Bicameral DNU (HCDN CKAN) — diario.
         # Después de hcdn-proyectos (08:00): el join usa los proyectos del día.

@@ -39,6 +39,15 @@ SOURCES: dict[str, dict] = {
         # Publica cada día hábil; 4 días tolera fin de semana largo.
         "freshness_slo_days": 4,
     },
+    "hcdn_movimientos": {
+        "code": "hcdn_movimientos",
+        "name": "HCDN — Movimientos de proyectos (estados de tramitación)",
+        "kind": "feed",
+        "base_url": "https://datos.hcdn.gob.ar",
+        "cadence_hours": 24,
+        # No crea normas (actualiza estado de PROYECTO): sin SLO propio.
+        "freshness_slo_days": None,
+    },
     "bcra_comunicaciones": {
         "code": "bcra_comunicaciones",
         "name": "BCRA — Comunicaciones A (normativa cambiaria y financiera)",

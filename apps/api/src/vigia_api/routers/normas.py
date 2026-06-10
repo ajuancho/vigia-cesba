@@ -76,4 +76,8 @@ async def get_norma(norma_id: int) -> NormaDetail:
     detail = NormaDetail.model_validate(norma)
     detail.fuente = fuente
     detail.fuente_code = fuente_code
+    if isinstance(norma.raw, dict):
+        movs = norma.raw.get("movimientos")
+        if isinstance(movs, list) and movs:
+            detail.movimientos = movs
     return detail

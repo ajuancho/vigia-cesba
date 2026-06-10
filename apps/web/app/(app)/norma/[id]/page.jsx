@@ -110,6 +110,23 @@ export default function NormDetailView() {
         </FadeIn>
       )}
 
+      {norma.movimientos && norma.movimientos.length > 0 && (
+        <FadeIn delay={150}>
+          <section className="mb-10">
+            <p className="eyebrow mb-3"><span className="eyebrow-num">I·b</span><span className="ml-2">Tramitación</span></p>
+            <div className="border-l border-border-light ml-1">
+              {norma.movimientos.map((m, i) => (
+                <div key={i} className="relative pl-5 pb-4 last:pb-0">
+                  <span className="absolute -left-[3.5px] top-1.5 w-1.5 h-1.5 rounded-full bg-celeste/70" />
+                  <p className="text-[12px] text-text-secondary leading-relaxed">{m.movimiento}</p>
+                  {m.fecha && <p className="text-[10px] text-text-tertiary font-mono mt-0.5">{m.fecha}</p>}
+                </div>
+              ))}
+            </div>
+          </section>
+        </FadeIn>
+      )}
+
       {norma.entidades && norma.entidades.length > 0 && (
         <FadeIn delay={160}>
           <section className="mb-10">

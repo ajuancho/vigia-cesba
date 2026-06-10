@@ -40,6 +40,8 @@ class NormaDetail(NormaBase):
     ingested_at: datetime | None = None
     fuente: str | None = None  # source_catalog.name — de dónde salió esta norma
     fuente_code: str | None = None
+    # Timeline de tramitación (PROYECTO): últimos movimientos HCDN, de raw.
+    movimientos: list[dict] | None = None
 
 
 class NormaPage(BaseModel):

@@ -27,6 +27,42 @@ from vigia_connectors.sectores import detect_sector
 
 CKAN_BASE = "https://datos.hcdn.gob.ar"
 PACKAGE_ID = "proyectos-parlamentarios"
+MOVIMIENTOS_PACKAGE_ID = "movimientos-de-proyectos"
+
+# Derivación de estado de tramitación desde los textos libres de movimientos.
+# Sin fechas confiables (mayoría NA) se toma el estado de mayor rango visto.
+# "CONSIDERACION Y APROBACION" en cámara de origen suele preceder a un
+# "PASA A SENADO/DIPUTADOS" (que rankea más alto y gana cuando existe).
+_ESTADO_RULES: list[tuple[int, str, tuple[str, ...]]] = [
+    (6, "Sancionado", ("SANCIONADO", "SANCION DEFINITIVA", "COMUNICACION AL PODER EJECUTIVO")),
+    (5, "Media sanción", ("PASA A SENADO", "PASA A DIPUTADOS", "MEDIA SANCION")),
+    (4, "Aprobado", ("CONSIDERACION Y APROBACION", "APROBACION ARTICULO 114", "APROBADO")),
+    (3, "Con dictamen", ("DICTAMEN",)),
+    (2, "Archivado", ("PASA AL ARCHIVO", "AL ARCHIVO")),
+    (1, "En comisión", ("GIRO A", "AMPLIACION DE GIRO", "CAMBIO DE GIRO")),
+]
+
+
+def clasificar_movimiento(texto: str | None) -> tuple[int, str] | None:
+    """(rank, estado) que implica un movimiento, o None si no cambia el estado."""
+    t = (texto or "").upper()
+    if not t:
+        return None
+    for rank, estado, keywords in _ESTADO_RULES:
+        for kw in keywords:
+            if kw in t:
+                return rank, estado
+    return None
+
+
+def derivar_estado(movimientos: list[str | None]) -> str | None:
+    """Estado de tramitación derivado del conjunto de movimientos de un proyecto."""
+    best: tuple[int, str] | None = None
+    for texto in movimientos:
+        c = clasificar_movimiento(texto)
+        if c is not None and (best is None or c[0] > best[0]):
+            best = c
+    return best[1] if best else None
 
 
 @dataclass(slots=True)
@@ -51,6 +87,14 @@ class HcdnProyecto:
 
     def detect_sector(self) -> str | None:
         return detect_sector(self.titulo)
+
+
+@dataclass(slots=True)
+class HcdnMovimiento:
+    proyecto_id: str  # == norma.external_id (fuente hcdn_proyectos)
+    movimiento: str
+    fecha: Date | None
+    orden: str | None
 
 
 def _parse_fecha(value: str | None) -> Date | None:
@@ -115,6 +159,24 @@ class HcdnClient:
                 p = HcdnClient._row_to_proyecto(row)
                 if p is not None:
                     yield p
+
+    @staticmethod
+    def iter_movimientos_csv(csv_path: Path) -> Iterator["HcdnMovimiento"]:
+        """Itera movimientos desde el CSV en disco (PROYECTO_ID, FECHA, MOVIMIENTO, ORDEN)."""
+        with csv_path.open("rb") as binary:
+            text = io.TextIOWrapper(binary, encoding="utf-8-sig", errors="replace", newline="")
+            reader = csv.DictReader(text)
+            for row in reader:
+                pid = (row.get("PROYECTO_ID") or "").strip()
+                mov = _na(row.get("MOVIMIENTO"))
+                if not pid or not mov:
+                    continue  # la mayoría de las filas son NA (proyectos sin movimientos)
+                yield HcdnMovimiento(
+                    proyecto_id=pid,
+                    movimiento=mov,
+                    fecha=_parse_fecha(row.get("FECHA")),
+                    orden=_na(row.get("ORDEN")),
+                )
 
     @staticmethod
     def _row_to_proyecto(row: dict) -> "HcdnProyecto | None":
