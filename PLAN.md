@@ -5,35 +5,19 @@ completos con actualización diaria automática). Lo que sigue, en orden sugerid
 
 ---
 
-## 1. Google OAuth — activar login real ⬅️ PRÓXIMO
+## 1. Google OAuth — ✅ ACTIVADO (2026-06-10)
 
-Hoy el sitio corre en **modo demo** (`AUTH_ENABLED=false`): datos públicos sin
-login, alertas solo client-side. Todo el backend de auth (Fase 2: `/auth/sync`,
-workspaces, invitaciones, JWT) y el de alertas (Fase 3: persistencia + matching
-+ digests) ya está construido y verificado — solo le falta la llave.
+Login con Google **vivo en producción**: OAuth client creado por el usuario
+(proyecto GCP, redirect `https://vigia.openarg.org/api/auth/callback/google`),
+env vars en Vercel (`AUTH_GOOGLE_ID/SECRET`, `AUTH_SECRET`, `AUTH_ENABLED`,
+`NEXT_PUBLIC_AUTH_ENABLED`), API del EC2 en modo gated (`AUTH_ENABLED=true`).
+Verificado: provider Google registrado en NextAuth, 401 sin token en
+`/workspaces`, datos públicos intactos.
 
-### Pasos (requiere acción del usuario en Google Cloud Console)
-1. Crear proyecto en https://console.cloud.google.com → APIs & Services →
-   Credentials → **Create OAuth client ID** (tipo: Web application):
-   - Authorized JavaScript origins: `https://vigia.openarg.org`
-   - Authorized redirect URI: `https://vigia.openarg.org/api/auth/callback/google`
-   - (Para dev local agregar también `http://localhost:3000` y su callback.)
-2. Configurar la OAuth consent screen (External, publicada).
-3. Guardar `Client ID` y `Client Secret`.
-
-### Pasos (los ejecuta Claude con las credenciales)
-4. **Vercel** (production env): `AUTH_GOOGLE_ID`, `AUTH_GOOGLE_SECRET`,
-   `AUTH_SECRET` (el mismo del backend — está en `.env.production` del EC2),
-   `AUTH_ENABLED=true`, `NEXT_PUBLIC_AUTH_ENABLED=true` → redeploy.
-5. **EC2** (`~/vigia/.env.production` + `.env`): `AUTH_ENABLED=true` → restart api.
-6. Probar el flujo completo: login Google → `/auth/sync` crea user+workspace →
-   onboarding → crear alerta persistente → invitar un segundo usuario.
-
-### Riesgo conocido
-NextAuth `5.0.0-beta.31` + Next 16 tiene un issue con `headers()` async que
-puede aparecer recién al activar OAuth real. Si revienta: bumpear `next-auth`
-a la última beta o mover el sync a un route handler (documentado en
-`../investarg` README, sección "Conocidos Fase 4").
+**Pendiente de validación humana:** completar un login real (necesita una
+cuenta Google interactiva) → onboarding → alerta persistente → invitación.
+Si el login falla con un error de `headers()`: es el known issue de NextAuth
+v5-beta + Next 16 → bumpear `next-auth` (documentado en `../investarg`).
 
 ---
 
