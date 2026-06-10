@@ -38,15 +38,17 @@ celery_app.conf.update(
     timezone="America/Argentina/Buenos_Aires",
     enable_utc=False,
     beat_schedule={
-        # InfoLEG / Boletín Oficial — corpus completo, semanal domingo 02:00 ART.
+        # InfoLEG / Boletín Oficial — corpus completo (incluye lo último publicado),
+        # diario 03:00 ART. El dataset oficial se refresca semanalmente, correrlo
+        # a diario garantiza tomar cada actualización apenas sale.
         "ingest-infoleg-full": {
             "task": "vigia_workers.tasks.ingest_infoleg_full",
-            "schedule": crontab(hour=2, minute=0, day_of_week=0),
+            "schedule": crontab(hour=3, minute=0),
         },
-        # Refresco incremental diario 07:00 ART (muestreo, normas recientes).
-        "ingest-infoleg-sample": {
-            "task": "vigia_workers.tasks.ingest_infoleg",
-            "schedule": crontab(hour=7, minute=0),
+        # HCDN proyectos parlamentarios — el dataset se actualiza a diario.
+        "ingest-hcdn-proyectos": {
+            "task": "vigia_workers.tasks.ingest_hcdn_proyectos",
+            "schedule": crontab(hour=8, minute=0),
         },
         # Matching de alertas + notificaciones — cada hora.
         "match-alertas": {

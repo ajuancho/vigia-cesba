@@ -61,7 +61,14 @@ class InfoLegNorm:
     texto_original_url: str | None
 
     def tipo_slug(self) -> str:
-        """Normaliza tipo_norma al vocabulario de `norma.tipo` (Vigía)."""
+        """Normaliza tipo_norma al vocabulario de `norma.tipo` (Vigía).
+
+        InfoLEG clasifica los DNU como tipo_norma="Decreto" + clase_norma="DNU",
+        por eso la clase se evalúa primero.
+        """
+        c = (self.clase_norma or "").strip().lower()
+        if c == "dnu" or "necesidad y urgencia" in c:
+            return "DNU"
         t = (self.tipo_norma or "").strip().lower()
         if t.startswith("decreto de necesidad") or "necesidad y urgencia" in t or t.startswith("dnu"):
             return "DNU"
@@ -79,28 +86,11 @@ class InfoLegNorm:
 
     def detect_sector(self) -> str | None:
         """Etiquetado barato de sector por organismo + keywords del título."""
-        haystack = " ".join(
-            filter(
-                None,
-                [self.organismo_origen, self.titulo_resumido, self.titulo_sumario, self.texto_resumido],
-            )
-        ).upper()
-        rules = [
-            ("Energía", ["VACA MUERTA", "PETRÓLEO", "PETROLEO", " GAS ", "GNL", "HIDROCARBURO", "ENERGIA", "ENERGÍA", "ENARGAS", "CAMMESA", "RENOVABLE"]),
-            ("Minería", ["LITIO", "MINERIA", "MINERÍA", "MINERA ", "ORO", "COBRE", "SEGEMAR"]),
-            ("Agro", ["AGROPECUAR", "GRANOS", "SENASA", "BIOECONOMIA", "BIOECONOMÍA", "GANADER"]),
-            ("Tecnología", ["SOFTWARE", "ECONOMIA DEL CONOCIMIENTO", "ECONOMÍA DEL CONOCIMIENTO", "CIBERSEGURIDAD", "INTELIGENCIA ARTIFICIAL", "DATA CENTER"]),
-            ("Economía", ["BCRA", "BANCO CENTRAL", "AFIP", "ARCA", "IMPOSITIV", "TRIBUTARI", "ADUANA", "FINANCIER"]),
-            ("Salud", ["SALUD", "HOSPITAL", "MEDICAMENTO", "ANMAT", "SANITARI"]),
-            ("Trabajo", ["TRABAJO", "SALARIO", "SMVM", "LABORAL", "EMPLEO", "ANSES", "ANSeS"]),
-            ("Transporte", ["TRANSPORTE", "AUTOMOTOR", "AERONAUT", "FERROVIAR", "VIAL"]),
-            ("Seguridad", ["SEGURIDAD", "POLICIA", "POLICÍA", "DEFENSA NACIONAL"]),
-        ]
-        for sector, keywords in rules:
-            for kw in keywords:
-                if kw in haystack:
-                    return sector
-        return None
+        from vigia_connectors.sectores import detect_sector
+
+        return detect_sector(
+            self.organismo_origen, self.titulo_resumido, self.titulo_sumario, self.texto_resumido
+        )
 
 
 def _parse_date(value: str) -> Date | None:

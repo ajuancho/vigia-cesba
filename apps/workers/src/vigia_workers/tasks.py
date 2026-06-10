@@ -15,7 +15,7 @@ from datetime import date
 from pathlib import Path
 from typing import Any
 
-from vigia_connectors import InfoLegClient, InfoLegNorm
+from vigia_connectors import HcdnClient, HcdnProyecto, InfoLegClient, InfoLegNorm
 from vigia_workers.celery_app import celery_app
 from vigia_workers.persistence import run_async, upsert_normas, with_status
 
@@ -26,8 +26,17 @@ INFOLEG_SOURCE = {
     "base_url": "https://datos.jus.gob.ar",
 }
 
+HCDN_SOURCE = {
+    "code": "hcdn_proyectos",
+    "name": "HCDN — Proyectos parlamentarios (datos.hcdn.gob.ar)",
+    "kind": "feed",
+    "base_url": "https://datos.hcdn.gob.ar",
+}
+
 # Cuántos registros por batch al persistir el corpus completo.
-_FULL_BATCH = 2000
+# Tope: asyncpg admite máx 32767 parámetros bind por statement
+# (~17 columnas por fila → 1000 filas ≈ 17k params, margen cómodo).
+_FULL_BATCH = 1000
 
 
 def _norma_to_row(n: InfoLegNorm) -> dict[str, Any]:
@@ -75,6 +84,60 @@ def ingest_infoleg() -> dict[str, Any]:
     from vigia_workers.alerts import _match_all
     result["matching"] = run_async(_match_all())
     return result
+
+
+def _proyecto_to_row(p: HcdnProyecto) -> dict[str, Any]:
+    """Mapea un HcdnProyecto al shape de la tabla `norma` (tipo PROYECTO)."""
+    return {
+        "external_id": p.proyecto_id,
+        "tipo": "PROYECTO",
+        "numero": p.expediente,
+        "titulo": p.titulo,
+        "resumen": None,
+        "fecha_publicacion": p.fecha_publicacion,
+        "jurisdiccion": "Nacional",
+        "sector": p.detect_sector(),
+        "organismo": p.organismo(),
+        "estado": "En trámite",
+        "impacto": None,
+        "bora_seccion": None,
+        "entidades": [p.autor] if p.autor else None,
+        "tags": [p.tipo_proyecto.lower()] if p.tipo_proyecto else None,
+        "url": None,
+        "raw": {k: (v.isoformat() if isinstance(v, date) else v)
+                for k, v in dataclasses.asdict(p).items()},
+    }
+
+
+@celery_app.task(name="vigia_workers.tasks.ingest_hcdn_proyectos")
+def ingest_hcdn_proyectos() -> dict[str, Any]:
+    """Ingesta los proyectos parlamentarios de HCDN (CSV completo por streaming).
+
+    El dataset se actualiza a diario en datos.hcdn.gob.ar; el upsert es
+    idempotente por (source_id, external_id=PROYECTO_ID).
+    """
+
+    async def _run() -> int:
+        total = 0
+        with tempfile.TemporaryDirectory() as tmp:
+            dest = Path(tmp) / "proyectos.csv"
+            async with HcdnClient() as client:
+                await client.download_csv(dest)
+            batch: list[dict[str, Any]] = []
+            for p in HcdnClient.iter_csv(dest):
+                batch.append(_proyecto_to_row(p))
+                if len(batch) >= _FULL_BATCH:
+                    total += await upsert_normas(HCDN_SOURCE, batch)
+                    batch = []
+            if batch:
+                total += await upsert_normas(HCDN_SOURCE, batch)
+        return total
+
+    async def _wrapped() -> dict[str, Any]:
+        count = await with_status([HCDN_SOURCE["code"]], _run)
+        return {"source": "hcdn_proyectos", "rows": count}
+
+    return run_async(_wrapped())
 
 
 @celery_app.task(name="vigia_workers.tasks.ingest_infoleg_full")
