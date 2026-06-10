@@ -1,10 +1,35 @@
 import './globals.css';
 import Providers from '@/components/Providers';
 
+const TITLE = 'Vigía — Inteligencia Legislativa Argentina';
+const DESCRIPTION =
+  'La normativa argentina, vigilada. Monitoreo del Boletín Oficial y el Congreso: 533.000+ normas indexadas, búsqueda full-text, alertas por email y tracker de DNU. Por OpenArg.';
+
 export const metadata = {
-  title: 'Vigía — Inteligencia Legislativa Argentina',
-  description:
-    'Vigía — Plataforma de Inteligencia Legislativa y Regulatoria para Argentina. Monitoreo en tiempo real del Boletín Oficial, Congreso y normativa nacional.',
+  metadataBase: new URL('https://vigia.openarg.org'),
+  title: {
+    default: TITLE,
+    template: '%s · Vigía',
+  },
+  description: DESCRIPTION,
+  keywords: ['boletín oficial', 'normativa argentina', 'DNU', 'InfoLEG', 'inteligencia legislativa', 'compliance', 'OpenArg'],
+  openGraph: {
+    title: TITLE,
+    description: DESCRIPTION,
+    url: 'https://vigia.openarg.org',
+    siteName: 'Vigía por OpenArg',
+    locale: 'es_AR',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: TITLE,
+    description: DESCRIPTION,
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
 };
 
 export default function RootLayout({ children }) {
