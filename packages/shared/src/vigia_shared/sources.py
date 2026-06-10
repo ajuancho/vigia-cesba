@@ -30,6 +30,15 @@ SOURCES: dict[str, dict] = {
         "cadence_hours": 24,
         "freshness_slo_days": 10,
     },
+    "bora_primera": {
+        "code": "bora_primera",
+        "name": "Boletín Oficial — Primera Sección (edición del día)",
+        "kind": "scrape",
+        "base_url": "https://www.boletinoficial.gob.ar",
+        "cadence_hours": 24,
+        # Publica cada día hábil; 4 días tolera fin de semana largo.
+        "freshness_slo_days": 4,
+    },
 }
 
 # Campos que van a la tabla source_catalog (los upserta cada task de ingesta).

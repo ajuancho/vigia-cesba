@@ -38,3 +38,18 @@ async def get_json(client: httpx.AsyncClient, path: str, **kwargs: Any) -> Any:
             resp.raise_for_status()
             return resp.json()
     raise RuntimeError("unreachable")
+
+
+async def get_text(client: httpx.AsyncClient, path: str, **kwargs: Any) -> str:
+    """GET con el mismo retry que get_json, devolviendo el body como texto (HTML)."""
+    async for attempt in AsyncRetrying(
+        stop=stop_after_attempt(3),
+        wait=wait_exponential_jitter(initial=0.5, max=4),
+        retry=retry_if_exception_type((httpx.TransportError, httpx.HTTPStatusError)),
+        reraise=True,
+    ):
+        with attempt:
+            resp = await client.get(path, **kwargs)
+            resp.raise_for_status()
+            return resp.text
+    raise RuntimeError("unreachable")

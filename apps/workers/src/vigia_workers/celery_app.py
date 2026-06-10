@@ -12,7 +12,12 @@ celery_app = Celery(
     "vigia",
     broker=REDIS_URL,
     backend=REDIS_URL,
-    include=["vigia_workers.tasks", "vigia_workers.alerts", "vigia_workers.freshness"],
+    include=[
+        "vigia_workers.tasks",
+        "vigia_workers.alerts",
+        "vigia_workers.freshness",
+        "vigia_workers.reconcile",
+    ],
 )
 
 # Sentry — no-op si falta SENTRY_DSN.
@@ -44,6 +49,22 @@ celery_app.conf.update(
         "ingest-infoleg-full": {
             "task": "vigia_workers.tasks.ingest_infoleg_full",
             "schedule": crontab(hour=3, minute=0),
+        },
+        # Reconcile BORA↔InfoLEG post corpus full: la gemela InfoLEG reemplaza
+        # a la fila BORA (anti-duplicados del feed).
+        "reconcile-bora-infoleg": {
+            "task": "vigia_workers.reconcile.reconcile_bora_infoleg",
+            "schedule": crontab(hour=4, minute=30),
+        },
+        # BORA 1ª sección — frescura diaria real (el BO publica de madrugada).
+        # Retry 12:00 por si la edición sale tarde. Lookback 5 días idempotente.
+        "ingest-bora-primera": {
+            "task": "vigia_workers.tasks.ingest_bora_primera",
+            "schedule": crontab(hour=7, minute=0),
+        },
+        "ingest-bora-primera-retry": {
+            "task": "vigia_workers.tasks.ingest_bora_primera",
+            "schedule": crontab(hour=12, minute=0),
         },
         # HCDN proyectos parlamentarios — el dataset se actualiza a diario.
         "ingest-hcdn-proyectos": {

@@ -9,9 +9,9 @@ from __future__ import annotations
 
 from datetime import date
 
-from vigia_connectors import HcdnProyecto, InfoLegNorm
+from vigia_connectors import BoraAviso, HcdnProyecto, InfoLegNorm
 from vigia_workers.persistence import _NORMA_UPDATE_COLS
-from vigia_workers.tasks import _norma_to_row, _proyecto_to_row
+from vigia_workers.tasks import _aviso_to_row, _norma_to_row, _proyecto_to_row
 
 EXPECTED_KEYS = set(_NORMA_UPDATE_COLS) | {"external_id"}
 
@@ -57,3 +57,26 @@ def test_proyecto_to_row_shape():
     assert row["numero"] == "2561-D-2026"
     assert row["estado"] == "En trámite"
     assert row["tags"] == ["ley"]
+
+
+def test_aviso_to_row_shape():
+    a = BoraAviso(
+        aviso_id="342946",
+        seccion="primera",
+        fecha=date(2026, 6, 10),
+        organismo="MINISTERIO DE SEGURIDAD NACIONAL",
+        tipo_linea="Decreto 436/2026",
+        sumario="DECTO-2026-436-APN-PTE - Desígnase Subsecretario.",
+    )
+    row = _aviso_to_row(a)
+    assert set(row.keys()) == EXPECTED_KEYS
+    assert row["tipo"] == "DECRETO"
+    assert row["numero"] == "436/2026"
+    assert row["bora_seccion"] == "Primera Sección"
+    assert row["url"].endswith("/342946/20260610")
+    assert row["raw"]["tipo_linea"] == "Decreto 436/2026"  # lo usa el reconcile
+    assert row["raw"]["fecha"] == "2026-06-10"
+
+    # Promoción a DNU por texto del detalle (override del tipo).
+    row_dnu = _aviso_to_row(a, tipo="DNU")
+    assert row_dnu["tipo"] == "DNU"
