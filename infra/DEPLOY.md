@@ -1,5 +1,16 @@
 # Deploy de Vigía — Runbook (Fase 4)
 
+> **Deploy real (2026-06):** EC2 all-in-one `vigia-production` (t3.small, us-east-1)
+> con perfil `local-data` del compose. API en `https://vigia-api.openarg.org`,
+> web en `https://vigia.openarg.org` (Vercel). User-data en `infra/ec2-user-data.sh`.
+> Orden de arranque all-in-one (el `pull` evita que compose buildee en el EC2):
+> ```bash
+> docker compose -f docker-compose.prod.yml --profile local-data pull
+> docker compose -f docker-compose.prod.yml --profile local-data up -d db redis
+> docker compose -f docker-compose.prod.yml run --rm --no-deps migrate
+> docker compose -f docker-compose.prod.yml up -d --no-build api worker worker-beat caddy
+> ```
+
 Arquitectura de producción (patrón Laboratorio Colossus):
 
 ```

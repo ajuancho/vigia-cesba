@@ -68,6 +68,10 @@ services:
       - api
 
   # ---- Solo para EC2 all-in-one (perfil opcional) ----
+  # Arranque ordenado (los perfiles no participan de depends_on):
+  #   docker compose -f docker-compose.prod.yml --profile local-data up -d db redis
+  #   docker compose -f docker-compose.prod.yml run --rm migrate
+  #   docker compose -f docker-compose.prod.yml up -d api worker worker-beat caddy
   db:
     image: pgvector/pgvector:pg16
     profiles: ["local-data"]
@@ -76,6 +80,11 @@ services:
     volumes:
       - vigia_pgdata:/var/lib/postgresql/data
       - ./db/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-vigia}"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
 
   redis:
     image: redis:7-alpine
@@ -83,6 +92,11 @@ services:
     restart: unless-stopped
     volumes:
       - vigia_redisdata:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
 
 volumes:
   caddy_data:
