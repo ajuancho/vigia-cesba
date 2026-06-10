@@ -3,12 +3,14 @@
 import { useState } from 'react';
 import Sidebar from '@/components/Sidebar';
 import Header from '@/components/Header';
+import TrialGate from '@/components/TrialGate';
 
 export default function AppLayout({ children }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
     <div className="min-h-screen flex flex-col">
+      <TrialGate />
       <div className="flag-stripe fixed top-0 inset-x-0 z-[60]" />
       <div className="flex flex-1">
         <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />

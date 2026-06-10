@@ -17,7 +17,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from vigia_api.core.db import get_sessionmaker
-from vigia_api.core.security import sign_jwt
+from vigia_api.core.security import sign_jwt, trial_ends_at_for
 from vigia_api.core.settings import Settings, get_settings
 from vigia_api.services.audit import ACTION_LOGIN, write_audit_event
 from vigia_shared.models import AppUser, Workspace, WorkspaceMember
@@ -40,6 +40,7 @@ class SyncResponse(BaseModel):
     workspace_name: str
     role: str
     plan: str
+    trial_ends_at: datetime | None = None
     onboarded: bool
     jwt: str
 
@@ -124,7 +125,11 @@ async def sync_user(
         await session.commit()
 
         token = sign_jwt(user_id=user.id, workspace_id=ws.id, role=member.role, settings=settings)
+        # Workspace recién creado: created_at lo pone server_default y no está
+        # cargado en el objeto → el trial arranca ahora.
+        trial_ends = trial_ends_at_for(ws.created_at or now, settings)
         return SyncResponse(
             user_id=user.id, workspace_id=ws.id, workspace_slug=ws.slug, workspace_name=ws.name,
-            role=member.role, plan=ws.plan, onboarded=ws.onboarded_at is not None, jwt=token,
+            role=member.role, plan=ws.plan, trial_ends_at=trial_ends,
+            onboarded=ws.onboarded_at is not None, jwt=token,
         )

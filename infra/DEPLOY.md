@@ -179,6 +179,25 @@ curl "https://api.vigia.legal/normas?limit=1"        # datos reales
 - Web: abrir `https://vigia.legal/feed` → normas reales; login Google → onboarding.
 - Crear una alerta → `match_alertas` corre por beat (o `docker compose ... run --rm worker python -c "from vigia_workers.alerts import match_alertas as t; print(t())"`) → llega email (si `RESEND_API_KEY`).
 
+## Free trial y membresías
+
+Cada workspace tiene 30 días de prueba desde su creación (`VIGIA_TRIAL_DAYS`
+para cambiarlo). Al vencer, los endpoints gated devuelven `402 trial_expired`
+y el web muestra el cartel de membresía (contacto: `devops@colossuslab.org`).
+Los datos públicos no se ven afectados.
+
+**Otorgar una membresía** (en el EC2, contra el Postgres del compose):
+
+```bash
+docker compose -f docker-compose.prod.yml exec -T db \
+  psql -U vigia vigia -c "UPDATE workspace SET plan = 'member' WHERE slug = '<slug>';"
+```
+
+El cartel se levanta solo (el web refetchea `/workspaces/me`); no requiere
+re-login. **Extender un trial** sin otorgar membresía: retro-datar
+`created_at` del workspace (misma vía, `UPDATE workspace SET created_at = ...`).
+Para encontrar el slug: `SELECT slug, name, plan, created_at FROM workspace;`.
+
 ## Costos aproximados (us-east-1)
 EC2 t3.small (~$15) + RDS t4g.micro (~$13) + ElastiCache t4g.micro (~$12) ≈ **$40/mo**.
 Web en Vercel: free/pro. Bajar costos: EC2 all-in-one con perfil `local-data` (~$15/mo) hasta tener tráfico.

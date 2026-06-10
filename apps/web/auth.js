@@ -77,6 +77,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           token.workspaceSlug = sync.workspace_slug;
           token.workspaceName = sync.workspace_name;
           token.role = sync.role;
+          token.plan = sync.plan;
+          token.trialEndsAt = sync.trial_ends_at;
           token.onboarded = sync.onboarded;
         }
       }
@@ -90,6 +92,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           slug: token.workspaceSlug ?? '',
           name: token.workspaceName ?? '',
           role: token.role ?? 'viewer',
+          plan: token.plan ?? 'free',
+          trialEndsAt: token.trialEndsAt ?? null,
           onboarded: Boolean(token.onboarded),
         };
       }

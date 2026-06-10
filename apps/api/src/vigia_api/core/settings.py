@@ -16,6 +16,10 @@ class Settings(BaseSettings):
     auth_jwt_ttl_seconds: int = 60 * 60 * 24  # 24h
     auth_enabled: bool = False  # False = modo demo abierto
 
+    # Free trial: días de uso pleno desde la creación del workspace. Al vencer,
+    # los endpoints gated devuelven 402 trial_expired salvo plan != "free".
+    trial_days: int = 30
+
     @property
     def cors_origins(self) -> list[str]:
         return [o.strip() for o in self.api_cors_origins.split(",") if o.strip()]

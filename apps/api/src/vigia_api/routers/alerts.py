@@ -14,7 +14,7 @@ from pydantic import BaseModel
 from sqlalchemy import delete, func, select, update
 
 from vigia_api.core.db import get_sessionmaker
-from vigia_api.core.security import WorkspaceContext, current_workspace
+from vigia_api.core.security import WorkspaceContext, require_active_plan
 from vigia_shared.models import Alerta, AlertaMatch, Norma
 
 router = APIRouter(prefix="/alerts", tags=["alerts"])
@@ -56,7 +56,7 @@ class MatchOut(BaseModel):
 
 
 @router.get("", response_model=list[AlertaOut])
-async def list_alertas(ctx: Annotated[WorkspaceContext, Depends(current_workspace)]) -> list[AlertaOut]:
+async def list_alertas(ctx: Annotated[WorkspaceContext, Depends(require_active_plan)]) -> list[AlertaOut]:
     _require_real_workspace(ctx)
     Session = get_sessionmaker()
     async with Session() as session:
@@ -81,7 +81,7 @@ async def list_alertas(ctx: Annotated[WorkspaceContext, Depends(current_workspac
 @router.post("", response_model=AlertaOut, status_code=201)
 async def create_alerta(
     body: AlertaIn,
-    ctx: Annotated[WorkspaceContext, Depends(current_workspace)],
+    ctx: Annotated[WorkspaceContext, Depends(require_active_plan)],
 ) -> AlertaOut:
     _require_real_workspace(ctx)
     if not body.keyword.strip():
@@ -105,7 +105,7 @@ async def create_alerta(
 async def toggle_alerta(
     alerta_id: int,
     body: AlertaPatch,
-    ctx: Annotated[WorkspaceContext, Depends(current_workspace)],
+    ctx: Annotated[WorkspaceContext, Depends(require_active_plan)],
 ) -> AlertaOut:
     _require_real_workspace(ctx)
     Session = get_sessionmaker()
@@ -129,7 +129,7 @@ async def toggle_alerta(
 @router.delete("/{alerta_id}", status_code=204)
 async def delete_alerta(
     alerta_id: int,
-    ctx: Annotated[WorkspaceContext, Depends(current_workspace)],
+    ctx: Annotated[WorkspaceContext, Depends(require_active_plan)],
 ) -> None:
     _require_real_workspace(ctx)
     Session = get_sessionmaker()
@@ -145,7 +145,7 @@ async def delete_alerta(
 @router.get("/{alerta_id}/matches", response_model=list[MatchOut])
 async def alerta_matches(
     alerta_id: int,
-    ctx: Annotated[WorkspaceContext, Depends(current_workspace)],
+    ctx: Annotated[WorkspaceContext, Depends(require_active_plan)],
 ) -> list[MatchOut]:
     _require_real_workspace(ctx)
     Session = get_sessionmaker()

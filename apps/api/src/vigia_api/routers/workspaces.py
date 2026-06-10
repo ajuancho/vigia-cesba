@@ -10,7 +10,7 @@ from pydantic import BaseModel, EmailStr
 from sqlalchemy import func, select
 
 from vigia_api.core.db import get_sessionmaker
-from vigia_api.core.security import WorkspaceContext, current_workspace
+from vigia_api.core.security import WorkspaceContext, current_workspace, require_active_plan
 from vigia_api.services.audit import (
     ACTION_INVITE_CREATED,
     ACTION_MEMBER_LEFT,
@@ -38,6 +38,7 @@ class WorkspaceMe(BaseModel):
     slug: str
     name: str
     plan: str
+    trial_ends_at: datetime | None = None
     role: str
     seat_limit: int
     seats_used: int
@@ -65,6 +66,8 @@ class InviteOut(BaseModel):
 
 @router.get("/me", response_model=WorkspaceMe)
 async def me(ctx: Annotated[WorkspaceContext, Depends(current_workspace)]) -> WorkspaceMe:
+    # Exento del check de trial: el cliente necesita poder leer su propio estado
+    # (plan, trial_ends_at) incluso con el trial vencido.
     Session = get_sessionmaker()
     async with Session() as session:
         ws = await session.get(Workspace, ctx.workspace_id)
@@ -74,8 +77,8 @@ async def me(ctx: Annotated[WorkspaceContext, Depends(current_workspace)]) -> Wo
             select(func.count()).select_from(WorkspaceMember).where(WorkspaceMember.workspace_id == ws.id)
         )
     return WorkspaceMe(
-        id=ws.id, slug=ws.slug, name=ws.name, plan=ws.plan, role=ctx.role,
-        seat_limit=ws.seat_limit, seats_used=int(seats or 0),
+        id=ws.id, slug=ws.slug, name=ws.name, plan=ws.plan, trial_ends_at=ctx.trial_ends_at,
+        role=ctx.role, seat_limit=ws.seat_limit, seats_used=int(seats or 0),
         onboarded=ws.onboarded_at is not None, sectores_interes=ws.sectores_interes,
     )
 
@@ -84,7 +87,7 @@ async def me(ctx: Annotated[WorkspaceContext, Depends(current_workspace)]) -> Wo
 async def onboarding(
     body: OnboardingBody,
     request: Request,
-    ctx: Annotated[WorkspaceContext, Depends(current_workspace)],
+    ctx: Annotated[WorkspaceContext, Depends(require_active_plan)],
 ) -> WorkspaceMe:
     Session = get_sessionmaker()
     async with Session() as session:
@@ -104,14 +107,14 @@ async def onboarding(
             select(func.count()).select_from(WorkspaceMember).where(WorkspaceMember.workspace_id == ws.id)
         )
     return WorkspaceMe(
-        id=ws.id, slug=ws.slug, name=ws.name, plan=ws.plan, role=ctx.role,
-        seat_limit=ws.seat_limit, seats_used=int(seats or 0),
+        id=ws.id, slug=ws.slug, name=ws.name, plan=ws.plan, trial_ends_at=ctx.trial_ends_at,
+        role=ctx.role, seat_limit=ws.seat_limit, seats_used=int(seats or 0),
         onboarded=True, sectores_interes=ws.sectores_interes,
     )
 
 
 @router.get("/me/members", response_model=list[MemberOut])
-async def members(ctx: Annotated[WorkspaceContext, Depends(current_workspace)]) -> list[MemberOut]:
+async def members(ctx: Annotated[WorkspaceContext, Depends(require_active_plan)]) -> list[MemberOut]:
     Session = get_sessionmaker()
     async with Session() as session:
         rows = (
@@ -132,7 +135,7 @@ async def members(ctx: Annotated[WorkspaceContext, Depends(current_workspace)]) 
 async def create_invitation(
     body: InviteBody,
     request: Request,
-    ctx: Annotated[WorkspaceContext, Depends(current_workspace)],
+    ctx: Annotated[WorkspaceContext, Depends(require_active_plan)],
 ) -> InviteOut:
     if ctx.role not in ("owner", "admin"):
         raise HTTPException(status.HTTP_403_FORBIDDEN, "requires_owner_or_admin")
@@ -164,7 +167,7 @@ async def create_invitation(
 
 
 @router.get("/me/invitations", response_model=list[InviteOut])
-async def list_invitations(ctx: Annotated[WorkspaceContext, Depends(current_workspace)]) -> list[InviteOut]:
+async def list_invitations(ctx: Annotated[WorkspaceContext, Depends(require_active_plan)]) -> list[InviteOut]:
     Session = get_sessionmaker()
     async with Session() as session:
         rows = (
@@ -184,7 +187,7 @@ async def list_invitations(ctx: Annotated[WorkspaceContext, Depends(current_work
 async def remove_member(
     user_id: int,
     request: Request,
-    ctx: Annotated[WorkspaceContext, Depends(current_workspace)],
+    ctx: Annotated[WorkspaceContext, Depends(require_active_plan)],
 ) -> None:
     if ctx.role not in ("owner", "admin"):
         raise HTTPException(status.HTTP_403_FORBIDDEN, "requires_owner_or_admin")
@@ -210,7 +213,7 @@ async def remove_member(
 @router.post("/me/leave", status_code=204)
 async def leave(
     request: Request,
-    ctx: Annotated[WorkspaceContext, Depends(current_workspace)],
+    ctx: Annotated[WorkspaceContext, Depends(require_active_plan)],
 ) -> None:
     Session = get_sessionmaker()
     async with Session() as session:
