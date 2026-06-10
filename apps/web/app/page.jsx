@@ -110,7 +110,7 @@ export default async function Landing() {
           <FadeIn delay={320}>
             <div className="flex items-center justify-center gap-6 mt-9 text-[13px] font-medium">
               <Link href="/feed" className="textlink">
-                Explorar el feed <span className="arrow">→</span>
+                Entrar a la plataforma <span className="arrow">→</span>
               </Link>
               <Link href="/auth/signin" className="textlink">
                 Crear cuenta <span className="arrow">→</span>
@@ -196,8 +196,8 @@ export default async function Landing() {
                 Dejá de leer el Boletín. <em>Dejá que te avise.</em>
               </h2>
               <p className="text-[13px] text-text-secondary max-w-md mx-auto mb-7 leading-relaxed">
-                Crear una cuenta te da alertas por email, un workspace para tu equipo y monitoreo persistente.
-                El feed y el buscador son públicos, siempre.
+                Con tu cuenta gratuita accedés al feed, el buscador, las alertas por email
+                y un workspace para tu equipo. Los datos son públicos; tu monitoreo es tuyo.
               </p>
               <div className="flex items-center justify-center gap-4 flex-wrap">
                 <Link href="/feed" className="btn-celeste rounded-full px-6 py-2.5 text-[13px] font-bold inline-flex items-center gap-2">

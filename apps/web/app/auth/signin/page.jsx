@@ -77,11 +77,9 @@ function SignInInner() {
 
             <div className="flex items-center justify-between mt-6 pt-5 border-t border-border-light">
               <Link href="/" className="flex items-center gap-1 text-[11px] text-text-tertiary hover:text-text-primary transition-colors">
-                <ArrowLeft size={11} /> Volver
+                <ArrowLeft size={11} /> Volver al inicio
               </Link>
-              <Link href="/feed" className="textlink text-[12px] font-medium">
-                Explorar sin cuenta <span className="arrow">→</span>
-              </Link>
+              <span className="text-[11px] text-text-tertiary">Cuenta gratuita</span>
             </div>
           </div>
         </div>

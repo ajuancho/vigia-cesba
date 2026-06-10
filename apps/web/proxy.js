@@ -1,12 +1,21 @@
 /**
- * Next 16 proxy (ex middleware). Protege /onboarding y /settings cuando
- * AUTH_ENABLED=true. Las páginas de datos (feed, dashboard, search, dnu) son
- * públicas — datos legislativos abiertos. En modo demo, passthrough total.
+ * Next 16 proxy (ex middleware). Con AUTH_ENABLED=true protege TODA la
+ * plataforma: solo la landing (/) y /auth/* son públicas; cualquier vista de
+ * datos requiere sesión. En modo demo (sin credenciales OAuth), passthrough.
  */
 import { NextResponse } from 'next/server';
 import { AUTH_ENABLED, auth } from '@/auth';
 
-const PROTECTED_PREFIXES = ['/onboarding', '/settings'];
+const PROTECTED_PREFIXES = [
+  '/feed',
+  '/dashboard',
+  '/search',
+  '/alerts',
+  '/dnu',
+  '/norma',
+  '/onboarding',
+  '/settings',
+];
 
 const passthrough = () => NextResponse.next();
 
