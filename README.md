@@ -117,7 +117,7 @@ vigia/
 - [x] **Fase 1** — Datos reales end-to-end: conector InfoLEG → Postgres → API → web Next.js (sin mock)
 - [x] **Fase 2** — Auth + multi-tenant: NextAuth + Google OAuth, `/auth/sync`, workspaces B2C/B2B, miembros e invitaciones (dormido en modo demo hasta setear credenciales)
 - [x] **Fase 3** — Alertas persistentes por workspace + matching FTS + digest por email (Resend; no-op sin API key)
-- [~] **Fase 4** — Deploy producción: config lista y verificada (Dockerfiles, `docker-compose.prod.yml`, CI a GHCR, Caddy, runbook [`infra/DEPLOY.md`](infra/DEPLOY.md)). Falta el push a AWS/Vercel (requiere credenciales)
+- [x] **Fase 4** — **EN PRODUCCIÓN**: web [vigia.openarg.org](https://vigia.openarg.org) (Vercel) + API [vigia-api.openarg.org](https://vigia-api.openarg.org) (EC2 all-in-one, runbook [`infra/DEPLOY.md`](infra/DEPLOY.md))
 - [ ] **Fase 5** — IA (resúmenes + NER), embeddings pgvector, scrapers BORA directo / Congreso
 
 ---
