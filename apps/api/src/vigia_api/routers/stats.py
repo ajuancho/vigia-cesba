@@ -75,33 +75,48 @@ async def dashboard() -> DashboardStats:
 
 
 @router.get("/series", response_model=list[SeriesPoint])
-async def series(months: int = Query(24, ge=3, le=120)) -> list[SeriesPoint]:
-    """Producción normativa mensual por tipo (serie temporal del pulso regulatorio)."""
-    Session = get_sessionmaker()
-    async with Session() as session:
-        rows = (
-            await session.execute(
-                text(
-                    """
-                    SELECT to_char(date_trunc('month', fecha_publicacion), 'YYYY-MM') AS mes,
-                           tipo, COUNT(*) c
-                    FROM norma
-                    WHERE fecha_publicacion >= date_trunc('month', current_date) - make_interval(months => :months)
-                      AND fecha_publicacion < date_trunc('month', current_date) + interval '1 month'
-                    GROUP BY 1, 2
-                    ORDER BY 1
-                    """
-                ),
-                {"months": months},
-            )
-        ).all()
+async def series(
+    months: int = Query(24, ge=3, le=120),
+    granularity: str = Query("month", pattern="^(month|week)$"),
+) -> list[SeriesPoint]:
+    """Producción normativa por período y tipo (pulso regulatorio).
 
-    by_month: dict[str, dict[str, int]] = {}
-    for mes, tipo, c in rows:
-        by_month.setdefault(mes, {})[tipo] = int(c)
+    granularity=week devuelve semanas ISO (campo `mes` = lunes de la semana,
+    YYYY-MM-DD) acotadas a los últimos ~`months`*4.3 semanas.
+    """
+    Session = get_sessionmaker()
+    if granularity == "week":
+        sql = """
+            SELECT to_char(date_trunc('week', fecha_publicacion), 'YYYY-MM-DD') AS periodo,
+                   tipo, COUNT(*) c
+            FROM norma
+            WHERE fecha_publicacion >= date_trunc('week', current_date) - make_interval(weeks => :periods)
+              AND fecha_publicacion < date_trunc('week', current_date) + interval '1 week'
+            GROUP BY 1, 2
+            ORDER BY 1
+        """
+        params = {"periods": months * 4}
+    else:
+        sql = """
+            SELECT to_char(date_trunc('month', fecha_publicacion), 'YYYY-MM') AS periodo,
+                   tipo, COUNT(*) c
+            FROM norma
+            WHERE fecha_publicacion >= date_trunc('month', current_date) - make_interval(months => :periods)
+              AND fecha_publicacion < date_trunc('month', current_date) + interval '1 month'
+            GROUP BY 1, 2
+            ORDER BY 1
+        """
+        params = {"periods": months}
+
+    async with Session() as session:
+        rows = (await session.execute(text(sql), params)).all()
+
+    by_period: dict[str, dict[str, int]] = {}
+    for periodo, tipo, c in rows:
+        by_period.setdefault(periodo, {})[tipo] = int(c)
     return [
-        SeriesPoint(mes=mes, total=sum(tipos.values()), por_tipo=tipos)
-        for mes, tipos in sorted(by_month.items())
+        SeriesPoint(mes=p, total=sum(tipos.values()), por_tipo=tipos)
+        for p, tipos in sorted(by_period.items())
     ]
 
 

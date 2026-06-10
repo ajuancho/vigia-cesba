@@ -2,8 +2,21 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
 import { api } from '@/lib/api';
-import { Shield, AlertTriangle, CheckCircle, Timer, Clock, ArrowRight, Scale, Building2 } from 'lucide-react';
+import { Clock, ArrowRight, Scale, Building2 } from 'lucide-react';
+import FadeIn from '@/components/FadeIn';
+import CountUp from '@/components/CountUp';
+
+function ChartTooltip({ active, payload, label }) {
+  if (!active || !payload?.length) return null;
+  return (
+    <div className="bg-navy-700 border border-border-medium rounded-lg px-3 py-2 shadow-lg">
+      <p className="text-[10px] font-mono text-text-tertiary mb-0.5">{label}</p>
+      <p className="text-[12px] font-bold text-text-primary font-mono">{payload[0].value} DNU</p>
+    </div>
+  );
+}
 
 export default function DNUTrackerView() {
   const router = useRouter();
@@ -11,88 +24,116 @@ export default function DNUTrackerView() {
   const [normas, setNormas] = useState([]);
 
   useEffect(() => {
-    api.dnuStats().then(setDnu).catch(() => setDnu(null));
-    api.listNormas({ tipo: 'DNU', limit: 50 }).then((d) => setNormas(d.items || [])).catch(() => setNormas([]));
+    api.dnuStats().then(setDnu).catch(() => {});
+    api.listNormas({ tipo: 'DNU', limit: 30 }).then((d) => setNormas(d.items || [])).catch(() => {});
   }, []);
 
+  const hist = (dnu?.historico || []).filter((d) => d.anio >= 1994);
+  const anioActual = new Date().getFullYear();
+  const dnuEsteAnio = hist.find((h) => h.anio === anioActual)?.cantidad ?? 0;
+  const pico = hist.reduce((m, h) => (h.cantidad > m.cantidad ? h : m), { anio: '—', cantidad: 0 });
+
+  const KPIS = [
+    { label: 'Históricos', value: dnu?.total, sub: 'en seguimiento', color: 'text-text-primary' },
+    { label: `En ${anioActual}`, value: dnuEsteAnio, sub: 'emitidos este año', color: 'text-status-red' },
+    { label: 'Pendientes', value: dnu?.pendientes, sub: 'sin dictamen bicameral', color: 'text-sol' },
+    { label: `Pico: ${pico.anio}`, value: pico.cantidad, sub: 'el año más intenso', color: 'text-celeste' },
+  ];
+
   return (
-    <div className="max-w-5xl mx-auto animate-fade-in">
-      <div className="mb-6">
-        <h2 className="text-xl font-bold text-text-primary tracking-tight mb-0.5">Tracker de DNU</h2>
-        <p className="text-sm text-text-tertiary">Seguimiento de Decretos de Necesidad y Urgencia — Comisión Bicameral</p>
-      </div>
-
-      <div className="card p-5 mb-5 border-l-4 border-l-sol">
-        <div className="flex items-start gap-3">
-          <Scale size={16} className="text-status-amber shrink-0 mt-0.5" />
-          <div>
-            <h3 className="text-sm font-semibold text-text-primary mb-1">¿Qué son los DNU?</h3>
-            <p className="text-[12px] text-text-secondary leading-relaxed">
-              Los <strong>Decretos de Necesidad y Urgencia</strong> son medidas legislativas dictadas por el Poder Ejecutivo en circunstancias excepcionales.
-              En Argentina, <strong className="text-status-amber">mantienen vigencia por aprobación tácita</strong>: solo pierden efecto si ambas cámaras del Congreso los rechazan.
-              La Comisión Bicameral Permanente tiene <strong>10 días</strong> para emitir dictamen.
-            </p>
-          </div>
+    <div className="max-w-5xl mx-auto">
+      <FadeIn>
+        <div className="mb-7 pt-2">
+          <p className="eyebrow mb-1"><span className="eyebrow-num">VIGÍA / DNU</span><span className="ml-2">Decretos de Necesidad y Urgencia</span></p>
+          <h2 className="display-section text-text-primary mb-1">El Ejecutivo, <em>legislando.</em></h2>
+          <p className="text-[13px] text-text-tertiary font-mono">seguimiento bicameral · Art. 99 inc. 3 CN</p>
         </div>
-      </div>
+      </FadeIn>
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
-        {[
-          { icon: Shield, label: 'En seguimiento', value: dnu?.total ?? 0, sub: 'DNU monitoreados', color: 'text-text-primary' },
-          { icon: Timer, label: 'Pendientes', value: dnu?.pendientes ?? 0, sub: 'Sin tratamiento', color: 'text-status-amber' },
-          { icon: CheckCircle, label: 'Aprobados', value: dnu?.aprobados ?? 0, sub: 'Ratificados', color: 'text-status-green' },
-          { icon: AlertTriangle, label: 'Rechazados', value: dnu?.rechazados ?? 0, sub: 'Por ambas cámaras', color: 'text-status-red' },
-        ].map(({ icon: Icon, label, value, sub, color }) => (
-          <div key={label} className="card p-4">
-            <div className="flex items-center gap-2 mb-2">
-              <Icon size={14} className="text-text-tertiary" />
-              <span className="text-[9px] font-semibold text-text-tertiary uppercase tracking-wide">{label}</span>
+      {/* Contexto editorial */}
+      <FadeIn delay={80}>
+        <div className="flex items-start gap-3 border-l-2 border-sol pl-4 py-1 mb-10">
+          <Scale size={14} className="text-sol shrink-0 mt-0.5" />
+          <p className="text-[12px] text-text-secondary leading-relaxed max-w-2xl">
+            Los DNU son medidas legislativas dictadas por el Poder Ejecutivo en circunstancias excepcionales.
+            <strong className="text-sol"> Mantienen vigencia por aprobación tácita</strong>: solo caen si ambas
+            cámaras los rechazan. La Comisión Bicameral tiene 10 días para dictaminar.
+          </p>
+        </div>
+      </FadeIn>
+
+      {/* KPIs monumentales */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 border-t-2 border-text-primary/70 mb-12">
+        {KPIS.map(({ label, value, sub, color }, i) => (
+          <FadeIn key={label} delay={i * 90} className="h-full">
+            <div className="pt-5 pb-6 lg:border-r border-border-light lg:px-5 first:pl-0 h-full transition-colors duration-300 hover:bg-celeste/[0.03]">
+              <p className={`font-mono font-bold tracking-tight text-[clamp(2rem,3.5vw,3rem)] leading-none mb-2 ${color}`}>
+                {value != null ? <CountUp value={value} /> : '—'}
+              </p>
+              <p className="text-[13px] font-bold text-text-primary mb-0.5" style={{ fontFamily: 'var(--font-display)' }}>{label}</p>
+              <p className="text-[11px] text-text-tertiary">{sub}</p>
             </div>
-            <p className={`text-2xl font-bold font-mono ${color}`}>{value}</p>
-            <p className="text-[10px] text-text-tertiary">{sub}</p>
-          </div>
+          </FadeIn>
         ))}
       </div>
 
-      <div className="mb-3">
-        <h3 className="text-sm font-semibold text-text-primary mb-0.5">DNU recientes</h3>
-        <p className="text-[11px] text-text-tertiary">Últimos decretos monitoreados</p>
-      </div>
+      {/* Histórico */}
+      <section className="mb-12">
+        <FadeIn>
+          <p className="eyebrow mb-1"><span className="eyebrow-num">I.</span><span className="ml-2">Histórico 1994 → {anioActual}</span></p>
+          <h3 className="text-[17px] font-bold text-text-primary mb-6" style={{ fontFamily: 'var(--font-display)' }}>
+            Cada gestión deja <em className="text-sol italic">su huella.</em>
+          </h3>
+        </FadeIn>
+        <FadeIn delay={120}>
+          <ResponsiveContainer width="100%" height={260}>
+            <BarChart data={hist} margin={{ left: -14, right: 0 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="rgba(116, 172, 223, 0.08)" vertical={false} />
+              <XAxis dataKey="anio" tick={{ fill: '#636E85', fontSize: 9 }} axisLine={false} tickLine={false} interval={2} />
+              <YAxis tick={{ fill: '#636E85', fontSize: 10 }} axisLine={false} tickLine={false} />
+              <Tooltip content={<ChartTooltip />} cursor={{ fill: 'rgba(116,172,223,0.06)' }} />
+              <Bar dataKey="cantidad" name="DNU" fill="#F87171" radius={[3, 3, 0, 0]} animationDuration={1100} />
+            </BarChart>
+          </ResponsiveContainer>
+        </FadeIn>
+      </section>
 
-      <div className="space-y-2">
-        {normas.map((d) => {
-          const estado = d.estado || '';
-          const pendiente = estado.includes('Pendiente') || estado.includes('comisión');
-          return (
-            <div key={d.id} onClick={() => router.push(`/norma/${d.id}`)} className="card card-hover p-4 cursor-pointer group transition-all">
+      {/* Recientes */}
+      <section>
+        <FadeIn>
+          <p className="eyebrow mb-1"><span className="eyebrow-num">II.</span><span className="ml-2">Los últimos</span></p>
+          <h3 className="text-[17px] font-bold text-text-primary mb-4" style={{ fontFamily: 'var(--font-display)' }}>
+            DNU <em className="text-sol italic">recientes.</em>
+          </h3>
+        </FadeIn>
+        <div className="border-t border-border-light">
+          {normas.map((d, i) => (
+            <div
+              key={d.id}
+              onClick={() => router.push(`/norma/${d.id}`)}
+              className="group cursor-pointer border-b border-border-light py-3.5 transition-all duration-300 hover:bg-celeste/[0.03] hover:pl-3 animate-fade-in"
+              style={{ animationDelay: `${Math.min(i * 35, 350)}ms`, animationFillMode: 'both' }}
+            >
               <div className="flex items-start gap-3">
-                <div className="w-1 h-10 rounded-full bg-status-red shrink-0 mt-0.5" />
+                <div className="w-1 self-stretch rounded-full bg-status-red shrink-0 opacity-70 group-hover:opacity-100 transition-opacity" />
                 <div className="flex-1 min-w-0">
                   <div className="flex flex-wrap items-center gap-2 mb-0.5">
-                    <span className="text-[10px] font-semibold text-status-red uppercase">DNU {d.numero || ''}</span>
-                    <span className={`text-[9px] font-medium px-2 py-0.5 rounded-full border ${pendiente ? 'tint-amber' : 'tint-green'}`}>
-                      {pendiente ? 'Pendiente Bicameral' : 'Vigente'}
-                    </span>
+                    <span className="text-[9px] font-semibold text-status-red uppercase tracking-[0.1em]">DNU {d.numero || ''}</span>
+                    <span className="px-2 py-0.5 rounded-full text-[9px] font-medium border tint-amber">pendiente bicameral</span>
+                    {d.fecha_publicacion && <span className="text-[10px] text-text-tertiary font-mono ml-auto flex items-center gap-1"><Clock size={9} /> {d.fecha_publicacion}</span>}
                   </div>
-                  <h4 className="text-[13px] font-semibold text-text-primary group-hover:text-inst-accent transition-colors mb-0.5">{d.titulo}</h4>
-                  {d.resumen && <p className="text-[12px] text-text-tertiary line-clamp-1">{d.resumen}</p>}
-                  <div className="flex items-center gap-3 mt-1.5 text-[10px] text-text-tertiary">
-                    {d.fecha_publicacion && <span className="flex items-center gap-1"><Clock size={9} /> {d.fecha_publicacion}</span>}
-                    {d.organismo && <span className="flex items-center gap-1"><Building2 size={9} /> {d.organismo}</span>}
-                  </div>
+                  <h4 className="text-[13px] font-semibold text-text-primary group-hover:text-celeste-bright transition-colors mb-0.5" style={{ fontFamily: 'var(--font-display)' }}>{d.titulo}</h4>
+                  {d.organismo && (
+                    <p className="text-[10px] text-text-tertiary flex items-center gap-1"><Building2 size={9} /> {d.organismo}</p>
+                  )}
                 </div>
-                <ArrowRight size={12} className="text-text-tertiary group-hover:text-inst-accent shrink-0 mt-2 transition-colors" />
+                <ArrowRight size={12} className="text-text-tertiary group-hover:text-celeste group-hover:translate-x-0.5 shrink-0 mt-2 transition-all" />
               </div>
             </div>
-          );
-        })}
-      </div>
-
-      {normas.length === 0 && (
-        <div className="text-center py-12 text-text-tertiary text-sm">
-          No hay DNU en el corpus actual. La ingesta del corpus completo de InfoLEG los incorporará.
+          ))}
+          {normas.length === 0 && <p className="text-[12px] text-text-tertiary py-6">Cargando…</p>}
         </div>
-      )}
+      </section>
     </div>
   );
 }

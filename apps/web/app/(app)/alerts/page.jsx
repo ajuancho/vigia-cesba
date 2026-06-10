@@ -5,11 +5,14 @@ import { useSession } from 'next-auth/react';
 import { SECTORES } from '@/lib/constants';
 import { authedFetch, AUTH_ENABLED } from '@/lib/authClient';
 import { Bell, Plus, Trash2, Power, PowerOff, Tag, Hash, Calendar, Info } from 'lucide-react';
+import FadeIn from '@/components/FadeIn';
+import CountUp from '@/components/CountUp';
+
+const INPUT_CLS = 'w-full bg-transparent border-b border-border-light px-1 py-2 text-[13px] text-text-primary placeholder-text-tertiary focus:outline-none focus:border-celeste transition-colors';
 
 export default function AlertsView() {
   const { data: session } = useSession();
   const jwt = session?.apiJwt;
-  // Modo conectado: auth activa + sesión con JWT. Si no, demo client-side.
   const connected = AUTH_ENABLED && Boolean(jwt);
 
   const [alertas, setAlertas] = useState([]);
@@ -21,8 +24,7 @@ export default function AlertsView() {
   const load = useCallback(async () => {
     if (!connected) return;
     try {
-      const data = await authedFetch(jwt, '/alerts');
-      setAlertas(data);
+      setAlertas(await authedFetch(jwt, '/alerts'));
     } catch (e) { setErr(String(e.message || e)); }
   }, [connected, jwt]);
 
@@ -68,104 +70,114 @@ export default function AlertsView() {
   const activas = alertas.filter((a) => a.activa).length;
   const totalMatches = alertas.reduce((s, a) => s + (a.matches || 0), 0);
 
+  const KPIS = [
+    { label: 'Alertas', value: alertas.length, color: 'text-text-primary' },
+    { label: 'Activas', value: activas, color: 'text-status-green' },
+    { label: 'Matches', value: totalMatches, color: 'text-celeste' },
+  ];
+
   return (
-    <div className="max-w-3xl mx-auto animate-fade-in">
-      <div className="flex items-start justify-between mb-6">
-        <div>
-          <h2 className="text-xl font-bold text-text-primary tracking-tight mb-0.5">Alertas</h2>
-          <p className="text-sm text-text-tertiary">Monitoreo por keywords y sectores</p>
+    <div className="max-w-3xl mx-auto">
+      <FadeIn>
+        <div className="flex items-end justify-between gap-4 mb-7 pt-2">
+          <div>
+            <p className="eyebrow mb-1"><span className="eyebrow-num">VIGÍA / ALERTAS</span><span className="ml-2">Monitoreo automático</span></p>
+            <h2 className="display-section text-text-primary mb-1">Que la norma <em>te encuentre.</em></h2>
+            <p className="text-[13px] text-text-tertiary font-mono">keyword + sector · matching horario · digest por email</p>
+          </div>
+          <button onClick={() => setShowForm(!showForm)} className="flex items-center gap-1.5 px-4 py-2 btn-celeste rounded-full text-[11px] font-bold shrink-0">
+            <Plus size={13} /> Nueva
+          </button>
         </div>
-        <button onClick={() => setShowForm(!showForm)} className="flex items-center gap-1.5 px-3 py-2 btn-celeste rounded-full text-[11px] font-bold">
-          <Plus size={13} /> Nueva alerta
-        </button>
-      </div>
+      </FadeIn>
 
       {!connected && (
-        <div className="card p-3 mb-5 border-l-4 border-l-inst-accent flex items-start gap-2">
-          <Info size={14} className="text-inst-accent shrink-0 mt-0.5" />
-          <p className="text-[12px] text-text-secondary leading-relaxed">
-            {AUTH_ENABLED
-              ? 'Iniciá sesión para que tus alertas se guarden y te lleguen por email.'
-              : 'Vista previa: las alertas se persisten y notifican por email cuando la autenticación está activa. Por ahora viven solo en esta sesión.'}
-          </p>
-        </div>
+        <FadeIn delay={60}>
+          <div className="flex items-start gap-2 border-l-2 border-celeste pl-4 py-1 mb-8">
+            <Info size={13} className="text-celeste shrink-0 mt-0.5" />
+            <p className="text-[12px] text-text-secondary leading-relaxed">
+              {AUTH_ENABLED ? 'Iniciá sesión para que tus alertas se guarden y lleguen por email.' : 'Vista demo: las alertas viven solo en esta sesión.'}
+            </p>
+          </div>
+        </FadeIn>
       )}
 
-      {err && <div className="card p-3 mb-4 border-l-4 border-l-status-red text-[12px] text-status-red">{err}</div>}
+      {err && <p className="text-[12px] text-status-red mb-4 font-mono">{err}</p>}
 
-      <div className="grid grid-cols-3 gap-3 mb-5">
-        <div className="card p-4 text-center">
-          <p className="text-xl font-bold text-text-primary">{alertas.length}</p>
-          <p className="text-[10px] text-text-tertiary uppercase tracking-wide font-medium">Total</p>
-        </div>
-        <div className="card p-4 text-center">
-          <p className="text-xl font-bold text-status-green">{activas}</p>
-          <p className="text-[10px] text-text-tertiary uppercase tracking-wide font-medium">Activas</p>
-        </div>
-        <div className="card p-4 text-center">
-          <p className="text-xl font-bold text-inst-blue">{totalMatches}</p>
-          <p className="text-[10px] text-text-tertiary uppercase tracking-wide font-medium">Matches</p>
-        </div>
+      {/* KPIs flotantes */}
+      <div className="grid grid-cols-3 border-t-2 border-text-primary/70 mb-10">
+        {KPIS.map(({ label, value, color }, i) => (
+          <FadeIn key={label} delay={i * 80}>
+            <div className="pt-4 pb-5 lg:border-r border-border-light lg:px-5 first:pl-0 transition-colors duration-300 hover:bg-celeste/[0.03]">
+              <p className={`font-mono font-bold text-3xl leading-none mb-1.5 ${color}`}><CountUp value={value} /></p>
+              <p className="eyebrow text-[9px]">{label}</p>
+            </div>
+          </FadeIn>
+        ))}
       </div>
 
+      {/* Form flotante */}
       {showForm && (
-        <div className="card p-5 mb-5 animate-slide-up">
-          <h3 className="text-sm font-semibold text-text-primary mb-3">Crear nueva alerta</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
+        <div className="mb-10 animate-slide-up border-l-2 border-celeste pl-5 py-1">
+          <p className="eyebrow mb-4"><span className="eyebrow-num">+</span><span className="ml-2">Nueva alerta</span></p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-4">
             <div>
-              <label className="text-[10px] font-semibold text-text-tertiary uppercase tracking-wide mb-1 block">Keyword</label>
-              <input type="text" value={newKeyword} onChange={(e) => setNewKeyword(e.target.value)} placeholder="ej: litio, ciberseguridad, energia..." className="w-full bg-bg-primary border border-border-light rounded-lg px-3 py-2 text-[13px] text-text-primary placeholder-text-tertiary focus:outline-none focus:border-inst-accent" />
+              <label className="eyebrow text-[9px] block mb-1">Keyword</label>
+              <input type="text" value={newKeyword} onChange={(e) => setNewKeyword(e.target.value)} placeholder="litio, ciberseguridad, SMVM…" className={INPUT_CLS} autoFocus />
             </div>
             <div>
-              <label className="text-[10px] font-semibold text-text-tertiary uppercase tracking-wide mb-1 block">Sector</label>
-              <select value={newSector} onChange={(e) => setNewSector(e.target.value)} className="w-full bg-bg-primary border border-border-light rounded-lg px-3 py-2 text-[13px] text-text-secondary focus:outline-none focus:border-inst-accent">
+              <label className="eyebrow text-[9px] block mb-1">Sector (opcional)</label>
+              <select value={newSector} onChange={(e) => setNewSector(e.target.value)} className={INPUT_CLS}>
                 <option value="">Todos</option>
                 {SECTORES.map((s) => <option key={s} value={s}>{s}</option>)}
               </select>
             </div>
           </div>
-          <div className="flex gap-2">
-            <button onClick={addAlerta} className="px-3 py-1.5 btn-celeste rounded-full text-[11px] font-bold">Crear</button>
+          <div className="flex gap-3">
+            <button onClick={addAlerta} className="px-4 py-1.5 btn-celeste rounded-full text-[11px] font-bold">Crear</button>
             <button onClick={() => setShowForm(false)} className="px-3 py-1.5 text-text-secondary text-[11px] font-medium hover:text-text-primary transition-colors">Cancelar</button>
           </div>
         </div>
       )}
 
-      <div className="space-y-2">
-        {alertas.map((alerta) => (
-          <div key={alerta.id} className={`card p-4 transition-all ${!alerta.activa ? 'opacity-50' : ''}`}>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <Bell size={16} className={alerta.activa ? 'text-inst-blue' : 'text-text-tertiary'} />
-                <div>
-                  <div className="flex items-center gap-2 mb-0.5">
-                    <h4 className="text-[13px] font-semibold text-text-primary">&quot;{alerta.keyword}&quot;</h4>
-                    {alerta.activa && <span className="text-[9px] font-medium tint-green px-1.5 py-0.5 rounded-full border">Activa</span>}
+      {/* Lista editorial */}
+      <div className="border-t border-border-light">
+        {alertas.map((alerta, i) => (
+          <FadeIn key={alerta.id} delay={Math.min(i * 50, 300)}>
+            <div className={`group flex items-center justify-between gap-3 border-b border-border-light py-4 transition-all duration-300 hover:bg-celeste/[0.03] hover:pl-2 ${!alerta.activa ? 'opacity-40' : ''}`}>
+              <div className="flex items-center gap-3 min-w-0">
+                <Bell size={15} className={alerta.activa ? 'text-celeste' : 'text-text-tertiary'} />
+                <div className="min-w-0">
+                  <div className="flex items-center gap-2 mb-1">
+                    <h4 className="text-[14px] font-semibold text-text-primary truncate" style={{ fontFamily: 'var(--font-display)' }}>
+                      “{alerta.keyword}”
+                    </h4>
+                    {alerta.activa && <span className="text-[9px] font-medium tint-green border px-1.5 py-0.5 rounded-full shrink-0">activa</span>}
                   </div>
-                  <div className="flex items-center gap-3 text-[10px] text-text-tertiary">
-                    <span className="flex items-center gap-1"><Tag size={9} /> {alerta.sector || 'Todos'}</span>
-                    <span className="flex items-center gap-1"><Hash size={9} /> {alerta.matches || 0} matches</span>
+                  <div className="flex items-center gap-3 text-[10px] text-text-tertiary font-mono">
+                    <span className="flex items-center gap-1"><Tag size={9} /> {alerta.sector || 'todos'}</span>
+                    <span className="flex items-center gap-1"><Hash size={9} /> {(alerta.matches || 0).toLocaleString('es-AR')} matches</span>
                     {alerta.last_match_at && <span className="flex items-center gap-1"><Calendar size={9} /> {alerta.last_match_at.slice(0, 10)}</span>}
                   </div>
                 </div>
               </div>
-              <div className="flex items-center gap-1">
-                <button onClick={() => toggleAlerta(alerta)} className={`p-1.5 rounded transition-colors ${alerta.activa ? 'text-status-green hover:bg-status-green/10' : 'text-text-tertiary hover:bg-bg-tertiary'}`}>
+              <div className="flex items-center gap-1 shrink-0">
+                <button onClick={() => toggleAlerta(alerta)} className={`p-1.5 rounded-lg transition-colors ${alerta.activa ? 'text-status-green hover:bg-status-green/10' : 'text-text-tertiary hover:bg-bg-tertiary'}`}>
                   {alerta.activa ? <Power size={14} /> : <PowerOff size={14} />}
                 </button>
-                <button onClick={() => deleteAlerta(alerta)} className="p-1.5 rounded text-text-tertiary hover:text-status-red hover:bg-status-red/10 transition-colors">
+                <button onClick={() => deleteAlerta(alerta)} className="p-1.5 rounded-lg text-text-tertiary hover:text-status-red hover:bg-status-red/10 transition-colors">
                   <Trash2 size={14} />
                 </button>
               </div>
             </div>
-          </div>
+          </FadeIn>
         ))}
       </div>
 
       {alertas.length === 0 && (
         <div className="text-center py-16">
-          <Bell size={32} className="text-border-medium mx-auto mb-2" />
-          <p className="text-text-tertiary text-sm">No hay alertas configuradas</p>
+          <Bell size={28} className="text-text-tertiary/40 mx-auto mb-3" />
+          <p className="text-text-tertiary text-sm">Sin alertas todavía — creá la primera.</p>
         </div>
       )}
     </div>
