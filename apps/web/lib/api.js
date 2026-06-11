@@ -18,6 +18,7 @@ async function get(path) {
 
 export const api = {
   listNormas: (params) => get(`/normas${qs(params)}`),
+  ediciones: (params) => get(`/normas/ediciones${qs(params)}`),
   getNorma: (id) => get(`/normas/${id}`),
   search: (params) => get(`/search${qs(params)}`),
   dashboard: () => get('/stats/dashboard'),

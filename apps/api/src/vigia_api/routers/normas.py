@@ -6,9 +6,92 @@ from sqlalchemy import func, select
 
 from vigia_api.core.db import get_sessionmaker
 from vigia_shared.models import DnuTracking, Norma, SourceCatalog
+from vigia_shared.relevancia import PESO_TIPO, es_tramite
 from vigia_shared.schemas import NormaDetail, NormaListItem, NormaPage
 
 router = APIRouter(prefix="/normas", tags=["normas"])
+
+# Topes por edición (el cliente muestra lo que llega; el resto queda contado).
+_MAX_DESTACADOS = 30
+_MAX_TRAMITE = 80
+
+
+@router.get("/ediciones")
+async def ediciones(
+    dias: int = Query(7, ge=1, le=31, description="cuántas ediciones (días con normas) traer"),
+    offset_dias: int = Query(0, ge=0, le=365, description="paginación: saltear N ediciones"),
+    tipo: str | None = Query(None),
+    sector: str | None = Query(None),
+) -> dict:
+    """El feed como diario: una edición por día, con jerarquía editorial.
+
+    Cada edición separa `destacados` (DNU, leyes, decretos de alcance general,
+    normativa regulatoria) de `tramite` (edictos, designaciones, beneplácitos),
+    que el cliente colapsa en una línea. Orden: peso editorial del tipo.
+    """
+    Session = get_sessionmaker()
+    filters = []
+    if tipo:
+        filters.append(Norma.tipo == tipo)
+    if sector:
+        filters.append(Norma.sector == sector)
+
+    async with Session() as session:
+        fechas = (
+            await session.execute(
+                select(Norma.fecha_publicacion)
+                .where(Norma.fecha_publicacion.isnot(None), *filters)
+                .group_by(Norma.fecha_publicacion)
+                .order_by(Norma.fecha_publicacion.desc())
+                .limit(dias + 1)  # +1 para saber si hay más
+                .offset(offset_dias)
+            )
+        ).scalars().all()
+        has_more = len(fechas) > dias
+        fechas = fechas[:dias]
+        if not fechas:
+            return {"ediciones": [], "has_more": False}
+
+        rows = (
+            await session.execute(
+                select(Norma)
+                .where(Norma.fecha_publicacion.in_(fechas), *filters)
+                .order_by(Norma.fecha_publicacion.desc(), Norma.id.desc())
+            )
+        ).scalars().all()
+
+    por_fecha: dict = {f: {"destacados": [], "tramite": []} for f in fechas}
+    resumen: dict = {f: {} for f in fechas}
+    for n in rows:
+        raw = n.raw if isinstance(n.raw, dict) else {}
+        bucket = (
+            "tramite"
+            if es_tramite(n.tipo, n.titulo, tags=n.tags, tipo_linea=raw.get("tipo_linea"))
+            else "destacados"
+        )
+        por_fecha[n.fecha_publicacion][bucket].append(n)
+        r = resumen[n.fecha_publicacion]
+        r[n.tipo] = r.get(n.tipo, 0) + 1
+
+    out = []
+    for f in fechas:
+        destacados = sorted(
+            por_fecha[f]["destacados"], key=lambda n: (PESO_TIPO.get(n.tipo, 9), -n.id)
+        )
+        tramite = por_fecha[f]["tramite"]
+        out.append(
+            {
+                "fecha": f.isoformat(),
+                "resumen": resumen[f],
+                "destacados_total": len(destacados),
+                "tramite_total": len(tramite),
+                "destacados": [
+                    NormaListItem.model_validate(n) for n in destacados[:_MAX_DESTACADOS]
+                ],
+                "tramite": [NormaListItem.model_validate(n) for n in tramite[:_MAX_TRAMITE]],
+            }
+        )
+    return {"ediciones": out, "has_more": has_more}
 
 
 @router.get("", response_model=NormaPage)

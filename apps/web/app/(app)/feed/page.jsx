@@ -123,6 +123,86 @@ function NormRow({ norma, onClick, index }) {
   );
 }
 
+function fmtEdicionFecha(iso) {
+  const d = new Date(`${iso}T12:00:00`);
+  const s = d.toLocaleDateString('es-AR', { weekday: 'long', day: 'numeric', month: 'long' });
+  return s.charAt(0).toUpperCase() + s.slice(1);
+}
+
+function resumenEdicion(ed) {
+  const partes = Object.entries(ed.resumen || {})
+    .filter(([t]) => t !== 'OTRA')
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 4)
+    .map(([t, c]) => `${c} ${(TIPOS_NORMA[t]?.label || t).toLowerCase()}${c !== 1 ? (t === 'LEY' ? 'es' : 's') : ''}`);
+  return partes.join(' · ');
+}
+
+/* Una edición del diario: header del día + destacados + trámite colapsado */
+function Edicion({ edicion, onOpen }) {
+  const [verTramite, setVerTramite] = useState(false);
+  const tramiteCount = edicion.tramite_total || 0;
+
+  return (
+    <section className="mb-10">
+      <div className="flex flex-wrap items-baseline justify-between gap-2 border-t-2 border-text-primary/70 pt-3 mb-1">
+        <h3 className="text-[16px] font-bold text-text-primary" style={{ fontFamily: 'var(--font-display)' }}>
+          {fmtEdicionFecha(edicion.fecha)}
+        </h3>
+        <p className="text-[10px] text-text-tertiary font-mono">{resumenEdicion(edicion)}</p>
+      </div>
+
+      {edicion.destacados.map((norma, i) => (
+        <div key={norma.id} className="animate-fade-in" style={{ animationDelay: `${Math.min(i * 30, 300)}ms`, animationFillMode: 'both' }}>
+          <NormRow norma={norma} index={i} onClick={() => onOpen(norma.id)} />
+        </div>
+      ))}
+      {edicion.destacados.length === 0 && tramiteCount === 0 && (
+        <p className="text-[12px] text-text-tertiary py-4">Sin publicaciones.</p>
+      )}
+      {edicion.destacados_total > edicion.destacados.length && (
+        <p className="text-[11px] text-text-tertiary font-mono py-2">
+          +{edicion.destacados_total - edicion.destacados.length} destacados más en el Buscador
+        </p>
+      )}
+
+      {tramiteCount > 0 && (
+        <div className="mt-1">
+          <button
+            onClick={() => setVerTramite((v) => !v)}
+            className="group w-full flex items-center gap-2 py-2.5 text-left text-[12px] text-text-tertiary hover:text-text-secondary transition-colors"
+          >
+            <span className={`inline-block transition-transform duration-200 ${verTramite ? 'rotate-90' : ''}`}>▸</span>
+            <span className="font-mono">{tramiteCount} de trámite</span>
+            <span className="hidden sm:inline">— edictos, designaciones y ceremoniales</span>
+            <span className="flex-1 border-b border-dashed border-border-light group-hover:border-border-medium transition-colors" />
+          </button>
+          {verTramite && (
+            <div className="border-l border-border-light ml-1 mb-2">
+              {edicion.tramite.map((n) => (
+                <div
+                  key={n.id}
+                  onClick={() => onOpen(n.id)}
+                  className="flex items-center gap-2 pl-4 py-1.5 cursor-pointer text-[12px] text-text-secondary hover:text-text-primary hover:bg-celeste/[0.03] transition-colors"
+                >
+                  <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ backgroundColor: TIPO_DOT[n.tipo] || TIPO_DOT.OTRA, opacity: 0.6 }} />
+                  <span className="truncate">{n.titulo}</span>
+                  {n.organismo && <span className="text-[10px] text-text-tertiary shrink-0 hidden md:inline truncate max-w-[180px]">{n.organismo}</span>}
+                </div>
+              ))}
+              {edicion.tramite_total > edicion.tramite.length && (
+                <p className="pl-4 py-1.5 text-[10px] text-text-tertiary font-mono">
+                  +{edicion.tramite_total - edicion.tramite.length} más
+                </p>
+              )}
+            </div>
+          )}
+        </div>
+      )}
+    </section>
+  );
+}
+
 function FeedView() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -133,21 +213,31 @@ function FeedView() {
     tipoParam && TIPOS_NORMA[tipoParam] ? tipoParam : 'TODOS'
   );
   const [filterSector, setFilterSector] = useState(sectorParam || null);
-  const [data, setData] = useState({ items: [], total: 0 });
+  const [ediciones, setEdiciones] = useState([]);
+  const [hasMore, setHasMore] = useState(false);
+  const [offsetDias, setOffsetDias] = useState(0);
   const [loading, setLoading] = useState(true);
 
+  // El feed son ediciones diarias (como un diario): cambiar el filtro
+  // resetea la paginación; "cargar más días" appendea.
   useEffect(() => {
     setLoading(true);
     api
-      .listNormas({
+      .ediciones({
+        dias: 5,
+        offset_dias: offsetDias,
         tipo: filterTipo !== 'TODOS' ? filterTipo : undefined,
         sector: filterSector || undefined,
-        limit: 30,
       })
-      .then(setData)
-      .catch(() => setData({ items: [], total: 0 }))
+      .then((d) => {
+        setEdiciones((prev) => (offsetDias === 0 ? d.ediciones : [...prev, ...d.ediciones]));
+        setHasMore(d.has_more);
+      })
+      .catch(() => { setEdiciones([]); setHasMore(false); })
       .finally(() => setLoading(false));
-  }, [filterTipo, filterSector]);
+  }, [filterTipo, filterSector, offsetDias]);
+
+  const changeFilter = (setter) => (value) => { setOffsetDias(0); setter(value); };
 
   return (
     <div className="max-w-4xl mx-auto">
@@ -167,7 +257,7 @@ function FeedView() {
           {['TODOS', ...Object.keys(TIPOS_NORMA)].map((tipo) => (
             <button
               key={tipo}
-              onClick={() => setFilterTipo(tipo)}
+              onClick={() => changeFilter(setFilterTipo)(tipo)}
               className={`px-3 py-1 rounded-full text-[11px] font-medium transition-all duration-200 border ${
                 filterTipo === tipo
                   ? 'bg-celeste/10 text-celeste-bright border-celeste/40 scale-105'
@@ -179,37 +269,46 @@ function FeedView() {
           ))}
           {filterSector && (
             <button
-              onClick={() => setFilterSector(null)}
+              onClick={() => changeFilter(setFilterSector)(null)}
               className="px-3 py-1 rounded-full text-[11px] font-medium border bg-sol/10 text-sol border-sol/40 hover:border-sol transition-all"
               title="Quitar filtro de sector"
             >
               {filterSector} ×
             </button>
           )}
-          <span className="ml-auto text-[11px] text-text-tertiary font-mono">
-            {loading ? '…' : <><span className="text-text-primary font-bold">{data.total.toLocaleString('es-AR')}</span> normas</>}
-          </span>
         </div>
       </FadeIn>
 
-      {loading ? (
+      {loading && ediciones.length === 0 ? (
         <div className="py-20 text-center">
           <p className="text-text-tertiary text-sm font-mono animate-pulse">Cargando el Boletín…</p>
         </div>
       ) : (
         <div>
-          {data.items.map((norma, i) => (
-            <div key={norma.id} className="animate-fade-in" style={{ animationDelay: `${Math.min(i * 35, 400)}ms`, animationFillMode: 'both' }}>
-              <NormRow norma={norma} index={i} onClick={() => router.push(`/norma/${norma.id}`)} />
-            </div>
+          {ediciones.map((ed) => (
+            <Edicion key={ed.fecha} edicion={ed} onOpen={(id) => router.push(`/norma/${id}`)} />
           ))}
         </div>
       )}
 
-      {!loading && data.items.length === 0 && (
+      {!loading && ediciones.length === 0 && (
         <div className="text-center py-16">
           <p className="text-text-tertiary text-sm">No hay normas que coincidan con el filtro.</p>
         </div>
+      )}
+
+      {hasMore && !loading && (
+        <div className="text-center py-8">
+          <button
+            onClick={() => setOffsetDias((o) => o + 5)}
+            className="px-5 py-2 rounded-full text-[12px] font-medium border border-border-light text-text-secondary hover:border-celeste/40 hover:text-celeste transition-colors"
+          >
+            Cargar ediciones anteriores ↓
+          </button>
+        </div>
+      )}
+      {loading && ediciones.length > 0 && (
+        <p className="text-center py-6 text-[11px] font-mono text-text-tertiary animate-pulse">Cargando…</p>
       )}
     </div>
   );
