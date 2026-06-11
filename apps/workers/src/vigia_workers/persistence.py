@@ -5,7 +5,7 @@ import asyncio
 from datetime import datetime, timezone
 from typing import Any
 
-from sqlalchemy import literal_column, select, update
+from sqlalchemy import func, literal_column, select, update
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -58,10 +58,13 @@ async def _upsert_source(
 
 # Columnas de `norma` que el upsert sobreescribe cuando ya existe (no tocamos
 # las identitarias ni search_vector, que es generada).
+# `resumen_ia` se trata aparte (COALESCE): es caro de generar y muchas tasks
+# re-ingestan sin recalcularlo (p.ej. InfoLEG full), así que no debe pisarse
+# con NULL — solo se actualiza cuando el INSERT trae uno nuevo.
 _NORMA_UPDATE_COLS = (
-    "tipo", "numero", "titulo", "resumen", "fecha_publicacion", "jurisdiccion",
-    "sector", "organismo", "estado", "impacto", "bora_seccion", "entidades",
-    "tags", "url", "raw",
+    "tipo", "numero", "titulo", "resumen", "resumen_ia", "fecha_publicacion",
+    "jurisdiccion", "sector", "organismo", "estado", "impacto", "bora_seccion",
+    "entidades", "tags", "url", "raw",
 )
 
 
@@ -88,9 +91,13 @@ async def upsert_normas(source: dict, normas: list[dict]) -> dict[str, int]:
 
         values = [{**n, "source_id": source_id} for n in normas]
         stmt = insert(Norma).values(values)
+        set_ = {col: getattr(stmt.excluded, col) for col in _NORMA_UPDATE_COLS}
+        # Conservar el resumen IA existente cuando esta corrida no trae uno
+        # (re-ingestas idempotentes, o fallo puntual del LLM en el lookback).
+        set_["resumen_ia"] = func.coalesce(stmt.excluded.resumen_ia, Norma.resumen_ia)
         stmt = stmt.on_conflict_do_update(
             index_elements=["source_id", "external_id"],
-            set_={col: getattr(stmt.excluded, col) for col in _NORMA_UPDATE_COLS},
+            set_=set_,
         ).returning(Norma.id, Norma.tipo, literal_column("(xmax = 0)").label("inserted"))
         res = await session.execute(stmt)
         rows = res.fetchall()

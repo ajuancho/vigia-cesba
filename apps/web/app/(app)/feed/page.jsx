@@ -106,8 +106,8 @@ function NormRow({ norma, onClick, index }) {
             {norma.titulo}
           </h3>
 
-          {norma.resumen && (
-            <p className="text-[12px] text-text-secondary leading-relaxed line-clamp-2 mb-1.5">{norma.resumen}</p>
+          {(norma.resumen_ia || norma.resumen) && (
+            <p className="text-[12px] text-text-secondary leading-relaxed line-clamp-2 mb-1.5">{norma.resumen_ia || norma.resumen}</p>
           )}
 
           <div className="flex flex-wrap items-center gap-3 text-[10px] text-text-tertiary">

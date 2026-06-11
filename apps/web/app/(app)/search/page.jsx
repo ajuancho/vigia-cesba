@@ -129,7 +129,7 @@ function SearchView() {
                 <h4 className="text-[13px] font-semibold text-text-primary group-hover:text-celeste-bright transition-colors mb-0.5 truncate" style={{ fontFamily: 'var(--font-display)' }}>
                   {norma.titulo}
                 </h4>
-                <p className="text-[12px] text-text-tertiary line-clamp-1">{norma.snippet || norma.resumen}</p>
+                <p className="text-[12px] text-text-tertiary line-clamp-1">{norma.snippet || norma.resumen_ia || norma.resumen}</p>
               </div>
               <ArrowRight size={12} className="text-text-tertiary group-hover:text-celeste group-hover:translate-x-0.5 shrink-0 mt-2 transition-all" />
             </div>

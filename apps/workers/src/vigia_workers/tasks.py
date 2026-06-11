@@ -17,6 +17,7 @@ from __future__ import annotations
 
 import dataclasses
 import os
+import re
 import tempfile
 from datetime import date
 from pathlib import Path
@@ -25,6 +26,7 @@ from typing import Any
 from vigia_connectors import BoraAviso, BoraClient, HcdnClient, HcdnProyecto, InfoLegClient, InfoLegNorm
 from vigia_connectors.bora import looks_like_dnu
 from vigia_shared.sources import catalog_fields
+from vigia_workers.ai_resumen import aplicar_resumen_ia
 from vigia_workers.celery_app import celery_app
 from vigia_workers.persistence import mark_source_run, run_async, upsert_normas, with_status
 
@@ -47,7 +49,7 @@ def _is_dry_run(flag: bool) -> bool:
 
 def _dry_sample_row(row: dict[str, Any]) -> dict[str, Any]:
     """Versión legible de una fila para el reporte de dry-run (sin raw)."""
-    keep = ("external_id", "tipo", "numero", "titulo", "fecha_publicacion", "organismo", "sector")
+    keep = ("external_id", "tipo", "numero", "titulo", "resumen", "fecha_publicacion", "organismo", "sector")
     out = {k: row.get(k) for k in keep}
     if isinstance(out.get("fecha_publicacion"), date):
         out["fecha_publicacion"] = out["fecha_publicacion"].isoformat()
@@ -185,11 +187,33 @@ def ingest_hcdn_proyectos(dry_run: bool = False) -> dict[str, Any]:
     return run_async(_wrapped())
 
 
+# Código GDE/GEDO (Gestión Documental Electrónica): RESOL-2026-276-APN-INASE#MEC,
+# DI-2026-12-APN-DNGRH#MS, DECTO-2026-443-APN-PTE, RESFC-2026-1-APN-MEC#MEC, …
+# El BORA usa esto como "sumario" para muchísimas resoluciones/disposiciones —
+# es el identificador del documento, no un resumen humano. Un sumario real es
+# una oración con espacios, así que el anclaje ^…$ sin espacios no da falsos +.
+_CODIGO_GDE_RE = re.compile(
+    r"^[A-Z]{2,8}-\d{4}-\d+(?:-[A-Z0-9]+)+(?:#[A-Z0-9]+)?$", re.IGNORECASE
+)
+
+
+def _es_codigo_documento(s: str | None) -> bool:
+    """True si el string es un código GDE y no un sumario en prosa."""
+    return bool(s and _CODIGO_GDE_RE.match(s.strip()))
+
+
 def _sumario_generico(a: BoraAviso) -> bool:
     """True si el listado no trae sumario útil (p.ej. rubro "Avisos Oficiales",
     donde el único item-detalle es el literal "Aviso Oficial")."""
     s = (a.sumario or "").strip().lower()
     return not s or s == (a.tipo_linea or "").strip().lower()
+
+
+def _sumario_sin_valor(a: BoraAviso) -> bool:
+    """El listado no aporta un sumario legible: vacío, == tipo+número, o un
+    código GDE. En todos estos casos bajamos el detalle y armamos el resumen
+    real desde el cuerpo del aviso."""
+    return _sumario_generico(a) or _es_codigo_documento(a.sumario)
 
 
 def _texto_excerpt(texto: str, max_len: int) -> str:
@@ -205,20 +229,26 @@ def _texto_excerpt(texto: str, max_len: int) -> str:
 def _aviso_to_row(a: BoraAviso, tipo: str | None = None, texto: str | None = None) -> dict[str, Any]:
     """Mapea un BoraAviso (1ª sección) al shape de la tabla `norma`.
 
-    Para avisos sin sumario en el listado, `texto` (cuerpo del detalle) provee
-    título y resumen reales — sin esto el feed muestra "Aviso Oficial" pelado.
+    Cuando el listado no trae un sumario legible (vacío, igual al tipo, o un
+    código GDE como ``RESOL-2026-276-APN-INASE#MEC``), `texto` (cuerpo del
+    detalle) provee el resumen real — sin esto el feed muestra el código pelado.
+    El código sí sirve como título canónico, así que solo lo reemplazamos por
+    un excerpt cuando no había nada legible (sumario vacío/genérico).
     """
-    titulo = a.sumario or a.tipo_linea or f"Aviso {a.aviso_id}"
-    resumen = a.sumario
-    if texto and _sumario_generico(a):
-        titulo = _texto_excerpt(texto, 140)
+    sumario = (a.sumario or "").strip() or None
+    titulo = sumario or a.tipo_linea or f"Aviso {a.aviso_id}"
+    resumen = sumario
+    if texto and _sumario_sin_valor(a):
         resumen = _texto_excerpt(texto, 1000)
+        if not _es_codigo_documento(sumario):
+            titulo = _texto_excerpt(texto, 140)
     return {
         "external_id": a.aviso_id,
         "tipo": tipo or a.tipo_slug(),
         "numero": a.numero,
         "titulo": titulo,
         "resumen": resumen,
+        "resumen_ia": None,  # lo completa aplicar_resumen_ia() si hay credencial
         "fecha_publicacion": a.fecha,
         "jurisdiccion": "Nacional",
         "sector": a.detect_sector(),
@@ -264,7 +294,7 @@ def ingest_bora_primera(dry_run: bool = False, lookback_days: int = 5) -> dict[s
                 # Detalle: para decretos (detección de DNU) y para avisos sin
                 # sumario en el listado (título/resumen reales para el feed).
                 necesitan_texto = [
-                    a for a in avisos if a.tipo_slug() == "DECRETO" or _sumario_generico(a)
+                    a for a in avisos if a.tipo_slug() == "DECRETO" or _sumario_sin_valor(a)
                 ]
                 fetched = await _asyncio.gather(
                     *(client.fetch_detalle_texto(a) for a in necesitan_texto),
@@ -292,6 +322,9 @@ def ingest_bora_primera(dry_run: bool = False, lookback_days: int = 5) -> dict[s
                     totals["rows"] += len(rows)
                     sample.extend(_dry_sample_row(r) for r in rows[: max(0, _DRY_SAMPLE - len(sample))])
                     continue
+                # Síntesis IA (resumen_ia) desde el cuerpo del aviso, donde lo
+                # bajamos. No-op si no hay ANTHROPIC_API_KEY; nunca rompe la ingesta.
+                await aplicar_resumen_ia(rows, textos)
                 _acc(totals, await upsert_normas(BORA_SOURCE, rows))
         if dry:
             return {"rows": totals["rows"], "sample": sample, "avisos_hoy": avisos_hoy}
