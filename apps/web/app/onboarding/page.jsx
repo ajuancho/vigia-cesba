@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useState } from 'react';
 import { useSession } from 'next-auth/react';
@@ -38,8 +38,8 @@ export default function OnboardingPage() {
             <Eye size={18} className="text-celeste" />
           </div>
           <div>
-            <h1 className="text-base font-bold text-text-primary">ConfigurÃ¡ tu workspace</h1>
-            <p className="text-[12px] text-text-tertiary">PersonalizÃ¡ VigÃ­a para tu organizaciÃ³n</p>
+            <h1 className="text-base font-bold text-text-primary">Configurá tu workspace</h1>
+            <p className="text-[12px] text-text-tertiary">Personalizá Vigía para tu organización</p>
           </div>
         </div>
 
@@ -47,11 +47,11 @@ export default function OnboardingPage() {
         <input
           value={name}
           onChange={(e) => setName(e.target.value)}
-          placeholder={session?.workspace?.name || 'Mi organizaciÃ³n'}
+          placeholder={session?.workspace?.name || 'Mi organización'}
           className="w-full bg-bg-primary border border-border-light rounded-lg px-3 py-2 text-[13px] mb-5 focus:outline-none focus:border-inst-accent"
         />
 
-        <label className="text-[10px] font-semibold text-text-tertiary uppercase tracking-wide mb-2 block">Sectores de interÃ©s</label>
+        <label className="text-[10px] font-semibold text-text-tertiary uppercase tracking-wide mb-2 block">Sectores de interés</label>
         <div className="flex flex-wrap gap-2 mb-6">
           {SECTORES.map((s) => (
             <button
@@ -73,7 +73,7 @@ export default function OnboardingPage() {
           disabled={saving}
           className="w-full px-4 py-2.5 btn-celeste rounded-full text-[13px] font-bold disabled:opacity-50"
         >
-          {saving ? 'Guardandoâ€¦' : 'Continuar'}
+          {saving ? 'Guardando…' : 'Continuar'}
         </button>
       </div>
     </div>
