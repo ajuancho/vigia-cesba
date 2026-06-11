@@ -26,6 +26,7 @@ export const api = {
   organismos: (params) => get(`/stats/organismos${qs(params)}`),
   listAvisos: (params) => get(`/avisos${qs(params)}`),
   avisosRubros: (params) => get(`/avisos/rubros${qs(params)}`),
+  universo: (params) => get(`/stats/universo${qs(params)}`),
 };
 
 export { BASE as API_BASE };

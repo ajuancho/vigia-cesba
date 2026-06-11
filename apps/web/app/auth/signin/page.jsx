@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { Suspense } from 'react';
 import Link from 'next/link';
@@ -10,7 +10,7 @@ import FadeIn from '@/components/FadeIn';
 
 const BENEFITS = [
   { icon: Bell, text: 'Alertas por keyword y sector, con digest por email' },
-  { icon: Users, text: 'Un workspace para tu equipo — invitá miembros' },
+  { icon: Users, text: 'Un workspace para tu equipo â€” invitÃ¡ miembros' },
   { icon: History, text: 'Monitoreo persistente: nada se pierde entre sesiones' },
 ];
 
@@ -27,7 +27,7 @@ function GoogleMark() {
 
 function SignInInner() {
   const params = useSearchParams();
-  const callbackUrl = params.get('callbackUrl') || '/feed';
+  const callbackUrl = params.get('callbackUrl') || '/universo';
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-4">
@@ -43,13 +43,13 @@ function SignInInner() {
                 <Eye size={20} className="text-celeste" />
               </div>
               <div>
-                <p className="text-[14px] font-bold text-text-primary leading-none" style={{ fontFamily: 'var(--font-display)' }}>VIGÍA</p>
+                <p className="text-[14px] font-bold text-text-primary leading-none" style={{ fontFamily: 'var(--font-display)' }}>VIGÃA</p>
                 <p className="text-[8px] text-text-tertiary uppercase tracking-[0.18em] font-mono mt-0.5">por OpenArg</p>
               </div>
             </div>
 
             <p className="eyebrow mb-2"><span className="eyebrow-num">ACCESO</span></p>
-            <h1 className="display-section text-text-primary mb-6">Entrá a <em>Vigía.</em></h1>
+            <h1 className="display-section text-text-primary mb-6">EntrÃ¡ a <em>VigÃ­a.</em></h1>
 
             <ul className="space-y-3 mb-7">
               {BENEFITS.map(({ icon: Icon, text }) => (
@@ -85,7 +85,7 @@ function SignInInner() {
         </div>
       </FadeIn>
 
-      <p className="text-[10px] text-text-tertiary font-mono mt-6">Datos públicos verificables · Colossus Lab · BA</p>
+      <p className="text-[10px] text-text-tertiary font-mono mt-6">Datos pÃºblicos verificables Â· Colossus Lab Â· BA</p>
     </div>
   );
 }

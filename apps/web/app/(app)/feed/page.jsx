@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { BarChart, Bar, XAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import { api } from '@/lib/api';
 import { TIPOS_NORMA } from '@/lib/constants';
@@ -123,20 +123,31 @@ function NormRow({ norma, onClick, index }) {
   );
 }
 
-export default function FeedView() {
+function FeedView() {
   const router = useRouter();
-  const [filterTipo, setFilterTipo] = useState('TODOS');
+  const searchParams = useSearchParams();
+  // Deep-link desde el Universo: /feed?tipo=LEY&sector=Energía
+  const tipoParam = searchParams.get('tipo');
+  const sectorParam = searchParams.get('sector');
+  const [filterTipo, setFilterTipo] = useState(
+    tipoParam && TIPOS_NORMA[tipoParam] ? tipoParam : 'TODOS'
+  );
+  const [filterSector, setFilterSector] = useState(sectorParam || null);
   const [data, setData] = useState({ items: [], total: 0 });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     setLoading(true);
     api
-      .listNormas({ tipo: filterTipo !== 'TODOS' ? filterTipo : undefined, limit: 30 })
+      .listNormas({
+        tipo: filterTipo !== 'TODOS' ? filterTipo : undefined,
+        sector: filterSector || undefined,
+        limit: 30,
+      })
       .then(setData)
       .catch(() => setData({ items: [], total: 0 }))
       .finally(() => setLoading(false));
-  }, [filterTipo]);
+  }, [filterTipo, filterSector]);
 
   return (
     <div className="max-w-4xl mx-auto">
@@ -166,6 +177,15 @@ export default function FeedView() {
               {tipo === 'TODOS' ? 'Todos' : TIPOS_NORMA[tipo].label}
             </button>
           ))}
+          {filterSector && (
+            <button
+              onClick={() => setFilterSector(null)}
+              className="px-3 py-1 rounded-full text-[11px] font-medium border bg-sol/10 text-sol border-sol/40 hover:border-sol transition-all"
+              title="Quitar filtro de sector"
+            >
+              {filterSector} ×
+            </button>
+          )}
           <span className="ml-auto text-[11px] text-text-tertiary font-mono">
             {loading ? '…' : <><span className="text-text-primary font-bold">{data.total.toLocaleString('es-AR')}</span> normas</>}
           </span>
@@ -192,5 +212,13 @@ export default function FeedView() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function FeedPage() {
+  return (
+    <Suspense fallback={<div className="max-w-4xl mx-auto text-text-tertiary text-sm pt-6">Cargando…</div>}>
+      <FeedView />
+    </Suspense>
   );
 }

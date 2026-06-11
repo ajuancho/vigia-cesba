@@ -147,6 +147,34 @@ async def organismos(
     return [OrganismoStat(organismo=r[0], cantidad=int(r[1])) for r in rows]
 
 
+@router.get("/universo")
+async def universo(tipo: str | None = Query(None, description="drill-down: sectores de un tipo")) -> list[dict]:
+    """Conteos para el mapa-universo del home.
+
+    Sin `tipo`: una burbuja por tipo de norma. Con `tipo`: las burbujas son
+    los sectores dentro de ese tipo (drill-down), con bucket "Sin clasificar".
+    """
+    Session = get_sessionmaker()
+    async with Session() as session:
+        if tipo is None:
+            rows = (
+                await session.execute(
+                    text("SELECT tipo AS k, COUNT(*) c FROM norma GROUP BY tipo ORDER BY c DESC")
+                )
+            ).all()
+        else:
+            rows = (
+                await session.execute(
+                    text(
+                        "SELECT COALESCE(sector, 'Sin clasificar') AS k, COUNT(*) c "
+                        "FROM norma WHERE tipo = :tipo GROUP BY 1 ORDER BY c DESC"
+                    ),
+                    {"tipo": tipo},
+                )
+            ).all()
+    return [{"key": r.k, "cantidad": int(r.c)} for r in rows]
+
+
 @router.get("/dnu", response_model=DnuStats)
 async def dnu_stats() -> DnuStats:
     Session = get_sessionmaker()
