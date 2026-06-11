@@ -86,9 +86,42 @@ los datos de usuarios/alertas no).
 
 ## 5. Fase 5 — IA (diferida por decisión de producto)
 
-- `resumen_ia` + entidades (NER) vía Bedrock/Anthropic (patrón InvestArg; env vars ya previstas).
-- Embeddings pgvector (la extensión ya está instalada) para búsqueda semántica.
-- Heurística/modelo de `impacto` (hoy null — el filtro del feed existe pero sin datos).
+**PLAN DE MEJORA — diseñado el 2026-06-11, NO implementar hasta validar la
+plataforma actual con usuarios.** La decisión de diferir es deliberada: el
+feed con jerarquía heurística funciona bien; la IA es refinamiento, no
+necesidad.
+
+**Vía: AWS Bedrock, calcando OpenArg** (verificado en
+`../Open Arg/openarg_backend/src/app/infrastructure/adapters/llm/bedrock_llm_adapter.py`):
+boto3 → `bedrock-runtime` con Converse API, región us-east-1, modelo
+`us.anthropic.claude-haiku-4-5-20251001-v1:0`. La cuenta (812661756823) ya
+tiene acceso a los modelos porque OpenArg los usa. Sin API keys: IAM puro,
+los datos no salen de la cuenta.
+
+**Orden de implementación sugerido (por valor):**
+1. **`impacto` + `resumen_ia` en una sola pasada** (mismo prompt): task
+   post-ingesta (~13:30 ART, después de todas las fuentes) que toma las
+   normas del día con `impacto IS NULL` y completa impacto
+   (alto/medio/bajo), resumen en castellano llano y entidades básicas.
+   `impacto` refina el split destacado/trámite de
+   `vigia_shared/relevancia.py` (la heurística regex queda de fallback) y
+   alimenta el filtro de impacto que ya existe en API + UI.
+2. **NER (`entidades`)**: empresas/organismos/leyes citadas → habilita
+   "seguir a una empresa" cruzando normas + avisos societarios + BCRA.
+3. **Embeddings pgvector** (extensión ya instalada; OpenArg tiene
+   `BedrockEmbeddingAdapter` para calcar): búsqueda semántica + alertas
+   semánticas (más allá del keyword FTS).
+
+**Prerequisito de infra (único)**: instance profile para el EC2
+`vigia-production` con `bedrock:InvokeModel` — aprovechar y sumarle
+`s3:PutObject` para los backups (§3), un solo rol para ambos pendientes.
+
+**Costo estimado**: ~200 normas/día × ~1.5k tokens con Haiku 4.5 ≈ $5-10/mes.
+Backfill histórico opcional por lotes empezando por lo reciente (todo el
+corpus ≈ $300 — no vale la pena de entrada).
+
+Las columnas destino (`impacto`, `resumen_ia`, `entidades`) existen vacías
+desde la migración 0001 y la API ya las expone: no hay migración.
 
 ## 6. Más fuentes (backlog)
 
