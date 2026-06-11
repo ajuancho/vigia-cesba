@@ -87,6 +87,37 @@ def test_aviso_to_row_shape():
     assert row_dnu["tipo"] == "DNU"
 
 
+def test_aviso_sin_sumario_usa_texto_del_detalle():
+    # Rubro "Avisos Oficiales": el listado solo trae el literal "Aviso Oficial"
+    # — sin el texto del detalle, el feed mostraba títulos vacíos de contenido.
+    a = BoraAviso(
+        aviso_id="342984",
+        seccion="primera",
+        fecha=date(2026, 6, 10),
+        organismo="TRIBUNAL FISCAL DE LA NACIÓN",
+        tipo_linea="Aviso Oficial",
+        sumario="Aviso Oficial",  # genérico == tipo_linea
+    )
+    texto = (
+        "El Tribunal Fiscal de la Nación, Sala G, comunica por dos (2) días que, "
+        "en los autos: ALPEMAR S.R.L. c/ Dirección General de Aduanas s/ Recurso "
+        "de Apelación, Expte. N° 35.256-A, se ha dictado la sentencia."
+    )
+    row = _aviso_to_row(a, texto=texto)
+    assert row["titulo"].startswith("El Tribunal Fiscal de la Nación")
+    assert len(row["titulo"]) <= 140
+    assert "ALPEMAR" in row["resumen"]
+    # Sin texto, cae al fallback de siempre.
+    row_sin = _aviso_to_row(a)
+    assert row_sin["titulo"] == "Aviso Oficial"
+    # Con sumario real, el texto NO pisa el sumario.
+    a2 = BoraAviso(
+        aviso_id="1", seccion="primera", fecha=date(2026, 6, 10),
+        organismo="X", tipo_linea="Decreto 1/2026", sumario="DECTO-2026-1 - Sumario real.",
+    )
+    assert _aviso_to_row(a2, texto=texto)["titulo"] == "DECTO-2026-1 - Sumario real."
+
+
 def test_comunicacion_to_row_shape():
     c = ComunicacionBcra(
         serie="A",

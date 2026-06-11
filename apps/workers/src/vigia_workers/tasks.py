@@ -185,15 +185,40 @@ def ingest_hcdn_proyectos(dry_run: bool = False) -> dict[str, Any]:
     return run_async(_wrapped())
 
 
-def _aviso_to_row(a: BoraAviso, tipo: str | None = None) -> dict[str, Any]:
-    """Mapea un BoraAviso (1ª sección) al shape de la tabla `norma`."""
+def _sumario_generico(a: BoraAviso) -> bool:
+    """True si el listado no trae sumario útil (p.ej. rubro "Avisos Oficiales",
+    donde el único item-detalle es el literal "Aviso Oficial")."""
+    s = (a.sumario or "").strip().lower()
+    return not s or s == (a.tipo_linea or "").strip().lower()
+
+
+def _texto_excerpt(texto: str, max_len: int) -> str:
+    import re as _re
+
+    t = _re.sub(r"\s+", " ", texto).strip()
+    if len(t) <= max_len:
+        return t
+    corte = t.rfind(" ", 0, max_len - 1)
+    return t[: corte if corte > max_len // 2 else max_len - 1] + "…"
+
+
+def _aviso_to_row(a: BoraAviso, tipo: str | None = None, texto: str | None = None) -> dict[str, Any]:
+    """Mapea un BoraAviso (1ª sección) al shape de la tabla `norma`.
+
+    Para avisos sin sumario en el listado, `texto` (cuerpo del detalle) provee
+    título y resumen reales — sin esto el feed muestra "Aviso Oficial" pelado.
+    """
     titulo = a.sumario or a.tipo_linea or f"Aviso {a.aviso_id}"
+    resumen = a.sumario
+    if texto and _sumario_generico(a):
+        titulo = _texto_excerpt(texto, 140)
+        resumen = _texto_excerpt(texto, 1000)
     return {
         "external_id": a.aviso_id,
         "tipo": tipo or a.tipo_slug(),
         "numero": a.numero,
         "titulo": titulo,
-        "resumen": a.sumario,
+        "resumen": resumen,
         "fecha_publicacion": a.fecha,
         "jurisdiccion": "Nacional",
         "sector": a.detect_sector(),
@@ -236,19 +261,31 @@ def ingest_bora_primera(dry_run: bool = False, lookback_days: int = 5) -> dict[s
                     avisos_hoy = len(avisos)
                 if not avisos:
                     continue
-                # Detección de DNU: solo para decretos (pocos por día).
-                decretos = [a for a in avisos if a.tipo_slug() == "DECRETO"]
-                textos = await _asyncio.gather(
-                    *(client.fetch_detalle_texto(a) for a in decretos),
+                # Detalle: para decretos (detección de DNU) y para avisos sin
+                # sumario en el listado (título/resumen reales para el feed).
+                necesitan_texto = [
+                    a for a in avisos if a.tipo_slug() == "DECRETO" or _sumario_generico(a)
+                ]
+                fetched = await _asyncio.gather(
+                    *(client.fetch_detalle_texto(a) for a in necesitan_texto),
                     return_exceptions=True,
                 )
+                textos = {
+                    a.aviso_id: t
+                    for a, t in zip(necesitan_texto, fetched)
+                    if not isinstance(t, Exception) and t
+                }
                 es_dnu = {
                     a.aviso_id
-                    for a, t in zip(decretos, textos)
-                    if not isinstance(t, Exception) and looks_like_dnu(t)
+                    for a in avisos
+                    if a.tipo_slug() == "DECRETO" and looks_like_dnu(textos.get(a.aviso_id))
                 }
                 rows = [
-                    _aviso_to_row(a, tipo="DNU" if a.aviso_id in es_dnu else None)
+                    _aviso_to_row(
+                        a,
+                        tipo="DNU" if a.aviso_id in es_dnu else None,
+                        texto=textos.get(a.aviso_id),
+                    )
                     for a in avisos
                 ]
                 if dry:
