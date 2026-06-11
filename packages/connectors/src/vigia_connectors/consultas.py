@@ -106,9 +106,14 @@ class ConsultasClient:
         await self._client.aclose()
 
     async def fetch_all(self) -> list[ConsultaPublica]:
-        """Todas las consultas públicas (paginado de a 20, hasta agotar)."""
+        """Todas las consultas públicas (paginado de a 20, hasta agotar).
+
+        OJO: la paginación de DemocracyOS es 0-INDEXED (page=1 es la SEGUNDA
+        página — verificado contra la API; arrancar en 1 saltea las 20 más
+        recientes).
+        """
         out: list[ConsultaPublica] = []
-        for page in range(1, _MAX_PAGES + 1):
+        for page in range(0, _MAX_PAGES):
             data = await get_json(self._client, f"/api/forum/all?page={page}")
             if not isinstance(data, list) or not data:
                 break
