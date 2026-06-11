@@ -1,29 +1,26 @@
 # Vigía — Plan de trabajo pendiente
 
-Estado al 2026-06-10: **Fases 0–4 completas y en producción** + **expansión
-multi-fuente implementada y verificada en local** (commits en `main` SIN
-pushear — ver §0). Lo que sigue, en orden sugerido:
+Estado al 2026-06-11: **Fases 0–4 + expansión multi-fuente DESPLEGADAS EN
+PRODUCCIÓN**. Lo que sigue, en orden sugerido:
 
 ---
 
-## 0. Deploy de la expansión multi-fuente — ⚠️ PENDIENTE (commits locales)
+## 0. Expansión multi-fuente — ✅ DESPLEGADA (2026-06-11)
 
-5 commits en `main` local listos (free trial + fundación + BORA 1ª + bicameral
-DNU/BCRA + movimientos HCDN + consultas + Radar societario). Para desplegar:
+8 fuentes vivas en prod (verificado vía `/health/sources`, todas `ok`):
+InfoLEG + HCDN proyectos (previas) + **BORA 1ª** (108 normas, frescura del
+día — "esta semana" pasó de 0 a 110), **BCRA Comunicaciones** (300, hasta
+A8445), **bicameral DNU** (228 dictaminados + 709 sin_tratamiento: el
+tracker dejó de decir 1187 pendientes/0/0), **movimientos HCDN** (19.807
+proyectos con estado real), **consultas públicas** (72 — ojo: la paginación
+de DemocracyOS es 0-indexed), **BORA 2ª → Radar societario** (300 avisos,
+FTS por razón social). Migraciones 0004/0005 aplicadas. Emails Resend
+activos (dominio openarg.org verificado, key en el `.env` del EC2). Free
+trial + cartel de membresía vivos.
 
-1. `git push origin main` → CI (pytest + build de imágenes) + Vercel redeploya el web.
-2. En el EC2: `git pull` + pull/up del compose (runbook `infra/DEPLOY.md`).
-   El servicio `migrate` aplica 0004 (bicameral) y 0005 (aviso_societario).
-3. Backfills (orden del runbook "Alta de una fuente nueva", con matching
-   silencioso): `ingest_bora_primera()`, `ingest_bcra_comunicaciones(backfill=300)`,
-   `ingest_bicameral_dnu()`, `ingest_hcdn_movimientos()`,
-   `ingest_consultas_publicas()`, `ingest_bora_segunda(lookback_days=5)`.
-4. Smoke: `/health/sources` todo `ok` (8 fuentes), `/stats/dashboard`
-   recientes.semana > 0, `/stats/dnu` con dictaminados > 0.
-
-Fuentes nuevas y beat (ART): BORA 1ª 07:00+12:00 · reconcile 04:30 · HCDN
-movimientos 08:30 · bicameral 09:30 · BORA 2ª 10:30 · consultas 12:00 ·
-BCRA 20:30 · check-sources cada 6 h.
+Beat (ART): infoleg 03:00 · reconcile 04:30 · BORA 1ª 07:00+12:00 · HCDN
+08:00/08:30 · bicameral 09:30 · BORA 2ª 10:30 · consultas 12:00 · BCRA
+20:30 · match-alertas :15 · check-sources cada 6 h.
 
 **Pospuesto con motivo**: Senado (sin export estructurado de proyectos /
 sanciones — los JSON de DatosAbiertos son administrativos; HCDN ya cubre
