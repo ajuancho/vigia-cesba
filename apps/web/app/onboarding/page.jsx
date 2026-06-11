@@ -23,7 +23,7 @@ export default function OnboardingPage() {
         method: 'POST',
         body: JSON.stringify({ name: name || undefined, sectores_interes: selected }),
       });
-      router.push('/universo');
+      router.push('/feed');
     } catch {
       setSaving(false);
     }

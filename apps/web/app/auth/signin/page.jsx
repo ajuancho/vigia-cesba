@@ -27,7 +27,7 @@ function GoogleMark() {
 
 function SignInInner() {
   const params = useSearchParams();
-  const callbackUrl = params.get('callbackUrl') || '/universo';
+  const callbackUrl = params.get('callbackUrl') || '/feed';
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-4">

@@ -2,10 +2,9 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Newspaper, BarChart3, Search, Bell, Shield, X, Eye, Landmark, Building2, Orbit } from 'lucide-react';
+import { Newspaper, BarChart3, Search, Bell, Shield, X, Eye, Landmark, Building2 } from 'lucide-react';
 
 const NAV_ITEMS = [
-  { to: '/universo', label: 'Universo', icon: Orbit },
   { to: '/feed', label: 'Feed Normativo', icon: Newspaper },
   { to: '/dashboard', label: 'Estadísticas', icon: BarChart3 },
   { to: '/search', label: 'Buscador', icon: Search },

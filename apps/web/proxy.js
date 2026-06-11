@@ -7,7 +7,6 @@ import { NextResponse } from 'next/server';
 import { AUTH_ENABLED, auth } from '@/auth';
 
 const PROTECTED_PREFIXES = [
-  '/universo',
   '/feed',
   '/dashboard',
   '/search',
