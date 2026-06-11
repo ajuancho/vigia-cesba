@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Eye, Newspaper, Search, Bell, Shield, ArrowRight } from 'lucide-react';
+import { Eye, Newspaper, Search, Bell, Shield, ArrowRight, Building2, BarChart3 } from 'lucide-react';
 import FadeIn from '@/components/FadeIn';
 import TypingDemo from '@/components/TypingDemo';
 
@@ -20,7 +20,7 @@ async function getStats() {
 const MODULES = [
   {
     num: '01', icon: Newspaper, title: 'Feed Normativo', href: '/feed',
-    desc: 'Cada ley, decreto, DNU y resolución publicada en el Boletín Oficial, en una sola línea de tiempo.',
+    desc: 'El Boletín del día como un diario: lo importante arriba, el trámite colapsado. Ediciones diarias con jerarquía editorial.',
   },
   {
     num: '02', icon: Search, title: 'Buscador', href: '/search',
@@ -28,19 +28,27 @@ const MODULES = [
   },
   {
     num: '03', icon: Bell, title: 'Alertas', href: '/alerts',
-    desc: 'Suscribite por keyword y sector. Cuando una norma matchea, te llega un digest por email.',
+    desc: 'Suscribite por keyword y sector. Cuando una norma, comunicación o edicto matchea, te llega un digest por email.',
   },
   {
     num: '04', icon: Shield, title: 'Tracker DNU', href: '/dnu',
-    desc: 'Seguimiento del tratamiento bicameral de cada Decreto de Necesidad y Urgencia.',
+    desc: 'Cada DNU con su estado bicameral real: dictaminados, pendientes y sin tratamiento, desde los datos del Congreso.',
+  },
+  {
+    num: '05', icon: Building2, title: 'Radar societario', href: '/avisos',
+    desc: 'La 2ª sección del Boletín, buscable: constituciones, asambleas y edictos. Vigilá una empresa por razón social.',
+  },
+  {
+    num: '06', icon: BarChart3, title: 'Estadísticas', href: '/dashboard',
+    desc: 'El pulso normativo en números: actividad por tipo y sector, organismos más activos, tendencias.',
   },
 ];
 
 const PIPELINE = [
-  { num: '01', label: 'Ingesta', desc: 'InfoLEG y Boletín Oficial, por workers programados', color: 'text-celeste' },
-  { num: '02', label: 'Normalización', desc: 'Tipo, organismo, sector y jurisdicción detectados', color: 'text-sol' },
+  { num: '01', label: 'Ingesta', desc: 'Ocho fuentes oficiales — BORA, InfoLEG, Congreso, BCRA — con workers diarios', color: 'text-celeste' },
+  { num: '02', label: 'Normalización', desc: 'Tipo, organismo, sector y estado de tramitación detectados', color: 'text-sol' },
   { num: '03', label: 'Índice', desc: 'Full-text search en español con ranking', color: 'text-sol-bright' },
-  { num: '04', label: 'Alertas', desc: 'Matching por keyword + notificación por email', color: 'text-text-primary' },
+  { num: '04', label: 'Alertas', desc: 'Matching por keyword + digest por email con links', color: 'text-text-primary' },
 ];
 
 export default async function Landing() {
@@ -99,9 +107,9 @@ export default async function Landing() {
           </FadeIn>
           <FadeIn delay={160}>
             <p className="text-[15px] md:text-base text-text-secondary max-w-xl mx-auto leading-relaxed mb-9">
-              Vigía monitorea el <strong className="text-text-primary font-semibold">Boletín Oficial</strong> y el corpus
-              normativo nacional, lo indexa y te avisa cuando algo que te importa cambia.
-              Datos públicos, en tiempo real, sin leer {fmt(total)} normas a mano.
+              Vigía monitorea el <strong className="text-text-primary font-semibold">Boletín Oficial del día</strong>,
+              el Congreso, el BCRA y las consultas públicas; lo indexa y te avisa cuando algo
+              que te importa cambia. Datos públicos, frescos cada mañana, sin leer {fmt(total)} normas a mano.
             </p>
           </FadeIn>
           <FadeIn delay={240}>
@@ -125,9 +133,10 @@ export default async function Landing() {
             <p className="eyebrow mb-8"><span className="eyebrow-num">I.</span> <span className="ml-2">Escala</span></p>
           </FadeIn>
           {[
-            { num: `${fmt(total)}+`, color: 'text-celeste', label: 'Normas indexadas', detail: 'Corpus InfoLEG / Boletín Oficial, en crecimiento con cada ingesta.' },
-            { num: String(sectores), color: 'text-sol', label: 'Sectores detectados', detail: 'Energía, minería, salud, trabajo, tecnología y más, etiquetados automáticamente.' },
-            { num: '24/7', color: 'text-sol-bright', label: 'Monitoreo continuo', detail: 'Workers programados ingieren, normalizan e indexan sin intervención.' },
+            { num: `${fmt(total)}+`, color: 'text-celeste', label: 'Normas indexadas', detail: 'Leyes, decretos, DNU, resoluciones, proyectos parlamentarios, comunicaciones del BCRA y consultas públicas.' },
+            { num: '8', color: 'text-sol', label: 'Fuentes oficiales', detail: 'Boletín Oficial (1ª y 2ª sección), InfoLEG, Diputados (proyectos, movimientos y dictámenes), BCRA y consultas públicas.' },
+            { num: String(sectores), color: 'text-sol-bright', label: 'Sectores detectados', detail: 'Energía, minería, salud, trabajo, tecnología y más, etiquetados automáticamente.' },
+            { num: '24/7', color: 'text-text-primary', label: 'Monitoreo continuo', detail: 'Ingesta diaria con SLOs de frescura por fuente: si un dato se atrasa, lo sabemos antes que vos.' },
           ].map((row, i) => (
             <FadeIn key={row.label} delay={i * 80}>
               <div className="grid grid-cols-1 md:grid-cols-[200px_220px_1fr] gap-2 md:gap-6 items-baseline py-6 border-b border-border-light">
@@ -143,9 +152,9 @@ export default async function Landing() {
         <section id="plataforma" className="border-t border-border-light py-12 md:py-16 scroll-mt-16">
           <FadeIn>
             <p className="eyebrow mb-3"><span className="eyebrow-num">II.</span> <span className="ml-2">La plataforma</span></p>
-            <h2 className="display-section text-text-primary mb-10">Cuatro módulos, <em>un solo radar.</em></h2>
+            <h2 className="display-section text-text-primary mb-10">Seis módulos, <em>un solo radar.</em></h2>
           </FadeIn>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 border-t-2 border-text-primary/80">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 border-t-2 border-text-primary/80">
             {MODULES.map(({ num, icon: Icon, title, desc, href }, i) => (
               <FadeIn key={num} delay={i * 70} className="h-full">
                 <Link href={href} className="group flex flex-col gap-3 p-5 min-h-[190px] border-b sm:border-r border-border-light hover:bg-bg-primary transition-colors h-full">
@@ -228,14 +237,18 @@ export default async function Landing() {
                 <li><Link href="/search" className="hover:text-celeste transition-colors">Buscador</Link></li>
                 <li><Link href="/alerts" className="hover:text-celeste transition-colors">Alertas</Link></li>
                 <li><Link href="/dnu" className="hover:text-celeste transition-colors">Tracker DNU</Link></li>
+                <li><Link href="/avisos" className="hover:text-celeste transition-colors">Radar societario</Link></li>
               </ul>
             </div>
             <div>
               <p className="eyebrow mb-3">Fuentes</p>
               <ul className="space-y-1.5 text-[12px] text-text-secondary">
-                <li>Boletín Oficial (BORA)</li>
+                <li>Boletín Oficial — 1ª y 2ª sección</li>
                 <li>InfoLEG — Min. Justicia</li>
-                <li className="text-text-tertiary">Congreso · próximamente</li>
+                <li>HCDN — proyectos, movimientos y dictámenes</li>
+                <li>Comisión Bicameral DNU</li>
+                <li>BCRA — Comunicaciones "A"</li>
+                <li>Consultas públicas nacionales</li>
               </ul>
             </div>
             <div>
