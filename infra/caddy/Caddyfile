@@ -10,6 +10,15 @@
 #       - caddy_data:/data
 
 vigia-api.openarg.org {
+	# Security headers (la API solo se sirve por HTTPS detrás de Caddy).
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		X-Content-Type-Options "nosniff"
+		X-Frame-Options "DENY"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		# No filtrar el stack del upstream.
+		-Server
+	}
 	reverse_proxy api:8000
 	encode gzip
 }

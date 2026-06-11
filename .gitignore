@@ -65,3 +65,7 @@ db/alembic/*.lock
 
 # Claude/agent transient
 .claude/
+
+# Informes de seguridad — NUNCA se commitean (viven en el escritorio, fuera del repo)
+*SECURITY-REVIEW*
+SECURITY-REVIEW.md
