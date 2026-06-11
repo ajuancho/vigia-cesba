@@ -1,7 +1,10 @@
 /** @type {import('next').NextConfig} */
 
 // API pública que consume el cliente (whitelist de connect-src del CSP).
-const API_ORIGIN = process.env.NEXT_PUBLIC_API_URL || 'https://vigia-api.openarg.org';
+// trim() es load-bearing: un \n colado en la env var (p.ej. cargada por CLI)
+// invalida el header y tira 500 en TODAS las rutas dinámicas (Node no
+// serializa headers con newlines) — pasó en prod el 2026-06-11.
+const API_ORIGIN = (process.env.NEXT_PUBLIC_API_URL || 'https://vigia-api.openarg.org').trim();
 
 // CSP en Report-Only primero: no rompe nada (solo reporta), permite endurecer
 // script-src con nonces más adelante sin romper la hidratación de Next.
