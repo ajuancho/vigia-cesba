@@ -51,16 +51,25 @@ v5-beta + Next 16 → bumpear `next-auth` (documentado en `../investarg`).
 
 ---
 
-## 2. Emails de alertas (Resend)
+## 2. Emails de alertas (Resend) — ✅ LISTO salvo cargar la key en el EC2
 
-El worker ya compone y "envía" digests (no-op sin API key). Activar:
-1. Cuenta en https://resend.com → API key. Verificar dominio `openarg.org`
-   (DNS records que da Resend) para enviar desde `alertas@openarg.org`.
-2. En el EC2: `RESEND_API_KEY=...` en `.env.production`/`.env` → restart worker.
-3. Probar: crear alerta con keyword frecuente → correr `match_alertas` → revisar inbox.
+**Dominio `openarg.org` VERIFICADO en Resend (2026-06-10)**: DKIM
+(`resend._domainkey`) + SPF (MX/TXT en `send.openarg.org`) cargados en
+Route53. Digest de alertas con links al detalle; emails de invitación a
+workspaces al crearlas. La key NO está en el repo (a propósito) — al
+desplegar, en el EC2:
 
-Alternativa sin cuenta nueva: AWS SES (ya hay cuenta AWS; requiere salir del
-sandbox de SES y verificar dominio).
+```bash
+# agregar a ~/vigia/.env.production Y ~/vigia/.env (la key la tiene el usuario):
+RESEND_API_KEY=<la key de Resend>
+ALERTS_FROM_EMAIL=Vigía <alertas@openarg.org>
+WEB_BASE_URL=https://vigia.openarg.org
+# opcional, avisos de fuentes caídas/estancadas:
+OPS_ALERT_EMAIL=devops@colossuslab.org
+```
+
+→ restart api + worker. Probar: crear alerta con keyword frecuente → correr
+`match_alertas` → revisar inbox.
 
 ---
 

@@ -62,6 +62,7 @@ class InviteOut(BaseModel):
     token: str
     expires_at: datetime
     accepted: bool
+    email_sent: bool = False  # solo significativo en la respuesta del POST
 
 
 @router.get("/me", response_model=WorkspaceMe)
@@ -162,8 +163,23 @@ async def create_invitation(
             session, action=ACTION_INVITE_CREATED, workspace_id=ctx.workspace_id, user_id=ctx.user_id,
             resource=body.email, params={"role": body.role}, request=request,
         )
+        ws_name = ws.name
+        inviter = await session.scalar(
+            select(AppUser.name).where(AppUser.id == ctx.user_id)
+        )
         await session.commit()
-    return InviteOut(email=body.email, role=body.role, token=token, expires_at=expires, accepted=False)
+
+    # Email de invitación best-effort (no-op sin RESEND_API_KEY; el link
+    # compartible por WhatsApp/copia es el camino principal).
+    from vigia_api.services.emails import send_invitation_email
+
+    sent = await send_invitation_email(
+        to=body.email, workspace_name=ws_name, role=body.role, token=token, invited_by=inviter
+    )
+    return InviteOut(
+        email=body.email, role=body.role, token=token, expires_at=expires,
+        accepted=False, email_sent=bool(sent.get("sent")),
+    )
 
 
 @router.get("/me/invitations", response_model=list[InviteOut])

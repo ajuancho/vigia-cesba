@@ -94,7 +94,8 @@ async def _match_all(notify: bool = True) -> dict[str, Any]:
                 digests[a.user_email] = (
                     a.ws_name,
                     items + [
-                        {"keyword": a.keyword, "tipo": n.tipo, "numero": n.numero, "titulo": n.titulo}
+                        {"id": n.id, "keyword": a.keyword, "tipo": n.tipo,
+                         "numero": n.numero, "titulo": n.titulo}
                         for n in normas
                     ],
                 )

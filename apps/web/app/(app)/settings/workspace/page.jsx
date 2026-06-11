@@ -2,8 +2,13 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useSession } from 'next-auth/react';
-import { Users, Plus, Trash2, Copy, Building2, Info } from 'lucide-react';
+import { Users, Plus, Trash2, Copy, Building2, Info, MessageCircle, Check, Mail } from 'lucide-react';
 import { authedFetch, AUTH_ENABLED } from '@/lib/authClient';
+
+function inviteMessage(wsName, token) {
+  const link = `${location.origin}/auth/invite?token=${token}`;
+  return `Te invito a "${wsName}" en Vigía, la plataforma de inteligencia legislativa argentina. Aceptá acá: ${link}`;
+}
 
 export default function WorkspaceSettings() {
   const { data: session, status } = useSession();
@@ -14,6 +19,8 @@ export default function WorkspaceSettings() {
   const [email, setEmail] = useState('');
   const [role, setRole] = useState('viewer');
   const [err, setErr] = useState('');
+  const [lastInvite, setLastInvite] = useState(null); // feedback del email automático
+  const [copied, setCopied] = useState(null); // token recién copiado
 
   const load = useCallback(async () => {
     if (!jwt) return;
@@ -32,13 +39,23 @@ export default function WorkspaceSettings() {
   const invite = async () => {
     setErr('');
     try {
-      await authedFetch(jwt, '/workspaces/me/invitations', {
+      const inv = await authedFetch(jwt, '/workspaces/me/invitations', {
         method: 'POST', body: JSON.stringify({ email, role }),
       });
+      setLastInvite(inv);
       setEmail('');
       load();
     } catch (e) { setErr(String(e.message || e)); }
   };
+
+  const copyMessage = (token) => {
+    navigator.clipboard?.writeText(inviteMessage(ws?.name || 'mi workspace', token));
+    setCopied(token);
+    setTimeout(() => setCopied(null), 2000);
+  };
+
+  const whatsappHref = (token) =>
+    `https://wa.me/?text=${encodeURIComponent(inviteMessage(ws?.name || 'mi workspace', token))}`;
 
   const removeMember = async (userId) => {
     try { await authedFetch(jwt, `/workspaces/me/members/${userId}`, { method: 'DELETE' }); load(); }
@@ -94,6 +111,17 @@ export default function WorkspaceSettings() {
           </select>
           <button onClick={invite} className="px-3 py-2 btn-celeste rounded-full text-[12px] font-bold">Invitar</button>
         </div>
+        {lastInvite && (
+          <div className="mt-3 flex items-start gap-2 text-[12px] text-text-secondary border-l-2 border-celeste/40 pl-3 py-1">
+            <Mail size={13} className="shrink-0 mt-0.5 text-celeste" />
+            <p>
+              Invitación creada para <strong className="text-text-primary">{lastInvite.email}</strong>
+              {lastInvite.email_sent
+                ? ' — le mandamos el email con el link.'
+                : ' — compartile el link por WhatsApp o copialo desde "Invitaciones pendientes".'}
+            </p>
+          </div>
+        )}
       </div>
 
       <div className="card p-5 mb-5">
@@ -118,12 +146,30 @@ export default function WorkspaceSettings() {
           <h3 className="text-sm font-semibold text-text-primary mb-3">Invitaciones pendientes</h3>
           <div className="space-y-2">
             {invites.filter((i) => !i.accepted).map((i) => (
-              <div key={i.token} className="flex items-center justify-between py-1.5 border-b border-border-light last:border-0">
-                <div>
-                  <p className="text-[13px] text-text-primary">{i.email} · {i.role}</p>
-                  <p className="text-[10px] text-text-tertiary font-mono">/auth/invite?token={i.token}</p>
+              <div key={i.token} className="flex items-center justify-between gap-3 py-2 border-b border-border-light last:border-0">
+                <div className="min-w-0">
+                  <p className="text-[13px] text-text-primary truncate">{i.email} · {i.role}</p>
+                  <p className="text-[10px] text-text-tertiary font-mono truncate">/auth/invite?token={i.token}</p>
                 </div>
-                <button onClick={() => navigator.clipboard?.writeText(`${location.origin}/auth/invite?token=${i.token}`)} className="p-1.5 rounded text-text-tertiary hover:text-inst-accent hover:bg-bg-secondary transition-colors" title="Copiar link de invitación"><Copy size={14} /></button>
+                <div className="flex items-center gap-1 shrink-0">
+                  <a
+                    href={whatsappHref(i.token)}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-full border border-status-green/30 text-status-green text-[11px] font-medium hover:bg-status-green/10 transition-colors"
+                    title="Compartir invitación por WhatsApp"
+                  >
+                    <MessageCircle size={13} /> WhatsApp
+                  </a>
+                  <button
+                    onClick={() => copyMessage(i.token)}
+                    className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-full border border-border-light text-text-secondary text-[11px] font-medium hover:border-celeste/40 hover:text-celeste transition-colors"
+                    title="Copiar mensaje con el link de invitación"
+                  >
+                    {copied === i.token ? <Check size={13} className="text-status-green" /> : <Copy size={13} />}
+                    {copied === i.token ? 'Copiado' : 'Copiar'}
+                  </button>
+                </div>
               </div>
             ))}
           </div>
