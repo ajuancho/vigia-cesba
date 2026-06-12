@@ -20,7 +20,7 @@ async function getStats() {
 const MODULES = [
   {
     num: '01', icon: Newspaper, title: 'Feed Normativo', href: '/feed',
-    desc: 'El Boletín del día como un diario: lo importante arriba, el trámite colapsado. Ediciones diarias con jerarquía editorial.',
+    desc: 'El Boletín del día como un diario: lo importante arriba, el trámite colapsado, y cada norma nueva con su resumen IA en lenguaje claro — qué resuelve y a quién afecta.',
   },
   {
     num: '02', icon: Search, title: 'Buscador', href: '/search',
@@ -47,8 +47,8 @@ const MODULES = [
 const PIPELINE = [
   { num: '01', label: 'Ingesta', desc: 'Ocho fuentes oficiales — BORA, InfoLEG, Congreso, BCRA — con workers diarios', color: 'text-celeste' },
   { num: '02', label: 'Normalización', desc: 'Tipo, organismo, sector y estado de tramitación detectados', color: 'text-sol' },
-  { num: '03', label: 'Índice', desc: 'Full-text search en español con ranking', color: 'text-sol-bright' },
-  { num: '04', label: 'Alertas', desc: 'Matching por keyword + digest por email con links', color: 'text-text-primary' },
+  { num: '03', label: 'Síntesis IA', desc: 'Cada norma nueva del Boletín, resumida en lenguaje claro: qué resuelve y a quién afecta', color: 'text-sol-bright' },
+  { num: '04', label: 'Alertas', desc: 'Índice full-text en español + matching por keyword y digest por email', color: 'text-text-primary' },
 ];
 
 export default async function Landing() {
@@ -108,8 +108,10 @@ export default async function Landing() {
           <FadeIn delay={160}>
             <p className="text-[15px] md:text-base text-text-secondary max-w-xl mx-auto leading-relaxed mb-9">
               Vigía monitorea el <strong className="text-text-primary font-semibold">Boletín Oficial del día</strong>,
-              el Congreso, el BCRA y las consultas públicas; lo indexa y te avisa cuando algo
-              que te importa cambia. Datos públicos, frescos cada mañana, sin leer {fmt(total)} normas a mano.
+              el Congreso, el BCRA y las consultas públicas; lo indexa, lo{' '}
+              <strong className="text-text-primary font-semibold">resume con IA en lenguaje claro</strong> y
+              te avisa cuando algo que te importa cambia. Datos públicos, frescos cada mañana,
+              sin leer {fmt(total)} normas a mano.
             </p>
           </FadeIn>
           <FadeIn delay={240}>
