@@ -109,9 +109,14 @@ async def _match_all(notify: bool = True) -> dict[str, Any]:
     for email, (ws_name, items) in digests.items():
         if not items:
             continue
+        subject = (
+            "Vigía — 1 nueva norma para tus alertas"
+            if len(items) == 1
+            else f"Vigía — {len(items)} nuevas normas para tus alertas"
+        )
         send_email(
             to=email,
-            subject=f"Vigía — {len(items)} nuevas normas para tus alertas",
+            subject=subject,
             html=render_digest(ws_name, items),
         )
         sent += 1

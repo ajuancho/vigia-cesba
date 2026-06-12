@@ -24,6 +24,13 @@ def test_render_digest_escapes_user_controlled_html():
     assert "/norma/1" in out
 
 
+def test_render_digest_pluraliza_coincidencias():
+    item = {"id": 1, "keyword": "minería", "tipo": "Ley", "numero": "27000", "titulo": "T"}
+    assert "Se detectó 1 coincidencia con tus alertas" in render_digest("WS", [item])
+    out = render_digest("WS", [item, {**item, "id": 2}])
+    assert "Se detectaron 2 coincidencias con tus alertas" in out
+
+
 def test_render_invitation_escapes_user_controlled_html():
     accept_url = "https://vigia.openarg.org/auth/invite?token=abc123"
     out = render_invitation(

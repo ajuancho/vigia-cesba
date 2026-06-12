@@ -55,6 +55,11 @@ def render_digest(workspace_name: str, items: list[dict]) -> str:
         f'{_esc(i["tipo"])} {_esc(i.get("numero") or "")}: {_esc(i["titulo"])}</p></td></tr>'
         for i in items
     )
+    detectadas = (
+        "Se detectó 1 coincidencia"
+        if len(items) == 1
+        else f"Se detectaron {len(items)} coincidencias"
+    )
     return (
         f'<div style="font-family:Inter,system-ui,sans-serif;background:#06090F;color:#E8ECF4;'
         f'padding:32px 24px;border-radius:12px;max-width:600px">'
@@ -63,7 +68,7 @@ def render_digest(workspace_name: str, items: list[dict]) -> str:
         f'<h2 style="margin:0 0 6px;font-size:20px;color:#E8ECF4">Nuevas normas para '
         f'<em style="color:#F6B40E;font-style:italic">{_esc(workspace_name)}</em></h2>'
         f'<p style="margin:0 0 18px;font-size:13px;color:#8892A8">'
-        f"Se detectaron {len(items)} coincidencias con tus alertas:</p>"
+        f"{detectadas} con tus alertas:</p>"
         f'<table style="width:100%;border-collapse:collapse">{rows}</table>'
         f'<p style="margin:20px 0 0;font-size:12px"><a href="{WEB_BASE_URL}/alerts" '
         f'style="color:#74ACDF;text-decoration:none">Gestionar mis alertas →</a></p>'
