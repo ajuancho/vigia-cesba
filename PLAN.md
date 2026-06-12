@@ -1,7 +1,8 @@
 # Vigía — Plan de trabajo pendiente
 
 Estado al 2026-06-11: **Fases 0–4 + expansión multi-fuente DESPLEGADAS EN
-PRODUCCIÓN**. Lo que sigue, en orden sugerido:
+PRODUCCIÓN**, más el primer pedazo de la Fase 5 IA — **`resumen_ia` por Bedrock,
+también vivo** (ver §5). Lo que sigue, en orden sugerido:
 
 ---
 
@@ -84,12 +85,42 @@ los datos de usuarios/alertas no).
 - Snapshot/AMI del EC2 post-setup.
 - Considerar staging si el producto suma usuarios reales.
 
-## 5. Fase 5 — IA (diferida por decisión de producto)
+## 5. Fase 5 — IA (parcial: `resumen_ia` ✅ desplegado · resto diferido)
 
-**PLAN DE MEJORA — diseñado el 2026-06-11, NO implementar hasta validar la
-plataforma actual con usuarios.** La decisión de diferir es deliberada: el
-feed con jerarquía heurística funciona bien; la IA es refinamiento, no
-necesidad.
+**`resumen_ia` YA ESTÁ VIVO EN PROD** (2026-06-11, commits 218320d + 399b3a8). El
+resto de la Fase 5 (impacto / NER / embeddings) sigue diferido a propósito hasta
+validar la plataforma con usuarios: el feed con jerarquía heurística funciona
+bien y eso es refinamiento, no necesidad.
+
+### ✅ `resumen_ia` — desplegado (2026-06-11)
+
+Resúmenes en lenguaje claro por norma (campo `resumen_ia`, mostrado como
+"Análisis automático" en el detalle y preferido en feed/búsqueda). Resuelve además
+el problema de que el BORA trae como "sumario" solo el código GDE del documento
+(p.ej. `RESOL-2026-276-APN-INASE#MEC`): ahora se baja el detalle del aviso y el
+`resumen` pasa a ser el texto real del BO (excerpt), y el `resumen_ia` la síntesis.
+
+Implementación en `apps/workers/src/vigia_workers/ai_resumen.py`:
+- **AWS Bedrock** vía `anthropic[bedrock]` (`AsyncAnthropicBedrock`) — NO el boto3
+  crudo + Converse de OpenArg, pero mismo backend / región / modelo.
+- Modelo `us.anthropic.claude-haiku-4-5-20251001-v1:0` (**perfil de inferencia**;
+  el id pelado `anthropic.claude-…` NO admite on-demand → ValidationException).
+- Opt-in por `VIGIA_AI_PROVIDER` (off | bedrock | anthropic, default off).
+  Resiliente: cualquier error → `None`, nunca rompe la ingesta. El upsert preserva
+  `resumen_ia` con COALESCE para no pisarlo en re-ingestas.
+- **Acceso AWS: usuario IAM `vigia-bedrock`** con policy mínima `bedrock:InvokeModel`
+  sobre el perfil Haiku; keys en `~/vigia/.env.production` del EC2 (NO instance
+  profile — ver nota de infra abajo).
+- Alcance: **solo BORA, ingesta nueva** (sin backfill). 42/50 normas de hoy ya con
+  `resumen_ia`; de acá en más lo hace el beat. Las que el BO trae con sumario
+  humano real no lo necesitan.
+
+**Pendiente de `resumen_ia`:** backfill histórico (por lotes, empezando por lo
+reciente) · extenderlo a InfoLEG (donde haya `texto_resumido`) · idealmente
+unificarlo con `impacto` en una sola pasada para no pagar dos llamadas.
+
+**(`resumen_ia` ya usa Bedrock — ver arriba; lo de abajo aplica al resto:
+`impacto` / NER / embeddings.)**
 
 **Vía: AWS Bedrock, calcando OpenArg** (verificado en
 `../Open Arg/openarg_backend/src/app/infrastructure/adapters/llm/bedrock_llm_adapter.py`):
@@ -99,29 +130,31 @@ tiene acceso a los modelos porque OpenArg los usa. Sin API keys: IAM puro,
 los datos no salen de la cuenta.
 
 **Orden de implementación sugerido (por valor):**
-1. **`impacto` + `resumen_ia` en una sola pasada** (mismo prompt): task
-   post-ingesta (~13:30 ART, después de todas las fuentes) que toma las
-   normas del día con `impacto IS NULL` y completa impacto
-   (alto/medio/bajo), resumen en castellano llano y entidades básicas.
-   `impacto` refina el split destacado/trámite de
-   `vigia_shared/relevancia.py` (la heurística regex queda de fallback) y
-   alimenta el filtro de impacto que ya existe en API + UI.
+1. **`impacto`** (alto/medio/bajo): task post-ingesta (~13:30 ART, después de
+   todas las fuentes) que toma las normas del día con `impacto IS NULL`. Refina
+   el split destacado/trámite de `vigia_shared/relevancia.py` (la heurística
+   regex queda de fallback) y alimenta el filtro de impacto que ya existe en API
+   + UI. Ideal: calcularlo en la **misma pasada** que `resumen_ia` (mismo prompt,
+   una sola llamada) para no pagar dos veces — hoy `resumen_ia` corre solo en la
+   ingesta BORA, así que esto implica unificarlos en la task post-ingesta.
 2. **NER (`entidades`)**: empresas/organismos/leyes citadas → habilita
    "seguir a una empresa" cruzando normas + avisos societarios + BCRA.
 3. **Embeddings pgvector** (extensión ya instalada; OpenArg tiene
    `BedrockEmbeddingAdapter` para calcar): búsqueda semántica + alertas
    semánticas (más allá del keyword FTS).
 
-**Prerequisito de infra (único)**: instance profile para el EC2
-`vigia-production` con `bedrock:InvokeModel` — aprovechar y sumarle
-`s3:PutObject` para los backups (§3), un solo rol para ambos pendientes.
+**Infra**: el acceso a Bedrock ya está resuelto para `resumen_ia` vía el usuario
+IAM `vigia-bedrock` (keys en `.env.production`). Pendiente: instance profile para
+el EC2 `vigia-production` con `s3:PutObject` para los backups (§3) — y, si se
+quiere, migrar el acceso Bedrock de keys a ese rol (un solo profile para ambos).
 
 **Costo estimado**: ~200 normas/día × ~1.5k tokens con Haiku 4.5 ≈ $5-10/mes.
 Backfill histórico opcional por lotes empezando por lo reciente (todo el
 corpus ≈ $300 — no vale la pena de entrada).
 
-Las columnas destino (`impacto`, `resumen_ia`, `entidades`) existen vacías
-desde la migración 0001 y la API ya las expone: no hay migración.
+Las columnas destino (`impacto`, `resumen_ia`, `entidades`) existen desde la
+migración 0001 y la API ya las expone: `resumen_ia` ya se está poblando;
+`impacto` / `entidades` siguen vacías. No hay migración.
 
 ## 6. Más fuentes (backlog)
 
