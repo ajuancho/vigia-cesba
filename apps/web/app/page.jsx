@@ -256,6 +256,7 @@ export default async function Landing() {
               <ul className="space-y-1.5 text-[12px] text-text-secondary">
                 <li><a href="https://openarg.org" target="_blank" rel="noreferrer" className="hover:text-celeste transition-colors">OpenArg</a></li>
                 <li><a href="https://github.com/colossus-lab/vigia" target="_blank" rel="noreferrer" className="hover:text-celeste transition-colors">Código abierto · MIT</a></li>
+                <li><Link href="/legal" className="hover:text-celeste transition-colors">Términos y privacidad</Link></li>
               </ul>
             </div>
           </div>

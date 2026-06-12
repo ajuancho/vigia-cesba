@@ -61,12 +61,18 @@ function SignInInner() {
             </ul>
 
             {AUTH_ENABLED ? (
-              <button
-                onClick={() => signIn('google', { callbackUrl })}
-                className="w-full flex items-center justify-center gap-2.5 px-4 py-2.5 bg-text-primary text-navy-950 rounded-full text-[13px] font-bold hover:bg-white transition-colors"
-              >
-                <GoogleMark /> Continuar con Google
-              </button>
+              <>
+                <button
+                  onClick={() => signIn('google', { callbackUrl })}
+                  className="w-full flex items-center justify-center gap-2.5 px-4 py-2.5 bg-text-primary text-navy-950 rounded-full text-[13px] font-bold hover:bg-white transition-colors"
+                >
+                  <GoogleMark /> Continuar con Google
+                </button>
+                <p className="text-[10px] text-text-tertiary text-center mt-3 leading-relaxed">
+                  Al continuar aceptás los{' '}
+                  <Link href="/legal" className="text-celeste hover:text-celeste-bright transition-colors">términos y la política de privacidad</Link>.
+                </p>
+              </>
             ) : (
               <div className="text-[12px] text-text-secondary bg-bg-secondary border border-border-light rounded-lg p-3 leading-relaxed">
                 <span className="tint-amber border rounded-full px-2 py-0.5 text-[10px] font-semibold mr-1.5">demo</span>
