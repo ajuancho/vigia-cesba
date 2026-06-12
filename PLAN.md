@@ -71,13 +71,14 @@ OPS_ALERT_EMAIL=devops@colossuslab.org
 
 ---
 
-## 3. Backups de la base (S3)
+## 3. Backups de la base (S3) — ✅ DESPLEGADO (2026-06-12)
 
-Hoy los datos viven solo en el EBS del EC2 (la ingesta es re-ejecutable, pero
-los datos de usuarios/alertas no).
-1. Bucket `vigia-backups` + lifecycle (30 días).
-2. IAM role mínimo (`s3:PutObject`) como instance profile del EC2.
-3. Cron diario en el host: `docker compose exec -T db pg_dump -U vigia vigia | gzip | aws s3 cp - s3://vigia-backups/vigia-$(date +%F).sql.gz`.
+Dump diario a `s3://vigia-backups/` (~80 MB gz), 06:00 ART por cron del host
+(`infra/backup-db.sh`), retención 30 días por lifecycle. Instance profile
+`vigia-ec2` con **solo `s3:PutObject`** (write-only: la caja no puede leer ni
+borrar backups). Primer backup verificado (contenido SQL válido + write-only
+comprobado con AccessDenied desde el host). Runbook completo, incluido el
+restore, en `infra/DEPLOY.md § Backups`.
 
 ## 4. Hardening menor
 

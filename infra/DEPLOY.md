@@ -227,6 +227,44 @@ re-login. **Extender un trial** sin otorgar membresía: retro-datar
 `created_at` del workspace (misma vía, `UPDATE workspace SET created_at = ...`).
 Para encontrar el slug: `SELECT slug, name, plan, created_at FROM workspace;`.
 
+## Backups de la base (S3)
+
+Dump diario completo a `s3://vigia-backups/vigia-YYYY-MM-DD.sql.gz` (~80 MB),
+**06:00 ART (09:00 UTC)** por cron del host (no del contenedor), vía
+[`infra/backup-db.sh`](backup-db.sh). Retención: lifecycle de 30 días en el
+bucket (público bloqueado, SSE-S3, multiparts incompletos se abortan a los 7 días).
+
+**Modelo de permisos (deliberado):** el EC2 tiene el instance profile
+`vigia-ec2` con **solo `s3:PutObject`** sobre el bucket — la caja sube backups
+pero no puede listarlos, leerlos ni borrarlos (un compromiso del host no
+compromete el historial). Listar/restaurar requiere credenciales admin desde
+afuera.
+
+```bash
+# cron instalado en el host (crontab de ec2-user; cronie en AL2023):
+0 9 * * * /home/ec2-user/vigia/infra/backup-db.sh >> /home/ec2-user/vigia-backup.log 2>&1
+
+# correr un backup manual:
+~/vigia/infra/backup-db.sh
+
+# listar backups (desde tu máquina, con credenciales admin):
+aws s3 ls s3://vigia-backups/ --human-readable
+```
+
+**Restore** (desde tu máquina con credenciales admin; el destino debe ser una
+base vacía — para desastre total, recrear `db` con el compose y dejar que
+`migrate` NO corra antes del restore):
+
+```bash
+aws s3 cp s3://vigia-backups/vigia-YYYY-MM-DD.sql.gz - | gunzip | \
+  ssh -i ~/.ssh/vigia.pem ec2-user@98.95.87.94 \
+  "docker compose -f ~/vigia/docker-compose.prod.yml exec -T db psql -U vigia -d vigia"
+```
+
+Notas: el dump usa `--no-owner` (restaura con cualquier rol); `search_vector`
+es columna GENERATED — no viaja en el dump y se regenera sola al insertar.
+Verificar que el cron vive: `tail ~/vigia-backup.log` en el EC2.
+
 ## Costos aproximados (us-east-1)
 EC2 t3.small (~$15) + RDS t4g.micro (~$13) + ElastiCache t4g.micro (~$12) ≈ **$40/mo**.
 Web en Vercel: free/pro. Bajar costos: EC2 all-in-one con perfil `local-data` (~$15/mo) hasta tener tráfico.
