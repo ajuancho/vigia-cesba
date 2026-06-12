@@ -83,7 +83,12 @@ restore, en `infra/DEPLOY.md § Backups`.
 ## 4. Hardening menor
 
 - `SENTRY_DSN` (API + workers ya lo soportan; web requiere agregar @sentry/nextjs).
-- Snapshot/AMI del EC2 post-setup.
+- ✅ AMI del EC2 (2026-06-12): `ami-0f2f0431afb91178a` ("vigia-production-2026-06-12"),
+  creada sin reboot post-setup completo (docker, caddy, cron de backups, instance
+  profile). Para los datos manda el dump S3 (§3); la AMI recupera la *config* de la
+  caja: lanzar desde la imagen + re-asociar la EIP. Rehacerla tras cambios grandes del host.
+- ✅ Página `/legal` (términos y privacidad, 2026-06-12): estática, tema OpenArg,
+  linkeada desde footer y signin. Borrado de cuenta vía devops@colossuslab.org.
 - Considerar staging si el producto suma usuarios reales.
 
 ## 5. Fase 5 — IA (parcial: `resumen_ia` ✅ desplegado · resto diferido)
