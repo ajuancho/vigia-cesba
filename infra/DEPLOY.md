@@ -37,7 +37,7 @@ Arquitectura de producción (patrón Laboratorio Colossus):
 
 ## Cuenta AWS
 
-- Account `812661756823`, IAM user `dante` (AWS CLI v2 ya autenticado en el equipo).
+- Account `<AWS_ACCOUNT_ID>`, IAM user `<IAM_USER>` (AWS CLI v2 ya autenticado en el equipo).
 - Verificar: `aws sts get-caller-identity`.
 - Región sugerida: `us-east-1` (igual que el resto del lab / Bedrock).
 

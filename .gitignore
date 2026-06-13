@@ -31,11 +31,14 @@ next-env.d.ts
 
 # Env
 .env
+.env.*
 .env.local
 .env.*.local
 .env.production
 .env.development
+.env.vercel-check
 !.env.example
+!.env.production.example
 
 # IDE
 .idea/
@@ -65,6 +68,12 @@ db/alembic/*.lock
 
 # Claude/agent transient
 .claude/
+
+# Debug / scratch artifacts
+repro_*.mjs
+
+# Marketing (flyers + capturas) — solo local, no va al repo público
+marketing/
 
 # Informes de seguridad — NUNCA se commitean (viven en el escritorio, fuera del repo)
 *SECURITY-REVIEW*

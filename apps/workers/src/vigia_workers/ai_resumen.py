@@ -31,7 +31,7 @@ _PROVIDER = os.environ.get("VIGIA_AI_PROVIDER", "off").strip().lower()
 _AWS_REGION = os.environ.get("AWS_REGION", "us-east-1").strip() or "us-east-1"
 # Perfil de inferencia de Bedrock. Claude 4.x NO admite on-demand sobre el id
 # pelado (`anthropic.claude-…`) — hay que invocar el inference profile regional.
-# Verificado en la cuenta 812661756823 (us-east-1): el `us.` responde, el pelado
+# Verificado en la cuenta del lab (us-east-1): el `us.` responde, el pelado
 # tira ValidationException. Cambiable por env (p.ej. `global.anthropic.…`).
 _MODEL_BEDROCK = (
     os.environ.get("AWS_BEDROCK_MODEL_HAIKU", "us.anthropic.claude-haiku-4-5-20251001-v1:0").strip()

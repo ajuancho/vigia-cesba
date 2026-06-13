@@ -131,7 +131,7 @@ unificarlo con `impacto` en una sola pasada para no pagar dos llamadas.
 **Vía: AWS Bedrock, calcando OpenArg** (verificado en
 `../Open Arg/openarg_backend/src/app/infrastructure/adapters/llm/bedrock_llm_adapter.py`):
 boto3 → `bedrock-runtime` con Converse API, región us-east-1, modelo
-`us.anthropic.claude-haiku-4-5-20251001-v1:0`. La cuenta (812661756823) ya
+`us.anthropic.claude-haiku-4-5-20251001-v1:0`. La cuenta del lab ya
 tiene acceso a los modelos porque OpenArg los usa. Sin API keys: IAM puro,
 los datos no salen de la cuenta.
 
