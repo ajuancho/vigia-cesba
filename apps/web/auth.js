@@ -48,6 +48,20 @@ async function syncUserWithApi(profile) {
 const NEXTAUTH_SECRET =
   process.env.AUTH_SECRET ?? (AUTH_ENABLED ? undefined : 'demo-mode-placeholder-not-used');
 
+// El apiJwt que firma la API dura 24h, pero la sesión NextAuth vive 30 días: sin
+// renovarlo, pasadas 24h del login todos los endpoints gateados devuelven 401
+// aunque el usuario siga "logueado". Decodificamos el exp para re-sincronizar
+// antes de que venza (margen de 1h). atob existe tanto en runtime node como edge.
+function apiJwtExp(jwt) {
+  try {
+    const part = jwt.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
+    return JSON.parse(atob(part)).exp ?? 0;
+  } catch {
+    return 0;
+  }
+}
+const API_JWT_REFRESH_MARGIN_S = 3600;
+
 export const { handlers, auth, signIn, signOut } = NextAuth({
   trustHost: true,
   secret: NEXTAUTH_SECRET,
@@ -63,12 +77,24 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   pages: { signIn: '/auth/signin' },
   callbacks: {
     async jwt({ token, account, profile }) {
+      // En el login guardamos la identidad para poder re-sincronizar después.
       if (account && profile && profile.email) {
+        token.email = profile.email;
+        token.name = profile.name;
+        token.picture = profile.picture;
+        token.providerId = profile.sub;
+      }
+      // Mintea el apiJwt al login y lo renueva cuando está por vencer (o ya
+      // venció). Sin esto, el token muere a las 24h y la sesión queda "viva"
+      // pero sin acceso a los endpoints gateados (401).
+      const now = Math.floor(Date.now() / 1000);
+      const exp = token.apiJwt ? apiJwtExp(token.apiJwt) : 0;
+      if (token.email && exp - now < API_JWT_REFRESH_MARGIN_S) {
         const sync = await syncUserWithApi({
-          email: profile.email,
-          name: profile.name,
-          picture: profile.picture,
-          sub: profile.sub,
+          email: token.email,
+          name: token.name,
+          picture: token.picture,
+          sub: token.providerId,
         });
         if (sync) {
           token.apiJwt = sync.jwt;
