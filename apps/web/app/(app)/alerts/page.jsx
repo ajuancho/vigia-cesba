@@ -4,11 +4,81 @@ import { useState, useEffect, useCallback } from 'react';
 import { useSession } from 'next-auth/react';
 import { SECTORES } from '@/lib/constants';
 import { authedFetch, AUTH_ENABLED } from '@/lib/authClient';
-import { Bell, Plus, Trash2, Power, PowerOff, Tag, Hash, Calendar, Info } from 'lucide-react';
+import { Bell, Plus, Trash2, Power, PowerOff, Tag, Hash, Calendar, Info, Pencil, X } from 'lucide-react';
 import FadeIn from '@/components/FadeIn';
 import CountUp from '@/components/CountUp';
 
 const INPUT_CLS = 'w-full bg-transparent border-b border-border-light px-1 py-2 text-[13px] text-text-primary placeholder-text-tertiary focus:outline-none focus:border-celeste transition-colors';
+
+// Form reutilizable: alta y edición comparten markup. `initial` pre-carga
+// keywords/sectores; `onSubmit` recibe el payload limpio { keywords, sectores }.
+function AlertaForm({ initial, onSubmit, onCancel, submitLabel }) {
+  const [keywords, setKeywords] = useState(initial?.keywords || []);
+  const [sectores, setSectores] = useState(initial?.sectores || []);
+  const [draft, setDraft] = useState('');
+
+  const addKeyword = (raw) => {
+    const kw = raw.trim();
+    if (kw && !keywords.includes(kw)) setKeywords((p) => [...p, kw]);
+    setDraft('');
+  };
+  const onKeyDown = (e) => {
+    if (e.key === 'Enter' || e.key === ',') { e.preventDefault(); addKeyword(draft); }
+    else if (e.key === 'Backspace' && !draft && keywords.length) setKeywords((p) => p.slice(0, -1));
+  };
+  const toggleSector = (s) =>
+    setSectores((p) => (p.includes(s) ? p.filter((x) => x !== s) : [...p, s]));
+
+  const submit = () => {
+    // Volcar lo que quede tipeado sin confirmar.
+    const kws = draft.trim() && !keywords.includes(draft.trim()) ? [...keywords, draft.trim()] : keywords;
+    if (!kws.length) return;
+    onSubmit({ keywords: kws, sectores });
+  };
+
+  return (
+    <div className="animate-slide-up border-l-2 border-celeste pl-5 py-1">
+      <div className="mb-4">
+        <label className="eyebrow text-[9px] block mb-2">Keywords <span className="text-text-tertiary normal-case font-normal">— Enter o coma para sumar (matchea cualquiera)</span></label>
+        <div className="flex flex-wrap items-center gap-1.5">
+          {keywords.map((kw) => (
+            <span key={kw} className="flex items-center gap-1 text-[11px] font-mono tint-blue border px-2 py-0.5 rounded-full">
+              {kw}
+              <button onClick={() => setKeywords((p) => p.filter((x) => x !== kw))} className="hover:text-status-red transition-colors"><X size={11} /></button>
+            </span>
+          ))}
+          <input
+            type="text" value={draft} onChange={(e) => setDraft(e.target.value)} onKeyDown={onKeyDown} onBlur={() => addKeyword(draft)}
+            placeholder={keywords.length ? 'sumar otra…' : 'litio, ciberseguridad, SMVM…'}
+            className="flex-1 min-w-[140px] bg-transparent px-1 py-1 text-[13px] text-text-primary placeholder-text-tertiary focus:outline-none"
+            autoFocus
+          />
+        </div>
+        <div className="border-b border-border-light mt-1" />
+      </div>
+
+      <div className="mb-4">
+        <label className="eyebrow text-[9px] block mb-2">Sectores <span className="text-text-tertiary normal-case font-normal">— opcional, uno o varios (vacío = todos)</span></label>
+        <div className="flex flex-wrap gap-1.5">
+          {SECTORES.map((s) => {
+            const on = sectores.includes(s);
+            return (
+              <button key={s} onClick={() => toggleSector(s)}
+                className={`text-[11px] font-mono px-2.5 py-1 rounded-full border transition-colors ${on ? 'tint-blue' : 'text-text-tertiary border-border-light hover:text-text-secondary hover:border-text-tertiary'}`}>
+                {s}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      <div className="flex gap-3">
+        <button onClick={submit} className="px-4 py-1.5 btn-celeste rounded-full text-[11px] font-bold">{submitLabel}</button>
+        <button onClick={onCancel} className="px-3 py-1.5 text-text-secondary text-[11px] font-medium hover:text-text-primary transition-colors">Cancelar</button>
+      </div>
+    </div>
+  );
+}
 
 export default function AlertsView() {
   const { data: session } = useSession();
@@ -16,9 +86,8 @@ export default function AlertsView() {
   const connected = AUTH_ENABLED && Boolean(jwt);
 
   const [alertas, setAlertas] = useState([]);
-  const [newKeyword, setNewKeyword] = useState('');
-  const [newSector, setNewSector] = useState('');
   const [showForm, setShowForm] = useState(false);
+  const [editingId, setEditingId] = useState(null);
   const [err, setErr] = useState('');
 
   const load = useCallback(async () => {
@@ -30,23 +99,31 @@ export default function AlertsView() {
 
   useEffect(() => { load(); }, [load]);
 
-  const addAlerta = async () => {
-    if (!newKeyword.trim()) return;
+  const addAlerta = async ({ keywords, sectores }) => {
     if (connected) {
       try {
-        await authedFetch(jwt, '/alerts', {
-          method: 'POST',
-          body: JSON.stringify({ keyword: newKeyword.trim(), sector: newSector || null }),
-        });
+        await authedFetch(jwt, '/alerts', { method: 'POST', body: JSON.stringify({ keywords, sectores }) });
         await load();
       } catch (e) { setErr(String(e.message || e)); }
     } else {
       setAlertas((prev) => [
-        { id: `local-${Date.now()}`, keyword: newKeyword.trim(), sector: newSector || null, activa: true, matches: 0, last_match_at: null },
+        { id: `local-${Date.now()}`, keywords, sectores, activa: true, matches: 0, last_match_at: null },
         ...prev,
       ]);
     }
-    setNewKeyword(''); setNewSector(''); setShowForm(false);
+    setShowForm(false);
+  };
+
+  const saveEdit = async (a, { keywords, sectores }) => {
+    if (connected) {
+      try {
+        await authedFetch(jwt, `/alerts/${a.id}`, { method: 'PATCH', body: JSON.stringify({ keywords, sectores }) });
+        await load();
+      } catch (e) { setErr(String(e.message || e)); }
+    } else {
+      setAlertas((prev) => prev.map((x) => (x.id === a.id ? { ...x, keywords, sectores } : x)));
+    }
+    setEditingId(null);
   };
 
   const toggleAlerta = async (a) => {
@@ -83,9 +160,9 @@ export default function AlertsView() {
           <div>
             <p className="eyebrow mb-1"><span className="eyebrow-num">VIGÍA / ALERTAS</span><span className="ml-2">Monitoreo automático</span></p>
             <h2 className="display-section text-text-primary mb-1">Que la norma <em>te encuentre.</em></h2>
-            <p className="text-[13px] text-text-tertiary font-mono">keyword + sector · matching horario · digest por email</p>
+            <p className="text-[13px] text-text-tertiary font-mono">keywords + sectores · matching horario · digest por email</p>
           </div>
-          <button onClick={() => setShowForm(!showForm)} className="flex items-center gap-1.5 px-4 py-2 btn-celeste rounded-full text-[11px] font-bold shrink-0">
+          <button onClick={() => { setShowForm((v) => !v); setEditingId(null); }} className="flex items-center gap-1.5 px-4 py-2 btn-celeste rounded-full text-[11px] font-bold shrink-0">
             <Plus size={13} /> Nueva
           </button>
         </div>
@@ -116,27 +193,11 @@ export default function AlertsView() {
         ))}
       </div>
 
-      {/* Form flotante */}
+      {/* Form de alta */}
       {showForm && (
-        <div className="mb-10 animate-slide-up border-l-2 border-celeste pl-5 py-1">
+        <div className="mb-10">
           <p className="eyebrow mb-4"><span className="eyebrow-num">+</span><span className="ml-2">Nueva alerta</span></p>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-4">
-            <div>
-              <label className="eyebrow text-[9px] block mb-1">Keyword</label>
-              <input type="text" value={newKeyword} onChange={(e) => setNewKeyword(e.target.value)} placeholder="litio, ciberseguridad, SMVM…" className={INPUT_CLS} autoFocus />
-            </div>
-            <div>
-              <label className="eyebrow text-[9px] block mb-1">Sector (opcional)</label>
-              <select value={newSector} onChange={(e) => setNewSector(e.target.value)} className={INPUT_CLS}>
-                <option value="">Todos</option>
-                {SECTORES.map((s) => <option key={s} value={s}>{s}</option>)}
-              </select>
-            </div>
-          </div>
-          <div className="flex gap-3">
-            <button onClick={addAlerta} className="px-4 py-1.5 btn-celeste rounded-full text-[11px] font-bold">Crear</button>
-            <button onClick={() => setShowForm(false)} className="px-3 py-1.5 text-text-secondary text-[11px] font-medium hover:text-text-primary transition-colors">Cancelar</button>
-          </div>
+          <AlertaForm initial={{ keywords: [], sectores: [] }} onSubmit={addAlerta} onCancel={() => setShowForm(false)} submitLabel="Crear" />
         </div>
       )}
 
@@ -144,32 +205,48 @@ export default function AlertsView() {
       <div className="border-t border-border-light">
         {alertas.map((alerta, i) => (
           <FadeIn key={alerta.id} delay={Math.min(i * 50, 300)}>
-            <div className={`group flex items-center justify-between gap-3 border-b border-border-light py-4 transition-all duration-300 hover:bg-celeste/[0.03] hover:pl-2 ${!alerta.activa ? 'opacity-40' : ''}`}>
-              <div className="flex items-center gap-3 min-w-0">
-                <Bell size={15} className={alerta.activa ? 'text-celeste' : 'text-text-tertiary'} />
-                <div className="min-w-0">
-                  <div className="flex items-center gap-2 mb-1">
-                    <h4 className="text-[14px] font-semibold text-text-primary truncate" style={{ fontFamily: 'var(--font-display)' }}>
-                      “{alerta.keyword}”
-                    </h4>
-                    {alerta.activa && <span className="text-[9px] font-medium tint-green border px-1.5 py-0.5 rounded-full shrink-0">activa</span>}
-                  </div>
-                  <div className="flex items-center gap-3 text-[10px] text-text-tertiary font-mono">
-                    <span className="flex items-center gap-1"><Tag size={9} /> {alerta.sector || 'todos'}</span>
-                    <span className="flex items-center gap-1"><Hash size={9} /> {(alerta.matches || 0).toLocaleString('es-AR')} matches</span>
-                    {alerta.last_match_at && <span className="flex items-center gap-1"><Calendar size={9} /> {alerta.last_match_at.slice(0, 10)}</span>}
+            {editingId === alerta.id ? (
+              <div className="border-b border-border-light py-5">
+                <p className="eyebrow mb-4"><span className="eyebrow-num">✎</span><span className="ml-2">Editar alerta</span></p>
+                <AlertaForm
+                  initial={{ keywords: alerta.keywords || [], sectores: alerta.sectores || [] }}
+                  onSubmit={(payload) => saveEdit(alerta, payload)}
+                  onCancel={() => setEditingId(null)}
+                  submitLabel="Guardar"
+                />
+                <p className="text-[10px] text-text-tertiary font-mono mt-3 pl-5">Cambiar el criterio reinicia los matches: la alerta solo notifica normas nuevas desde la edición.</p>
+              </div>
+            ) : (
+              <div className={`group flex items-center justify-between gap-3 border-b border-border-light py-4 transition-all duration-300 hover:bg-celeste/[0.03] hover:pl-2 ${!alerta.activa ? 'opacity-40' : ''}`}>
+                <div className="flex items-center gap-3 min-w-0">
+                  <Bell size={15} className={alerta.activa ? 'text-celeste' : 'text-text-tertiary'} />
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-2 mb-1">
+                      <h4 className="text-[14px] font-semibold text-text-primary truncate" style={{ fontFamily: 'var(--font-display)' }}>
+                        “{(alerta.keywords || []).join('”, “')}”
+                      </h4>
+                      {alerta.activa && <span className="text-[9px] font-medium tint-green border px-1.5 py-0.5 rounded-full shrink-0">activa</span>}
+                    </div>
+                    <div className="flex items-center gap-3 text-[10px] text-text-tertiary font-mono">
+                      <span className="flex items-center gap-1"><Tag size={9} /> {(alerta.sectores || []).length ? alerta.sectores.join(' · ') : 'todos'}</span>
+                      <span className="flex items-center gap-1"><Hash size={9} /> {(alerta.matches || 0).toLocaleString('es-AR')} matches</span>
+                      {alerta.last_match_at && <span className="flex items-center gap-1"><Calendar size={9} /> {alerta.last_match_at.slice(0, 10)}</span>}
+                    </div>
                   </div>
                 </div>
+                <div className="flex items-center gap-1 shrink-0">
+                  <button onClick={() => { setEditingId(alerta.id); setShowForm(false); }} className="p-1.5 rounded-lg text-text-tertiary hover:text-celeste hover:bg-celeste/10 transition-colors">
+                    <Pencil size={14} />
+                  </button>
+                  <button onClick={() => toggleAlerta(alerta)} className={`p-1.5 rounded-lg transition-colors ${alerta.activa ? 'text-status-green hover:bg-status-green/10' : 'text-text-tertiary hover:bg-bg-tertiary'}`}>
+                    {alerta.activa ? <Power size={14} /> : <PowerOff size={14} />}
+                  </button>
+                  <button onClick={() => deleteAlerta(alerta)} className="p-1.5 rounded-lg text-text-tertiary hover:text-status-red hover:bg-status-red/10 transition-colors">
+                    <Trash2 size={14} />
+                  </button>
+                </div>
               </div>
-              <div className="flex items-center gap-1 shrink-0">
-                <button onClick={() => toggleAlerta(alerta)} className={`p-1.5 rounded-lg transition-colors ${alerta.activa ? 'text-status-green hover:bg-status-green/10' : 'text-text-tertiary hover:bg-bg-tertiary'}`}>
-                  {alerta.activa ? <Power size={14} /> : <PowerOff size={14} />}
-                </button>
-                <button onClick={() => deleteAlerta(alerta)} className="p-1.5 rounded-lg text-text-tertiary hover:text-status-red hover:bg-status-red/10 transition-colors">
-                  <Trash2 size={14} />
-                </button>
-              </div>
-            </div>
+            )}
           </FadeIn>
         ))}
       </div>
