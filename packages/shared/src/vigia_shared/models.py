@@ -169,10 +169,17 @@ class DnuTracking(Base):
 
 
 class Alerta(Base):
-    """Suscripción de monitoreo por keyword (+ sector opcional), ligada a workspace.
+    """Suscripción de monitoreo por keywords (+ sectores opcionales), ligada a workspace.
 
     Reemplaza el `useState` efímero del frontend mock. El worker cruza las normas
     contra estas alertas y registra cada match en `alerta_match`.
+
+    `keywords`/`sectores` son listas (OR entre sí): la alerta matchea una norma
+    si pega ALGUNA keyword (FTS español) y la norma cae en ALGUNO de los sectores
+    (o cualquiera, si la lista está vacía). `anchor_at` es el piso temporal: solo
+    se notifican normas con `ingested_at >= anchor_at` (default = alta de la
+    alerta; se reancla a now() al editar el criterio). Sin esto, una alerta nueva
+    spamearía con todo el corpus histórico.
     """
 
     __tablename__ = "alerta"
@@ -186,9 +193,12 @@ class Alerta(Base):
         ForeignKey("workspace.id", ondelete="CASCADE"), nullable=False
     )
     user_id: Mapped[int | None] = mapped_column(ForeignKey("app_user.id", ondelete="SET NULL"))
-    keyword: Mapped[str] = mapped_column(String(255), nullable=False)
-    sector: Mapped[str | None] = mapped_column(String(64))
+    keywords: Mapped[list[str]] = mapped_column(JSONB, nullable=False)
+    sectores: Mapped[list[str]] = mapped_column(JSONB, nullable=False, default=list)
     activa: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
+    anchor_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), nullable=False
+    )
     last_match_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), nullable=False
