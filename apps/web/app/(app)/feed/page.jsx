@@ -209,14 +209,22 @@ function FeedView() {
   // Deep-link desde el Universo: /feed?tipo=LEY&sector=Energía
   const tipoParam = searchParams.get('tipo');
   const sectorParam = searchParams.get('sector');
+  const emisorParam = searchParams.get('emisor');
   const [filterTipo, setFilterTipo] = useState(
     tipoParam && TIPOS_NORMA[tipoParam] ? tipoParam : 'TODOS'
   );
   const [filterSector, setFilterSector] = useState(sectorParam || null);
+  const [filterEmisor, setFilterEmisor] = useState(emisorParam || '');
+  const [emisores, setEmisores] = useState([]);
   const [ediciones, setEdiciones] = useState([]);
   const [hasMore, setHasMore] = useState(false);
   const [offsetDias, setOffsetDias] = useState(0);
   const [loading, setLoading] = useState(true);
+
+  // Catálogo de emisores (organismos canónicos) para el facet — una sola vez.
+  useEffect(() => {
+    api.emisores().then((e) => setEmisores(e || [])).catch(() => setEmisores([]));
+  }, []);
 
   // El feed son ediciones diarias (como un diario): cambiar el filtro
   // resetea la paginación; "cargar más días" appendea.
@@ -228,6 +236,7 @@ function FeedView() {
         offset_dias: offsetDias,
         tipo: filterTipo !== 'TODOS' ? filterTipo : undefined,
         sector: filterSector || undefined,
+        emisor: filterEmisor || undefined,
       })
       .then((d) => {
         setEdiciones((prev) => (offsetDias === 0 ? d.ediciones : [...prev, ...d.ediciones]));
@@ -235,7 +244,7 @@ function FeedView() {
       })
       .catch(() => { setEdiciones([]); setHasMore(false); })
       .finally(() => setLoading(false));
-  }, [filterTipo, filterSector, offsetDias]);
+  }, [filterTipo, filterSector, filterEmisor, offsetDias]);
 
   const changeFilter = (setter) => (value) => { setOffsetDias(0); setter(value); };
 
@@ -275,6 +284,23 @@ function FeedView() {
             >
               {filterSector} ×
             </button>
+          )}
+          {emisores.length > 0 && (
+            <select
+              value={filterEmisor}
+              onChange={(e) => changeFilter(setFilterEmisor)(e.target.value)}
+              title="Filtrar por organismo emisor"
+              className={`ml-auto px-3 py-1 rounded-full text-[11px] font-medium border bg-transparent cursor-pointer transition-all ${
+                filterEmisor
+                  ? 'text-celeste-bright border-celeste/40'
+                  : 'text-text-secondary border-border-light hover:text-text-primary'
+              }`}
+            >
+              <option value="">Emisor: todos</option>
+              {emisores.map((e) => (
+                <option key={e.emisor} value={e.emisor}>{e.emisor} ({e.cantidad.toLocaleString('es-AR')})</option>
+              ))}
+            </select>
           )}
         </div>
       </FadeIn>
