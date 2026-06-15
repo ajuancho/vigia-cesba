@@ -22,6 +22,7 @@ async def ediciones(
     offset_dias: int = Query(0, ge=0, le=365, description="paginación: saltear N ediciones"),
     tipo: str | None = Query(None),
     sector: str | None = Query(None),
+    emisor: str | None = Query(None, description="organismo canónico: ARCA|CNV|BCRA|…"),
 ) -> dict:
     """El feed como diario: una edición por día, con jerarquía editorial.
 
@@ -35,6 +36,8 @@ async def ediciones(
         filters.append(Norma.tipo == tipo)
     if sector:
         filters.append(Norma.sector == sector)
+    if emisor:
+        filters.append(Norma.emisor == emisor)
 
     async with Session() as session:
         fechas = (
@@ -99,6 +102,7 @@ async def list_normas(
     tipo: str | None = Query(None, description="DNU|DECRETO|LEY|RESOLUCION|DISPOSICION|PROYECTO|COMUNICACION|OTRA"),
     impacto: str | None = Query(None, description="alto|medio|bajo"),
     sector: str | None = Query(None),
+    emisor: str | None = Query(None, description="organismo canónico: ARCA|CNV|BCRA|…"),
     limit: int = Query(20, ge=1, le=100),
     offset: int = Query(0, ge=0, le=100000),
 ) -> NormaPage:
@@ -110,6 +114,8 @@ async def list_normas(
         filters.append(Norma.impacto == impacto)
     if sector:
         filters.append(Norma.sector == sector)
+    if emisor:
+        filters.append(Norma.emisor == emisor)
 
     async with Session() as session:
         total = (

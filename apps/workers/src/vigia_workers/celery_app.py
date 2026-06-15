@@ -81,6 +81,13 @@ celery_app.conf.update(
             "task": "vigia_workers.movimientos.ingest_hcdn_movimientos",
             "schedule": crontab(hour=8, minute=30),
         },
+        # Senado — proyectos recientes (scrape del buscador HSN). Solo origen=S
+        # (los de Diputados ya entran por hcdn-proyectos). Fuera de la ventana
+        # HCDN (08:00–08:30) para no competir por el worker.
+        "ingest-senado-proyectos": {
+            "task": "vigia_workers.tasks.ingest_senado_proyectos",
+            "schedule": crontab(hour=8, minute=45),
+        },
         # Dictámenes de la Comisión Bicameral DNU (HCDN CKAN) — diario.
         # Después de hcdn-proyectos (08:00): el join usa los proyectos del día.
         "ingest-bicameral-dnu": {

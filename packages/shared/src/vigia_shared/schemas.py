@@ -18,6 +18,7 @@ class NormaBase(BaseModel):
     fecha_publicacion: date | None = None
     jurisdiccion: str | None = None
     sector: str | None = None
+    emisor: str | None = None
     organismo: str | None = None
     estado: str | None = None
     impacto: str | None = None
@@ -89,6 +90,11 @@ class SeriesPoint(BaseModel):
 
 class OrganismoStat(BaseModel):
     organismo: str
+    cantidad: int
+
+
+class EmisorStat(BaseModel):
+    emisor: str
     cantidad: int
 
 

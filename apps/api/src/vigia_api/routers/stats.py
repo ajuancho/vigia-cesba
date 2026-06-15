@@ -9,6 +9,7 @@ from vigia_shared.schemas import (
     DashboardStats,
     DnuAnio,
     DnuStats,
+    EmisorStat,
     OrganismoStat,
     RecentStats,
     SectorStat,
@@ -145,6 +146,22 @@ async def organismos(
             )
         ).all()
     return [OrganismoStat(organismo=r[0], cantidad=int(r[1])) for r in rows]
+
+
+@router.get("/emisores", response_model=list[EmisorStat])
+async def emisores() -> list[EmisorStat]:
+    """Conteo por emisor canónico (ARCA, CNV, …) — alimenta el facet del feed."""
+    Session = get_sessionmaker()
+    async with Session() as session:
+        rows = (
+            await session.execute(
+                text(
+                    "SELECT emisor, COUNT(*) c FROM norma "
+                    "WHERE emisor IS NOT NULL GROUP BY emisor ORDER BY c DESC"
+                )
+            )
+        ).all()
+    return [EmisorStat(emisor=r[0], cantidad=int(r[1])) for r in rows]
 
 
 @router.get("/dnu", response_model=DnuStats)

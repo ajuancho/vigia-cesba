@@ -23,8 +23,12 @@ from datetime import date
 from pathlib import Path
 from typing import Any
 
-from vigia_connectors import BoraAviso, BoraClient, HcdnClient, HcdnProyecto, InfoLegClient, InfoLegNorm
+from vigia_connectors import (
+    BoraAviso, BoraClient, HcdnClient, HcdnProyecto, InfoLegClient, InfoLegNorm,
+    SenadoClient, SenadoProyecto,
+)
 from vigia_connectors.bora import looks_like_dnu
+from vigia_connectors.emisores import detect_emisor
 from vigia_shared.sources import catalog_fields
 from vigia_workers.ai_resumen import aplicar_resumen_ia
 from vigia_workers.celery_app import celery_app
@@ -81,6 +85,7 @@ def _norma_to_row(n: InfoLegNorm) -> dict[str, Any]:
         "jurisdiccion": "Nacional",
         "sector": n.detect_sector(),
         "organismo": n.organismo_origen,
+        "emisor": detect_emisor(n.organismo_origen),
         "estado": "Publicada" if n.fecha_boletin else None,
         "impacto": None,  # heurística de impacto -> fase posterior
         "bora_seccion": "Primera Sección" if n.numero_boletin else None,
@@ -133,6 +138,7 @@ def _proyecto_to_row(p: HcdnProyecto) -> dict[str, Any]:
         "jurisdiccion": "Nacional",
         "sector": p.detect_sector(),
         "organismo": p.organismo(),
+        "emisor": detect_emisor(p.organismo()),
         "estado": "En trámite",
         "impacto": None,
         "bora_seccion": None,
@@ -187,6 +193,69 @@ def ingest_hcdn_proyectos(dry_run: bool = False) -> dict[str, Any]:
         return {"source": "hcdn_proyectos", **counts}
 
     return run_async(_wrapped())
+
+
+def _senado_to_row(p: SenadoProyecto) -> dict[str, Any]:
+    """Mapea un SenadoProyecto al shape de la tabla `norma` (tipo PROYECTO)."""
+    return {
+        "external_id": p.external_id,
+        "tipo": "PROYECTO",
+        "numero": f"{p.numero}/{p.anio}",
+        "titulo": p.extracto,
+        "resumen": None,
+        "resumen_ia": None,
+        "fecha_publicacion": p.fecha,
+        "jurisdiccion": "Nacional",
+        "sector": p.detect_sector(),
+        "emisor": None,  # el Senado no es un organismo regulador emisor
+        "organismo": "Honorable Senado de la Nación",
+        "estado": "En trámite",
+        "impacto": None,
+        "bora_seccion": None,
+        "entidades": p.autores or None,
+        "tags": [p.tipo_proyecto] if p.tipo_proyecto else None,
+        "url": p.url,
+        "raw": {
+            "numero": p.numero, "anio": p.anio, "tipo_codigo": p.tipo_codigo,
+            "origen": p.origen, "autores": p.autores,
+            "fecha": p.fecha.isoformat() if p.fecha else None,
+        },
+    }
+
+
+@celery_app.task(name="vigia_workers.tasks.ingest_senado_proyectos")
+def ingest_senado_proyectos(dry_run: bool = False, max_pages: int = 3) -> dict[str, Any]:
+    """Ingesta proyectos recientes originados en el Senado (scrape del buscador HSN).
+
+    Solo origen=S (los venidos de Diputados ya están en hcdn_proyectos). Upsert
+    idempotente por external_id = '{numero}/{anio}-{origen}-{tipo}'.
+    """
+    dry = _is_dry_run(dry_run)
+    SOURCE = catalog_fields("senado_proyectos")
+
+    async def _run() -> dict[str, Any]:
+        async with SenadoClient() as client:
+            proyectos = await client.fetch_recientes(max_pages=max_pages)
+        rows = [_senado_to_row(p) for p in proyectos]
+        if dry:
+            return {"rows": len(rows), "sample": [_dry_sample_row(r) for r in rows[:_DRY_SAMPLE]]}
+        totals = _empty_totals()
+        for i in range(0, len(rows), _FULL_BATCH):
+            _acc(totals, await upsert_normas(SOURCE, rows[i : i + _FULL_BATCH]))
+        return totals
+
+    if dry:
+        result = run_async(_run())
+        return {"source": "senado_proyectos", "dry_run": True, **result}
+
+    async def _wrapped() -> dict[str, Any]:
+        counts = await with_status([SOURCE["code"]], _run)
+        return {"source": "senado_proyectos", **counts}
+
+    result = run_async(_wrapped())
+    from vigia_workers.alerts import _match_all
+    result["matching"] = run_async(_match_all())
+    return result
 
 
 # Código GDE/GEDO (Gestión Documental Electrónica): RESOL-2026-276-APN-INASE#MEC,
@@ -255,6 +324,7 @@ def _aviso_to_row(a: BoraAviso, tipo: str | None = None, texto: str | None = Non
         "jurisdiccion": "Nacional",
         "sector": a.detect_sector(),
         "organismo": a.organismo,
+        "emisor": detect_emisor(a.organismo),
         "estado": "Publicada",
         "impacto": None,
         "bora_seccion": "Primera Sección",
@@ -378,6 +448,7 @@ def _comunicacion_to_row(c) -> dict[str, Any]:
         "jurisdiccion": "Nacional",
         "sector": c.detect_sector(),
         "organismo": "Banco Central de la República Argentina",
+        "emisor": "BCRA",
         "estado": "Publicada",
         "impacto": None,
         "bora_seccion": None,
@@ -464,6 +535,7 @@ def _consulta_to_row(c) -> dict[str, Any]:
         "jurisdiccion": "Nacional",
         "sector": c.detect_sector(),
         "organismo": c.organismo,
+        "emisor": detect_emisor(c.organismo),
         "estado": c.estado(),
         "impacto": None,
         "bora_seccion": None,
@@ -555,3 +627,48 @@ def ingest_infoleg_full(dry_run: bool = False) -> dict[str, Any]:
         return {"source": "infoleg", "mode": "full", **counts}
 
     return run_async(_wrapped())
+
+
+@celery_app.task(name="vigia_workers.tasks.backfill_emisores")
+def backfill_emisores() -> dict[str, Any]:
+    """Rellena `norma.emisor` en el histórico (la ingesta nueva ya lo setea).
+
+    Idempotente: solo toca filas con emisor NULL. Pagina por id para no cargar
+    todo el corpus en memoria. Re-correrla reescanea los NULL (barato).
+    """
+    from sqlalchemy import text as _text
+    from vigia_shared.db import session_scope
+
+    async def _run() -> dict[str, Any]:
+        scanned = 0
+        updated = 0
+        last_id = 0
+        async with session_scope() as session:
+            while True:
+                rows = (
+                    await session.execute(
+                        _text(
+                            "SELECT id, organismo FROM norma "
+                            "WHERE emisor IS NULL AND organismo IS NOT NULL AND id > :last "
+                            "ORDER BY id LIMIT 5000"
+                        ),
+                        {"last": last_id},
+                    )
+                ).all()
+                if not rows:
+                    break
+                scanned += len(rows)
+                last_id = rows[-1][0]
+                payload = [
+                    {"id": nid, "em": em}
+                    for nid, org in rows
+                    if (em := detect_emisor(org))
+                ]
+                if payload:
+                    await session.execute(
+                        _text("UPDATE norma SET emisor = :em WHERE id = :id"), payload
+                    )
+                    updated += len(payload)
+        return {"scanned": scanned, "updated": updated}
+
+    return run_async(_run())
