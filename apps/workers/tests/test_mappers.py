@@ -9,16 +9,34 @@ from __future__ import annotations
 
 from datetime import date
 
-from vigia_connectors import BoraAviso, ComunicacionBcra, HcdnProyecto, InfoLegNorm
+from vigia_connectors import BoraAviso, ComunicacionBcra, HcdnProyecto, InfoLegNorm, SenadoProyecto
 from vigia_workers.persistence import _NORMA_UPDATE_COLS
 from vigia_workers.tasks import (
     _aviso_to_row,
     _comunicacion_to_row,
     _norma_to_row,
     _proyecto_to_row,
+    _senado_to_row,
 )
 
 EXPECTED_KEYS = set(_NORMA_UPDATE_COLS) | {"external_id"}
+
+
+def test_senado_to_row_shape():
+    p = SenadoProyecto(
+        numero="1040", anio="26", tipo_codigo="PL", origen="S",
+        extracto="VALENZUELA: PROYECTO DE LEY QUE DECLARA FIESTA NACIONAL…",
+        fecha=date(2026, 6, 12), autores=["Valenzuela Mercedes Gabriela"],
+    )
+    row = _senado_to_row(p)
+    assert set(row.keys()) == EXPECTED_KEYS
+    assert row["tipo"] == "PROYECTO"
+    assert row["external_id"] == "1040/26-S-PL"
+    assert row["numero"] == "1040/26"
+    assert row["organismo"] == "Honorable Senado de la Nación"
+    assert row["fecha_publicacion"] == date(2026, 6, 12)
+    assert row["entidades"] == ["Valenzuela Mercedes Gabriela"]
+    assert row["tags"] == ["ley"]
 
 
 def test_norma_to_row_shape():

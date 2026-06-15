@@ -30,6 +30,14 @@ SOURCES: dict[str, dict] = {
         "cadence_hours": 24,
         "freshness_slo_days": 10,
     },
+    "senado_proyectos": {
+        "code": "senado_proyectos",
+        "name": "Senado — Proyectos parlamentarios (buscador HSN)",
+        "kind": "scrape",
+        "base_url": "https://www.senado.gob.ar",
+        "cadence_hours": 24,
+        "freshness_slo_days": 10,
+    },
     "bora_primera": {
         "code": "bora_primera",
         "name": "Boletín Oficial — Primera Sección (edición del día)",

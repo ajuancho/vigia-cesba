@@ -23,7 +23,10 @@ from datetime import date
 from pathlib import Path
 from typing import Any
 
-from vigia_connectors import BoraAviso, BoraClient, HcdnClient, HcdnProyecto, InfoLegClient, InfoLegNorm
+from vigia_connectors import (
+    BoraAviso, BoraClient, HcdnClient, HcdnProyecto, InfoLegClient, InfoLegNorm,
+    SenadoClient, SenadoProyecto,
+)
 from vigia_connectors.bora import looks_like_dnu
 from vigia_connectors.emisores import detect_emisor
 from vigia_shared.sources import catalog_fields
@@ -190,6 +193,69 @@ def ingest_hcdn_proyectos(dry_run: bool = False) -> dict[str, Any]:
         return {"source": "hcdn_proyectos", **counts}
 
     return run_async(_wrapped())
+
+
+def _senado_to_row(p: SenadoProyecto) -> dict[str, Any]:
+    """Mapea un SenadoProyecto al shape de la tabla `norma` (tipo PROYECTO)."""
+    return {
+        "external_id": p.external_id,
+        "tipo": "PROYECTO",
+        "numero": f"{p.numero}/{p.anio}",
+        "titulo": p.extracto,
+        "resumen": None,
+        "resumen_ia": None,
+        "fecha_publicacion": p.fecha,
+        "jurisdiccion": "Nacional",
+        "sector": p.detect_sector(),
+        "emisor": None,  # el Senado no es un organismo regulador emisor
+        "organismo": "Honorable Senado de la Nación",
+        "estado": "En trámite",
+        "impacto": None,
+        "bora_seccion": None,
+        "entidades": p.autores or None,
+        "tags": [p.tipo_proyecto] if p.tipo_proyecto else None,
+        "url": p.url,
+        "raw": {
+            "numero": p.numero, "anio": p.anio, "tipo_codigo": p.tipo_codigo,
+            "origen": p.origen, "autores": p.autores,
+            "fecha": p.fecha.isoformat() if p.fecha else None,
+        },
+    }
+
+
+@celery_app.task(name="vigia_workers.tasks.ingest_senado_proyectos")
+def ingest_senado_proyectos(dry_run: bool = False, max_pages: int = 3) -> dict[str, Any]:
+    """Ingesta proyectos recientes originados en el Senado (scrape del buscador HSN).
+
+    Solo origen=S (los venidos de Diputados ya están en hcdn_proyectos). Upsert
+    idempotente por external_id = '{numero}/{anio}-{origen}-{tipo}'.
+    """
+    dry = _is_dry_run(dry_run)
+    SOURCE = catalog_fields("senado_proyectos")
+
+    async def _run() -> dict[str, Any]:
+        async with SenadoClient() as client:
+            proyectos = await client.fetch_recientes(max_pages=max_pages)
+        rows = [_senado_to_row(p) for p in proyectos]
+        if dry:
+            return {"rows": len(rows), "sample": [_dry_sample_row(r) for r in rows[:_DRY_SAMPLE]]}
+        totals = _empty_totals()
+        for i in range(0, len(rows), _FULL_BATCH):
+            _acc(totals, await upsert_normas(SOURCE, rows[i : i + _FULL_BATCH]))
+        return totals
+
+    if dry:
+        result = run_async(_run())
+        return {"source": "senado_proyectos", "dry_run": True, **result}
+
+    async def _wrapped() -> dict[str, Any]:
+        counts = await with_status([SOURCE["code"]], _run)
+        return {"source": "senado_proyectos", **counts}
+
+    result = run_async(_wrapped())
+    from vigia_workers.alerts import _match_all
+    result["matching"] = run_async(_match_all())
+    return result
 
 
 # Código GDE/GEDO (Gestión Documental Electrónica): RESOL-2026-276-APN-INASE#MEC,
