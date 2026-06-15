@@ -5,7 +5,10 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { BarChart, Bar, XAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import { api } from '@/lib/api';
 import { TIPOS_NORMA } from '@/lib/constants';
-import { Clock, ArrowRight, Building2, Tag } from 'lucide-react';
+import {
+  Clock, ArrowRight, Building2, Tag,
+  Landmark, Receipt, Antenna, Umbrella, Zap, Pill, Flame, Sprout, CandlestickChart, ShieldAlert, Scale,
+} from 'lucide-react';
 import FadeIn from '@/components/FadeIn';
 import CountUp from '@/components/CountUp';
 
@@ -22,6 +25,13 @@ const TIPO_DOT = {
 };
 
 const IMPACTO_TINT = { alto: 'tint-red', medio: 'tint-amber', bajo: 'tint-gray' };
+
+// Icono por organismo emisor (lucide). Fallback a Building2.
+const EMISOR_ICON = {
+  BCRA: Landmark, ARCA: Receipt, ENACOM: Antenna, SSN: Umbrella, ENRE: Zap,
+  ANMAT: Pill, ENARGAS: Flame, SENASA: Sprout, CNV: CandlestickChart,
+  IGJ: Building2, UIF: ShieldAlert, CNDC: Scale,
+};
 
 function WeekTooltip({ active, payload, label }) {
   if (!active || !payload?.length) return null;
@@ -90,6 +100,11 @@ function NormRow({ norma, onClick, index }) {
             <span className={`px-2 py-0.5 rounded-full text-[9px] font-semibold uppercase tracking-wide border ${TIPO_TINT[norma.tipo] || TIPO_TINT.OTRA}`}>
               {tipoMeta.label}{norma.numero ? ` ${norma.numero}` : ''}
             </span>
+            {norma.emisor && (
+              <span className="px-2 py-0.5 rounded-full text-[9px] font-bold tracking-wide border tint-blue font-mono">
+                {norma.emisor}
+              </span>
+            )}
             {norma.impacto && (
               <span className={`px-2 py-0.5 rounded-full text-[9px] font-medium border ${IMPACTO_TINT[norma.impacto]}`}>
                 impacto {norma.impacto}
@@ -262,45 +277,52 @@ function FeedView() {
 
       {/* Filtros flotantes */}
       <FadeIn delay={140}>
-        <div className="flex flex-wrap items-center gap-2 mb-2 pb-4 border-b border-border-light">
-          {['TODOS', ...Object.keys(TIPOS_NORMA)].map((tipo) => (
-            <button
-              key={tipo}
-              onClick={() => changeFilter(setFilterTipo)(tipo)}
-              className={`px-3 py-1 rounded-full text-[11px] font-medium transition-all duration-200 border ${
-                filterTipo === tipo
-                  ? 'bg-celeste/10 text-celeste-bright border-celeste/40 scale-105'
-                  : 'bg-transparent text-text-secondary border-border-light hover:border-celeste/30 hover:text-text-primary'
-              }`}
-            >
-              {tipo === 'TODOS' ? 'Todos' : TIPOS_NORMA[tipo].label}
-            </button>
-          ))}
-          {filterSector && (
-            <button
-              onClick={() => changeFilter(setFilterSector)(null)}
-              className="px-3 py-1 rounded-full text-[11px] font-medium border bg-sol/10 text-sol border-sol/40 hover:border-sol transition-all"
-              title="Quitar filtro de sector"
-            >
-              {filterSector} ×
-            </button>
-          )}
+        <div className="mb-2 pb-4 border-b border-border-light">
+          <div className="flex flex-wrap items-center gap-2">
+            {['TODOS', ...Object.keys(TIPOS_NORMA)].map((tipo) => (
+              <button
+                key={tipo}
+                onClick={() => changeFilter(setFilterTipo)(tipo)}
+                className={`px-3 py-1 rounded-full text-[11px] font-medium transition-all duration-200 border ${
+                  filterTipo === tipo
+                    ? 'bg-celeste/10 text-celeste-bright border-celeste/40 scale-105'
+                    : 'bg-transparent text-text-secondary border-border-light hover:border-celeste/30 hover:text-text-primary'
+                }`}
+              >
+                {tipo === 'TODOS' ? 'Todos' : TIPOS_NORMA[tipo].label}
+              </button>
+            ))}
+            {filterSector && (
+              <button
+                onClick={() => changeFilter(setFilterSector)(null)}
+                className="px-3 py-1 rounded-full text-[11px] font-medium border bg-sol/10 text-sol border-sol/40 hover:border-sol transition-all"
+                title="Quitar filtro de sector"
+              >
+                {filterSector} ×
+              </button>
+            )}
+          </div>
           {emisores.length > 0 && (
-            <select
-              value={filterEmisor}
-              onChange={(e) => changeFilter(setFilterEmisor)(e.target.value)}
-              title="Filtrar por organismo emisor"
-              className={`ml-auto px-3 py-1 rounded-full text-[11px] font-medium border bg-transparent cursor-pointer transition-all ${
-                filterEmisor
-                  ? 'text-celeste-bright border-celeste/40'
-                  : 'text-text-secondary border-border-light hover:text-text-primary'
-              }`}
-            >
-              <option value="">Emisor: todos</option>
-              {emisores.map((e) => (
-                <option key={e.emisor} value={e.emisor}>{e.emisor} ({e.cantidad.toLocaleString('es-AR')})</option>
-              ))}
-            </select>
+            <div className="flex flex-wrap items-center gap-1.5 mt-3">
+              <span className="text-[9px] uppercase tracking-wider text-text-tertiary font-mono mr-1 shrink-0">Organismo</span>
+              {emisores.map((e) => {
+                const Icon = EMISOR_ICON[e.emisor] || Building2;
+                const on = filterEmisor === e.emisor;
+                return (
+                  <button
+                    key={e.emisor}
+                    onClick={() => changeFilter(setFilterEmisor)(on ? '' : e.emisor)}
+                    className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-mono transition-all border ${
+                      on ? 'tint-blue' : 'border-border-light text-text-tertiary hover:text-text-secondary hover:border-celeste/30'
+                    }`}
+                  >
+                    <Icon size={12} />
+                    <span className="font-bold tracking-wide">{e.emisor}</span>
+                    <span className="opacity-50">{e.cantidad.toLocaleString('es-AR')}</span>
+                  </button>
+                );
+              })}
+            </div>
           )}
         </div>
       </FadeIn>
