@@ -88,7 +88,7 @@ restore, en `infra/DEPLOY.md § Backups`.
   profile). Para los datos manda el dump S3 (§3); la AMI recupera la *config* de la
   caja: lanzar desde la imagen + re-asociar la EIP. Rehacerla tras cambios grandes del host.
 - ✅ Página `/legal` (términos y privacidad, 2026-06-12): estática, tema OpenArg,
-  linkeada desde footer y signin. Borrado de cuenta vía devops@colossuslab.org.
+  linkeada desde footer y signin. Reforzada para cumplimiento Ley 25.326 (ver §7).
 - Considerar staging si el producto suma usuarios reales.
 
 ## 5. Fase 5 — IA (parcial: `resumen_ia` ✅ desplegado · resto diferido)
@@ -174,3 +174,33 @@ Queda en backlog:
 - CNV, ENACOM, ARCA biblioteca propia (hoy cubiertos parcialmente vía BORA).
 - SAIJ / normativa provincial (datos.jus.gob.ar) — radar provincial.
 - Alertas sobre avisos societarios (matcher propio sobre aviso_societario).
+
+## 7. Cumplimiento Ley 25.326 (datos personales) — ✅ código / ⏳ trámite
+
+Disparado por una observación pública (Twitter) de que la plataforma "no cumple
+la ley de datos personales". Auditoría + cierre de gaps (2026-06-15):
+
+**Hecho en código** (responsable: **Fundación Colossus Lab**,
+contacto `devops@colossuslab.org`):
+- `/legal` reescrita: sección Responsable de la base, declaración completa de
+  datos (incluye IP/user-agent/`last_seen`/`audit_log`), transferencia
+  internacional (art. 12, servidores en EE.UU.: AWS/Vercel/Google/Resend +
+  Anthropic si IA on), plazos ARCO (acceso 10 días corridos, rect./supr. 5 días
+  hábiles) + gratuidad cada 6 meses, y la **leyenda obligatoria de la AAIP**
+  (Disp. DNPDP 10/2008).
+- Consentimiento **expreso**: checkbox opt-in en `/auth/signin` y `/auth/invite`.
+- Derechos self-service: `GET /account/export` (acceso/portabilidad) y
+  `DELETE /account` (supresión, con transferencia de ownership en workspaces
+  compartidos) — router `apps/api/.../routers/account.py`; UI en
+  Configuración → "Tu cuenta y tus datos".
+- Retención: task Celery `vigia_workers.maintenance.purge_audit_log` (beat
+  semanal, dom 05:00 ART) que borra `audit_log` > `VIGIA_AUDIT_RETENTION_DAYS`
+  (default 365). Cookies: NO se agregó banner (solo cookie de sesión necesaria).
+
+**Pendiente (trámite administrativo, NO código):**
+1. **Inscribir la base en el Registro Nacional de Bases de Datos** de la AAIP
+   (art. 21), a nombre de Fundación Colossus Lab — trámite TAD. Al obtener el
+   N° de registro, agregarlo a la sección Responsable de `/legal`.
+2. Validación final del texto por abogado de protección de datos.
+3. Revisar DPA/condiciones de cada sub-encargado (Google, Resend, AWS, Vercel,
+   Anthropic) y guardar evidencia del encuadre de transferencia internacional.
