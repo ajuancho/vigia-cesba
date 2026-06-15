@@ -25,6 +25,7 @@ from typing import Any
 
 from vigia_connectors import BoraAviso, BoraClient, HcdnClient, HcdnProyecto, InfoLegClient, InfoLegNorm
 from vigia_connectors.bora import looks_like_dnu
+from vigia_connectors.emisores import detect_emisor
 from vigia_shared.sources import catalog_fields
 from vigia_workers.ai_resumen import aplicar_resumen_ia
 from vigia_workers.celery_app import celery_app
@@ -81,6 +82,7 @@ def _norma_to_row(n: InfoLegNorm) -> dict[str, Any]:
         "jurisdiccion": "Nacional",
         "sector": n.detect_sector(),
         "organismo": n.organismo_origen,
+        "emisor": detect_emisor(n.organismo_origen),
         "estado": "Publicada" if n.fecha_boletin else None,
         "impacto": None,  # heurística de impacto -> fase posterior
         "bora_seccion": "Primera Sección" if n.numero_boletin else None,
@@ -133,6 +135,7 @@ def _proyecto_to_row(p: HcdnProyecto) -> dict[str, Any]:
         "jurisdiccion": "Nacional",
         "sector": p.detect_sector(),
         "organismo": p.organismo(),
+        "emisor": detect_emisor(p.organismo()),
         "estado": "En trámite",
         "impacto": None,
         "bora_seccion": None,
@@ -255,6 +258,7 @@ def _aviso_to_row(a: BoraAviso, tipo: str | None = None, texto: str | None = Non
         "jurisdiccion": "Nacional",
         "sector": a.detect_sector(),
         "organismo": a.organismo,
+        "emisor": detect_emisor(a.organismo),
         "estado": "Publicada",
         "impacto": None,
         "bora_seccion": "Primera Sección",
@@ -378,6 +382,7 @@ def _comunicacion_to_row(c) -> dict[str, Any]:
         "jurisdiccion": "Nacional",
         "sector": c.detect_sector(),
         "organismo": "Banco Central de la República Argentina",
+        "emisor": "BCRA",
         "estado": "Publicada",
         "impacto": None,
         "bora_seccion": None,
@@ -464,6 +469,7 @@ def _consulta_to_row(c) -> dict[str, Any]:
         "jurisdiccion": "Nacional",
         "sector": c.detect_sector(),
         "organismo": c.organismo,
+        "emisor": detect_emisor(c.organismo),
         "estado": c.estado(),
         "impacto": None,
         "bora_seccion": None,
@@ -555,3 +561,48 @@ def ingest_infoleg_full(dry_run: bool = False) -> dict[str, Any]:
         return {"source": "infoleg", "mode": "full", **counts}
 
     return run_async(_wrapped())
+
+
+@celery_app.task(name="vigia_workers.tasks.backfill_emisores")
+def backfill_emisores() -> dict[str, Any]:
+    """Rellena `norma.emisor` en el histórico (la ingesta nueva ya lo setea).
+
+    Idempotente: solo toca filas con emisor NULL. Pagina por id para no cargar
+    todo el corpus en memoria. Re-correrla reescanea los NULL (barato).
+    """
+    from sqlalchemy import text as _text
+    from vigia_shared.db import session_scope
+
+    async def _run() -> dict[str, Any]:
+        scanned = 0
+        updated = 0
+        last_id = 0
+        async with session_scope() as session:
+            while True:
+                rows = (
+                    await session.execute(
+                        _text(
+                            "SELECT id, organismo FROM norma "
+                            "WHERE emisor IS NULL AND organismo IS NOT NULL AND id > :last "
+                            "ORDER BY id LIMIT 5000"
+                        ),
+                        {"last": last_id},
+                    )
+                ).all()
+                if not rows:
+                    break
+                scanned += len(rows)
+                last_id = rows[-1][0]
+                payload = [
+                    {"id": nid, "em": em}
+                    for nid, org in rows
+                    if (em := detect_emisor(org))
+                ]
+                if payload:
+                    await session.execute(
+                        _text("UPDATE norma SET emisor = :em WHERE id = :id"), payload
+                    )
+                    updated += len(payload)
+        return {"scanned": scanned, "updated": updated}
+
+    return run_async(_run())

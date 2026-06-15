@@ -71,6 +71,7 @@ class Norma(Base):
         UniqueConstraint("source_id", "external_id", name="uq_norma_source_external"),
         Index("ix_norma_fecha", "fecha_publicacion"),
         Index("ix_norma_tipo_sector", "tipo", "sector"),
+        Index("ix_norma_emisor", "emisor"),
         Index("ix_norma_impacto", "impacto"),
     )
 
@@ -89,6 +90,7 @@ class Norma(Base):
     fecha_publicacion: Mapped[date | None] = mapped_column(Date)
     jurisdiccion: Mapped[str | None] = mapped_column(String(64))
     sector: Mapped[str | None] = mapped_column(String(64))
+    emisor: Mapped[str | None] = mapped_column(String(64))  # organismo canónico (ARCA, CNV, …)
     organismo: Mapped[str | None] = mapped_column(String(255))
     estado: Mapped[str | None] = mapped_column(String(128))
     impacto: Mapped[str | None] = mapped_column(String(16))      # alto | medio | bajo

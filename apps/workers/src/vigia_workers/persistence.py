@@ -63,7 +63,7 @@ async def _upsert_source(
 # con NULL — solo se actualiza cuando el INSERT trae uno nuevo.
 _NORMA_UPDATE_COLS = (
     "tipo", "numero", "titulo", "resumen", "resumen_ia", "fecha_publicacion",
-    "jurisdiccion", "sector", "organismo", "estado", "impacto", "bora_seccion",
+    "jurisdiccion", "sector", "emisor", "organismo", "estado", "impacto", "bora_seccion",
     "entidades", "tags", "url", "raw",
 )
 

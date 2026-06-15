@@ -21,6 +21,7 @@ class SearchHit(BaseModel):
     snippet: str | None
     fecha_publicacion: Date | None
     sector: str | None
+    emisor: str | None
     organismo: str | None
     tags: list[str] | None
     rank: float | None
@@ -37,6 +38,7 @@ async def search(
     q: str = Query("", description="Texto libre (lenguaje natural)"),
     tipo: str | None = Query(None),
     sector: str | None = Query(None),
+    emisor: str | None = Query(None, description="organismo canónico: ARCA|CNV|BCRA|…"),
     jurisdiccion: str | None = Query(None),
     limit: int = Query(40, ge=1, le=200),
     offset: int = Query(0, ge=0, le=10000),
@@ -55,6 +57,9 @@ async def search(
     if sector:
         where.append("sector = :sector")
         params["sector"] = sector
+    if emisor:
+        where.append("emisor = :emisor")
+        params["emisor"] = emisor
     if jurisdiccion:
         where.append("jurisdiccion = :jur")
         params["jur"] = jurisdiccion
@@ -78,7 +83,7 @@ async def search(
     )
 
     query_sql = f"""
-        SELECT id, tipo, numero, titulo, resumen, fecha_publicacion, sector, organismo, tags
+        SELECT id, tipo, numero, titulo, resumen, fecha_publicacion, sector, organismo, tags, emisor
                {rank_sql}
                {snippet_sql}
         FROM norma
@@ -95,9 +100,9 @@ async def search(
     hits = [
         SearchHit(
             id=r[0], tipo=r[1], numero=r[2], titulo=r[3], resumen=r[4],
-            fecha_publicacion=r[5], sector=r[6], organismo=r[7], tags=r[8],
-            rank=float(r[9]) if r[9] is not None else None,
-            snippet=r[10],
+            fecha_publicacion=r[5], sector=r[6], organismo=r[7], tags=r[8], emisor=r[9],
+            rank=float(r[10]) if r[10] is not None else None,
+            snippet=r[11],
         )
         for r in rows
     ]
