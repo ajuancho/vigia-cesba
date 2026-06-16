@@ -20,7 +20,7 @@ async function getStats() {
 const MODULES = [
   {
     num: '01', icon: Newspaper, title: 'Feed Normativo', href: '/feed',
-    desc: 'El Boletín del día como un diario: lo importante arriba, el trámite colapsado, y cada norma nueva con su resumen IA en lenguaje claro — qué resuelve y a quién afecta.',
+    desc: 'El Boletín del día como un diario: lo importante arriba, el trámite colapsado, filtrable por organismo emisor, y cada norma nueva con su resumen IA — qué resuelve y a quién afecta.',
   },
   {
     num: '02', icon: Search, title: 'Buscador', href: '/search',
@@ -45,8 +45,8 @@ const MODULES = [
 ];
 
 const PIPELINE = [
-  { num: '01', label: 'Ingesta', desc: 'Ocho fuentes oficiales — BORA, InfoLEG, Congreso, BCRA — con workers diarios', color: 'text-celeste' },
-  { num: '02', label: 'Normalización', desc: 'Tipo, organismo, sector y estado de tramitación detectados', color: 'text-sol' },
+  { num: '01', label: 'Ingesta', desc: 'Nueve fuentes oficiales — BORA, InfoLEG, ambas cámaras del Congreso, BCRA — con workers diarios', color: 'text-celeste' },
+  { num: '02', label: 'Normalización', desc: 'Tipo, sector, estado de tramitación y organismo emisor canónico (ARCA, CNV, BCRA…) detectados', color: 'text-sol' },
   { num: '03', label: 'Síntesis IA', desc: 'Cada norma nueva del Boletín, resumida en lenguaje claro: qué resuelve y a quién afecta', color: 'text-sol-bright' },
   { num: '04', label: 'Alertas', desc: 'Índice full-text en español + matching por keyword y digest por email', color: 'text-text-primary' },
 ];
@@ -108,7 +108,7 @@ export default async function Landing() {
           <FadeIn delay={160}>
             <p className="text-[15px] md:text-base text-text-secondary max-w-xl mx-auto leading-relaxed mb-9">
               Vigía monitorea el <strong className="text-text-primary font-semibold">Boletín Oficial del día</strong>,
-              el Congreso, el BCRA y las consultas públicas; lo indexa, lo{' '}
+              ambas cámaras del Congreso, el BCRA y las consultas públicas; lo indexa, lo{' '}
               <strong className="text-text-primary font-semibold">resume con IA en lenguaje claro</strong> y
               te avisa cuando algo que te importa cambia. Datos públicos, frescos cada mañana,
               sin leer {fmt(total)} normas a mano.
@@ -136,7 +136,7 @@ export default async function Landing() {
           </FadeIn>
           {[
             { num: `${fmt(total)}+`, color: 'text-celeste', label: 'Normas indexadas', detail: 'Leyes, decretos, DNU, resoluciones, proyectos parlamentarios, comunicaciones del BCRA y consultas públicas.' },
-            { num: '8', color: 'text-sol', label: 'Fuentes oficiales', detail: 'Boletín Oficial (1ª y 2ª sección), InfoLEG, Diputados (proyectos, movimientos y dictámenes), BCRA y consultas públicas.' },
+            { num: '9', color: 'text-sol', label: 'Fuentes oficiales', detail: 'Boletín Oficial (1ª y 2ª sección), InfoLEG, Diputados y Senado (proyectos, movimientos y dictámenes), BCRA y consultas públicas.' },
             { num: String(sectores), color: 'text-sol-bright', label: 'Sectores detectados', detail: 'Energía, minería, salud, trabajo, tecnología y más, etiquetados automáticamente.' },
             { num: '24/7', color: 'text-text-primary', label: 'Monitoreo continuo', detail: 'Ingesta diaria con SLOs de frescura por fuente: si un dato se atrasa, lo sabemos antes que vos.' },
           ].map((row, i) => (
@@ -247,7 +247,7 @@ export default async function Landing() {
               <ul className="space-y-1.5 text-[12px] text-text-secondary">
                 <li>Boletín Oficial — 1ª y 2ª sección</li>
                 <li>InfoLEG — Min. Justicia</li>
-                <li>HCDN — proyectos, movimientos y dictámenes</li>
+                <li>Congreso — Diputados y Senado (proyectos, movimientos, dictámenes)</li>
                 <li>Comisión Bicameral DNU</li>
                 <li>BCRA — Comunicaciones "A"</li>
                 <li>Consultas públicas nacionales</li>
