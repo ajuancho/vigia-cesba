@@ -1,6 +1,7 @@
 'use client';
 
 import { Suspense, useState, useEffect } from 'react';
+import Link from 'next/link';
 import { useSession, signIn } from 'next-auth/react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { Eye } from 'lucide-react';
@@ -13,6 +14,7 @@ function InviteInner() {
   const token = params.get('token');
   const [state, setState] = useState('idle'); // idle | accepting | ok | error
   const [msg, setMsg] = useState('');
+  const [accepted, setAccepted] = useState(false);
 
   useEffect(() => {
     if (!AUTH_ENABLED || !token) return;
@@ -33,7 +35,21 @@ function InviteInner() {
         {!token && <p className="text-[13px] text-status-red">Falta el token de invitación.</p>}
         {token && !AUTH_ENABLED && <p className="text-[13px] text-text-secondary">Auth deshabilitada en este entorno.</p>}
         {token && AUTH_ENABLED && status === 'unauthenticated' && (
-          <button onClick={() => signIn('google')} className="w-full px-4 py-2.5 btn-celeste rounded-full text-[13px] font-bold">Iniciá sesión para aceptar</button>
+          <>
+            <label className="flex items-start gap-2.5 mb-4 cursor-pointer select-none text-left">
+              <input
+                type="checkbox"
+                checked={accepted}
+                onChange={(e) => setAccepted(e.target.checked)}
+                className="mt-0.5 w-4 h-4 shrink-0 accent-celeste cursor-pointer"
+              />
+              <span className="text-[11px] text-text-tertiary leading-relaxed">
+                Leí y acepto los{' '}
+                <Link href="/legal" className="text-celeste hover:text-celeste-bright transition-colors">términos y la política de privacidad</Link>, y presto mi consentimiento al tratamiento de mis datos personales conforme a la Ley N° 25.326.
+              </span>
+            </label>
+            <button onClick={() => signIn('google')} disabled={!accepted} className="w-full px-4 py-2.5 btn-celeste rounded-full text-[13px] font-bold disabled:opacity-40 disabled:cursor-not-allowed">Iniciá sesión para aceptar</button>
+          </>
         )}
         {state === 'accepting' && <p className="text-[13px] text-text-secondary">Aceptando…</p>}
         {state === 'ok' && <p className="text-[13px] text-status-green">¡Listo! Redirigiendo…</p>}

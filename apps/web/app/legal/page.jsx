@@ -18,49 +18,61 @@ const SECCIONES = [
   },
   {
     num: 'II.',
-    titulo: 'Qué datos guardamos',
+    titulo: 'Responsable de la base de datos',
     cuerpo: [
-      <>Si creás una cuenta, guardamos lo que tu cuenta de Google nos da al iniciar sesión: <strong className="text-text-primary">email, nombre y foto de perfil</strong>. Nada más — no accedemos a tu correo, contactos ni archivos.</>,
-      <>Además guardamos lo que vos creás dentro de la plataforma: tu workspace, sus miembros, las alertas que configurás (keywords y sectores) y los emails de las personas que invitás.</>,
+      <>El responsable del tratamiento de tus datos personales es la <strong className="text-text-primary">Fundación Colossus Lab</strong>. Para cualquier consulta sobre tus datos, escribinos a <a href="mailto:devops@colossuslab.org" className="textlink">devops@colossuslab.org</a>.</>,
+      <>Tratamos tus datos conforme a la <strong className="text-text-primary">Ley N° 25.326</strong> de Protección de los Datos Personales y su reglamentación.</>,
     ],
   },
   {
     num: 'III.',
+    titulo: 'Qué datos guardamos',
+    cuerpo: [
+      <>Si creás una cuenta, guardamos lo que tu cuenta de Google nos da al iniciar sesión: <strong className="text-text-primary">email, nombre y foto de perfil</strong>. No accedemos a tu correo, contactos ni archivos.</>,
+      <>Además guardamos lo que vos creás dentro de la plataforma: tu workspace, sus miembros, las alertas que configurás (keywords y sectores) y los emails de las personas que invitás.</>,
+      <>Por seguridad y trazabilidad, registramos también datos técnicos de tu actividad de cuenta: tu <strong className="text-text-primary">dirección IP</strong>, el <strong className="text-text-primary">navegador y dispositivo</strong> (user-agent), la fecha de tu último acceso y un registro de eventos relevantes (inicios de sesión, invitaciones enviadas o aceptadas y cambios de membresía). Conservamos este registro por un máximo de <strong className="text-text-primary">12 meses</strong> y luego lo borramos automáticamente.</>,
+    ],
+  },
+  {
+    num: 'IV.',
     titulo: 'Para qué los usamos',
     cuerpo: [
       <>Para que el servicio funcione: autenticarte, mantener tu workspace y mandarte los emails que pediste — el digest de tus alertas y las invitaciones que enviás. Son emails operativos, no de marketing.</>,
     ],
   },
   {
-    num: 'IV.',
+    num: 'V.',
     titulo: 'Lo que no hacemos',
     cuerpo: [
       <>No vendemos ni compartimos tus datos con terceros. No mostramos publicidad. No usamos trackers de terceros ni perfiles de comportamiento. Tu monitoreo — qué keywords vigilás, qué buscás — es tuyo.</>,
     ],
   },
   {
-    num: 'V.',
-    titulo: 'Servicios de terceros',
-    cuerpo: [
-      <>Para operar usamos: <strong className="text-text-primary">Google</strong> (inicio de sesión), <strong className="text-text-primary">Resend</strong> (envío de emails), <strong className="text-text-primary">Amazon Web Services</strong> (infraestructura y base de datos) y <strong className="text-text-primary">Vercel</strong> (hosting del sitio). Cada uno recibe solo lo mínimo necesario para su función.</>,
-    ],
-  },
-  {
     num: 'VI.',
-    titulo: 'Cookies',
+    titulo: 'Servicios de terceros y transferencia internacional',
     cuerpo: [
-      <>Usamos únicamente la cookie de sesión necesaria para mantenerte logueado. Sin cookies de publicidad ni de analytics de terceros.</>,
+      <>Para operar usamos: <strong className="text-text-primary">Google</strong> (inicio de sesión), <strong className="text-text-primary">Resend</strong> (envío de emails), <strong className="text-text-primary">Amazon Web Services</strong> (infraestructura y base de datos) y <strong className="text-text-primary">Vercel</strong> (hosting del sitio). Si está activo el resumen automático con IA, usamos <strong className="text-text-primary">Anthropic / AWS Bedrock</strong>, que recibe únicamente el texto público de las normas — nunca tus datos personales. Cada proveedor recibe solo lo mínimo necesario para su función.</>,
+      <>Estos servicios alojan datos en servidores ubicados en <strong className="text-text-primary">los Estados Unidos</strong>. Al usar Vigía prestás tu consentimiento para esa transferencia internacional de datos, en los términos del artículo 12 de la Ley N° 25.326.</>,
     ],
   },
   {
     num: 'VII.',
-    titulo: 'Tus datos, tus derechos',
+    titulo: 'Cookies',
     cuerpo: [
-      <>Podés pedir acceso, corrección o <strong className="text-text-primary">borrado completo de tu cuenta y tus datos</strong> escribiendo a <a href="mailto:devops@colossuslab.org" className="textlink">devops@colossuslab.org</a>. Lo procesamos a la brevedad y sin vueltas.</>,
+      <>Usamos únicamente la cookie de sesión necesaria para mantenerte logueado. Es una cookie estrictamente técnica: no requiere consentimiento previo. Sin cookies de publicidad ni de analytics de terceros.</>,
     ],
   },
   {
     num: 'VIII.',
+    titulo: 'Tus datos, tus derechos',
+    cuerpo: [
+      <>Tenés derecho a <strong className="text-text-primary">acceder</strong> a tus datos, <strong className="text-text-primary">rectificarlos</strong>, <strong className="text-text-primary">actualizarlos</strong> y pedir su <strong className="text-text-primary">supresión</strong>. Desde <strong className="text-text-primary">Configuración → Tu cuenta</strong> podés descargar todos tus datos o eliminar tu cuenta por completo en cualquier momento. También podés ejercer estos derechos escribiendo a <a href="mailto:devops@colossuslab.org" className="textlink">devops@colossuslab.org</a>.</>,
+      <>El acceso es <strong className="text-text-primary">gratuito</strong> a intervalos no inferiores a seis meses. Respondemos los pedidos de acceso dentro de los <strong className="text-text-primary">10 días corridos</strong> y los de rectificación, actualización o supresión dentro de los <strong className="text-text-primary">5 días hábiles</strong>, conforme a la Ley N° 25.326.</>,
+      <em className="block text-[12px] text-text-tertiary leading-relaxed not-italic border-l-2 border-border-light pl-4">El titular de los datos personales tiene la facultad de ejercer el derecho de acceso a los mismos en forma gratuita a intervalos no inferiores a seis meses, salvo que se acredite un interés legítimo al efecto conforme lo establecido en el artículo 14, inciso 3 de la Ley N° 25.326. La AGENCIA DE ACCESO A LA INFORMACIÓN PÚBLICA, en su carácter de Órgano de Control de la Ley N° 25.326, tiene la atribución de atender las denuncias y reclamos que interpongan quienes resulten afectados en sus derechos por incumplimiento de las normas vigentes en materia de protección de datos personales.</em>,
+    ],
+  },
+  {
+    num: 'IX.',
     titulo: 'Términos de uso',
     cuerpo: [
       <>Vigía está en <strong className="text-text-primary">beta</strong> y se ofrece "tal cual". Hacemos lo posible por la frescura y fidelidad de los datos (monitoreamos cada fuente con SLOs), pero las fuentes oficiales pueden contener errores, demoras u omisiones — y nuestro procesamiento también puede fallar.</>,
@@ -69,7 +81,7 @@ const SECCIONES = [
     ],
   },
   {
-    num: 'IX.',
+    num: 'X.',
     titulo: 'Cambios',
     cuerpo: [
       <>Si esta página cambia, actualizamos la fecha de abajo. Si el cambio es relevante para tus datos, te avisamos por email.</>,
@@ -142,7 +154,7 @@ export default function LegalPage() {
 
         <FadeIn>
           <p className="text-[10px] text-text-tertiary font-mono pt-6">
-            Última actualización: 12 de junio de 2026 · Colossus Lab · Buenos Aires
+            Última actualización: 15 de junio de 2026 · Fundación Colossus Lab · Buenos Aires
           </p>
         </FadeIn>
       </main>

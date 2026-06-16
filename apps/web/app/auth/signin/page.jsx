@@ -1,6 +1,6 @@
 'use client';
 
-import { Suspense } from 'react';
+import { Suspense, useState } from 'react';
 import Link from 'next/link';
 import { signIn } from 'next-auth/react';
 import { useSearchParams } from 'next/navigation';
@@ -28,6 +28,7 @@ function GoogleMark() {
 function SignInInner() {
   const params = useSearchParams();
   const callbackUrl = params.get('callbackUrl') || '/feed';
+  const [accepted, setAccepted] = useState(false);
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-4">
@@ -62,16 +63,25 @@ function SignInInner() {
 
             {AUTH_ENABLED ? (
               <>
+                <label className="flex items-start gap-2.5 mb-4 cursor-pointer select-none">
+                  <input
+                    type="checkbox"
+                    checked={accepted}
+                    onChange={(e) => setAccepted(e.target.checked)}
+                    className="mt-0.5 w-4 h-4 shrink-0 accent-celeste cursor-pointer"
+                  />
+                  <span className="text-[11px] text-text-tertiary leading-relaxed">
+                    Leí y acepto los{' '}
+                    <Link href="/legal" className="text-celeste hover:text-celeste-bright transition-colors">términos y la política de privacidad</Link>, y presto mi consentimiento al tratamiento de mis datos personales conforme a la Ley N° 25.326.
+                  </span>
+                </label>
                 <button
                   onClick={() => signIn('google', { callbackUrl })}
-                  className="w-full flex items-center justify-center gap-2.5 px-4 py-2.5 bg-text-primary text-navy-950 rounded-full text-[13px] font-bold hover:bg-white transition-colors"
+                  disabled={!accepted}
+                  className="w-full flex items-center justify-center gap-2.5 px-4 py-2.5 bg-text-primary text-navy-950 rounded-full text-[13px] font-bold hover:bg-white transition-colors disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-text-primary"
                 >
                   <GoogleMark /> Continuar con Google
                 </button>
-                <p className="text-[10px] text-text-tertiary text-center mt-3 leading-relaxed">
-                  Al continuar aceptás los{' '}
-                  <Link href="/legal" className="text-celeste hover:text-celeste-bright transition-colors">términos y la política de privacidad</Link>.
-                </p>
               </>
             ) : (
               <div className="text-[12px] text-text-secondary bg-bg-secondary border border-border-light rounded-lg p-3 leading-relaxed">

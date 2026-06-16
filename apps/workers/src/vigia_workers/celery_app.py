@@ -20,6 +20,7 @@ celery_app = Celery(
         "vigia_workers.bicameral",
         "vigia_workers.movimientos",
         "vigia_workers.societario",
+        "vigia_workers.maintenance",
     ],
 )
 
@@ -120,6 +121,13 @@ celery_app.conf.update(
         "check-sources": {
             "task": "vigia_workers.freshness.check_sources",
             "schedule": crontab(hour="*/6", minute=45),
+        },
+        # Retención de audit_log (IP/user-agent) — semanal, domingo 05:00 ART.
+        # Borra registros más viejos que VIGIA_AUDIT_RETENTION_DAYS (Ley 25.326,
+        # art. 4: limitación temporal). Fuera de la ventana de ingesta.
+        "purge-audit-log": {
+            "task": "vigia_workers.maintenance.purge_audit_log",
+            "schedule": crontab(day_of_week=0, hour=5, minute=0),
         },
     },
 )

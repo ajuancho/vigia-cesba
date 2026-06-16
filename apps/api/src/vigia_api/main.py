@@ -7,6 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from vigia_api.core.settings import get_settings
 from vigia_api.routers import (
+    account,
     alerts,
     auth,
     avisos,
@@ -53,6 +54,7 @@ def create_app() -> FastAPI:
     app.include_router(health.router)
     app.include_router(auth.router)
     app.include_router(workspaces.router)
+    app.include_router(account.router)
     app.include_router(invitations.router)
     app.include_router(alerts.router)
     app.include_router(normas.router)

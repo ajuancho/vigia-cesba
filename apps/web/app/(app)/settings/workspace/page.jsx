@@ -1,9 +1,10 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { useSession } from 'next-auth/react';
-import { Users, Plus, Trash2, Copy, Building2, Info, MessageCircle, Check, Mail } from 'lucide-react';
+import { useSession, signOut } from 'next-auth/react';
+import { Users, Plus, Trash2, Copy, Building2, Info, MessageCircle, Check, Mail, Download, ShieldAlert, AlertTriangle } from 'lucide-react';
 import { authedFetch, AUTH_ENABLED } from '@/lib/authClient';
+import { API_BASE } from '@/lib/api';
 
 function inviteMessage(wsName, token) {
   const link = `${location.origin}/auth/invite?token=${token}`;
@@ -21,6 +22,11 @@ export default function WorkspaceSettings() {
   const [err, setErr] = useState('');
   const [lastInvite, setLastInvite] = useState(null); // feedback del email automático
   const [copied, setCopied] = useState(null); // token recién copiado
+  const [showDelete, setShowDelete] = useState(false); // modal de borrado de cuenta
+  const [confirmEmail, setConfirmEmail] = useState(''); // email tipeado para confirmar
+  const [busy, setBusy] = useState(false); // export/delete en curso
+
+  const userEmail = session?.user?.email || '';
 
   const load = useCallback(async () => {
     if (!jwt) return;
@@ -60,6 +66,31 @@ export default function WorkspaceSettings() {
   const removeMember = async (userId) => {
     try { await authedFetch(jwt, `/workspaces/me/members/${userId}`, { method: 'DELETE' }); load(); }
     catch (e) { setErr(String(e.message || e)); }
+  };
+
+  const exportData = async () => {
+    setErr(''); setBusy(true);
+    try {
+      const res = await fetch(`${API_BASE}/account/export`, {
+        headers: { Authorization: `Bearer ${jwt}` }, cache: 'no-store',
+      });
+      if (!res.ok) throw new Error(`API ${res.status} en /account/export`);
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = 'vigia-mis-datos.json';
+      document.body.appendChild(a); a.click(); a.remove();
+      URL.revokeObjectURL(url);
+    } catch (e) { setErr(String(e.message || e)); }
+    finally { setBusy(false); }
+  };
+
+  const deleteAccount = async () => {
+    setErr(''); setBusy(true);
+    try {
+      await authedFetch(jwt, '/account', { method: 'DELETE' });
+      await signOut({ callbackUrl: '/' });
+    } catch (e) { setErr(String(e.message || e)); setBusy(false); }
   };
 
   if (!AUTH_ENABLED) {
@@ -172,6 +203,61 @@ export default function WorkspaceSettings() {
                 </div>
               </div>
             ))}
+          </div>
+        </div>
+      )}
+
+      <div className="card p-5 mt-5">
+        <h3 className="text-sm font-semibold text-text-primary mb-1 flex items-center gap-2"><ShieldAlert size={14} /> Tu cuenta y tus datos</h3>
+        <p className="text-[12px] text-text-tertiary leading-relaxed mb-4">
+          Ejercé tus derechos sobre tus datos personales (Ley 25.326): descargá todo lo que guardamos
+          de vos o eliminá tu cuenta por completo. El borrado es inmediato e irreversible.
+        </p>
+        <div className="flex flex-col md:flex-row gap-2">
+          <button
+            onClick={exportData}
+            disabled={busy}
+            className="flex items-center justify-center gap-2 px-3 py-2 rounded-full border border-border-light text-[12px] font-medium text-text-secondary hover:border-celeste/40 hover:text-celeste transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+          >
+            <Download size={14} /> Descargar mis datos
+          </button>
+          <button
+            onClick={() => { setConfirmEmail(''); setShowDelete(true); }}
+            className="flex items-center justify-center gap-2 px-3 py-2 rounded-full border border-status-red/30 text-[12px] font-medium text-status-red hover:bg-status-red/10 transition-colors"
+          >
+            <Trash2 size={14} /> Eliminar mi cuenta
+          </button>
+        </div>
+      </div>
+
+      {showDelete && (
+        <div className="fixed inset-0 z-[80] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm" onClick={() => !busy && setShowDelete(false)}>
+          <div className="card p-6 max-w-sm w-full" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center gap-2.5 mb-3">
+              <div className="w-9 h-9 rounded-lg bg-status-red/10 border border-status-red/30 flex items-center justify-center"><AlertTriangle size={18} className="text-status-red" /></div>
+              <h3 className="text-sm font-bold text-text-primary">Eliminar tu cuenta</h3>
+            </div>
+            <p className="text-[12px] text-text-secondary leading-relaxed mb-4">
+              Esto borra tu cuenta, tus workspaces personales, alertas y todo tu registro de actividad.
+              <strong className="text-text-primary"> No se puede deshacer.</strong> Para confirmar, escribí tu email
+              <span className="font-mono text-text-primary"> {userEmail}</span>.
+            </p>
+            <input
+              value={confirmEmail}
+              onChange={(e) => setConfirmEmail(e.target.value)}
+              placeholder={userEmail}
+              className="w-full bg-bg-primary border border-border-light rounded-lg px-3 py-2 text-[13px] mb-4 focus:outline-none focus:border-status-red"
+            />
+            <div className="flex gap-2 justify-end">
+              <button onClick={() => setShowDelete(false)} disabled={busy} className="px-3 py-2 rounded-full border border-border-light text-[12px] text-text-secondary hover:text-text-primary transition-colors disabled:opacity-40">Cancelar</button>
+              <button
+                onClick={deleteAccount}
+                disabled={busy || confirmEmail.trim().toLowerCase() !== userEmail.toLowerCase()}
+                className="px-3 py-2 rounded-full bg-status-red text-white text-[12px] font-bold hover:bg-status-red/90 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                {busy ? 'Eliminando…' : 'Eliminar definitivamente'}
+              </button>
+            </div>
           </div>
         </div>
       )}
