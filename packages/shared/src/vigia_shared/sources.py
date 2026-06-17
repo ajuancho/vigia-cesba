@@ -28,7 +28,10 @@ SOURCES: dict[str, dict] = {
         "kind": "feed",
         "base_url": "https://datos.hcdn.gob.ar",
         "cadence_hours": 24,
-        "freshness_slo_days": 10,
+        # El portal de Diputados publica el dataset de forma irregular (baches de
+        # 1-2 semanas son normales, p.ej. recesos). 15d evita el ruido de alertas
+        # en cada bache habitual; sigue avisando si el atraso es realmente anómalo.
+        "freshness_slo_days": 15,
     },
     "senado_proyectos": {
         "code": "senado_proyectos",
