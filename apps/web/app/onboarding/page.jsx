@@ -23,6 +23,9 @@ export default function OnboardingPage() {
         method: 'POST',
         body: JSON.stringify({ name: name || undefined, sectores_interes: selected }),
       });
+      // El flag `onboarded` del JWT queda stale hasta el próximo sync; marcamos
+      // el dismiss para que el banner de OnboardingBanner no reaparezca.
+      try { localStorage.setItem('vigia_onboarding_dismissed', '1'); } catch { /* noop */ }
       router.push('/feed');
     } catch {
       setSaving(false);
