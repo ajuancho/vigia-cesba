@@ -28,6 +28,7 @@ export const api = {
   emisores: () => get('/stats/emisores'),
   listAvisos: (params) => get(`/avisos${qs(params)}`),
   avisosRubros: (params) => get(`/avisos/rubros${qs(params)}`),
+  avisosStats: (params) => get(`/avisos/stats${qs(params)}`),
 };
 
 export { BASE as API_BASE };

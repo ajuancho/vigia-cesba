@@ -77,6 +77,47 @@ async def list_avisos(
     )
 
 
+class AvisoStats(BaseModel):
+    total: int
+    days: int
+    por_rubro: list[dict]  # [{rubro, cantidad}] orden desc
+
+
+@router.get("/stats", response_model=AvisoStats)
+async def avisos_stats(days: int = Query(7, ge=1, le=90)) -> AvisoStats:
+    """Resumen del Radar societario: total de avisos en la ventana + desglose por
+    rubro (para el conteo + torta de la página de avisos)."""
+    Session = get_sessionmaker()
+    async with Session() as session:
+        total = (
+            await session.execute(
+                text(
+                    "SELECT COUNT(*) FROM aviso_societario "
+                    "WHERE fecha > CURRENT_DATE - make_interval(days => :days)"
+                ),
+                {"days": days},
+            )
+        ).scalar_one()
+        rows = (
+            await session.execute(
+                text(
+                    """
+                    SELECT COALESCE(rubro, 'Sin rubro') AS rubro, COUNT(*) AS c
+                    FROM aviso_societario
+                    WHERE fecha > CURRENT_DATE - make_interval(days => :days)
+                    GROUP BY 1 ORDER BY c DESC
+                    """
+                ),
+                {"days": days},
+            )
+        ).all()
+    return AvisoStats(
+        total=int(total or 0),
+        days=days,
+        por_rubro=[{"rubro": r[0], "cantidad": int(r[1])} for r in rows],
+    )
+
+
 @router.get("/rubros")
 async def rubros(days: int = Query(30, ge=1, le=365)) -> list[dict]:
     """Rubros con actividad reciente (para el filtro del Radar societario)."""
