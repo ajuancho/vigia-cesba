@@ -85,7 +85,7 @@ class AvisoStats(BaseModel):
     mes_anterior: int
     rubros_distintos: int
     por_rubro: list[dict]  # últimos 30 días, [{rubro, cantidad}] desc
-    serie: list[dict]      # últimas 12 semanas, [{semana: 'YYYY-MM-DD', total}]
+    serie: list[dict]      # últimos 7 días, [{dia: 'YYYY-MM-DD', total}] (incluye días en 0)
 
 
 @router.get("/stats", response_model=AvisoStats)
@@ -127,11 +127,15 @@ async def avisos_stats() -> AvisoStats:
             await session.execute(
                 text(
                     """
-                    SELECT to_char(date_trunc('week', fecha), 'YYYY-MM-DD') AS semana,
-                           COUNT(*) AS total
-                    FROM aviso_societario
-                    WHERE fecha > CURRENT_DATE - 84
-                    GROUP BY 1 ORDER BY 1
+                    SELECT to_char(d.dia, 'YYYY-MM-DD') AS dia, COALESCE(c.total, 0) AS total
+                    FROM generate_series(CURRENT_DATE - 6, CURRENT_DATE, interval '1 day') AS d(dia)
+                    LEFT JOIN (
+                        SELECT fecha, COUNT(*) AS total
+                        FROM aviso_societario
+                        WHERE fecha > CURRENT_DATE - 7
+                        GROUP BY fecha
+                    ) c ON c.fecha = d.dia::date
+                    ORDER BY d.dia
                     """
                 )
             )
@@ -145,7 +149,7 @@ async def avisos_stats() -> AvisoStats:
         mes_anterior=int(kpi.mes_anterior or 0),
         rubros_distintos=int(kpi.rubros_distintos or 0),
         por_rubro=[{"rubro": r[0], "cantidad": int(r[1])} for r in por_rubro],
-        serie=[{"semana": r[0], "total": int(r[1])} for r in serie],
+        serie=[{"dia": r[0], "total": int(r[1])} for r in serie],
     )
 
 

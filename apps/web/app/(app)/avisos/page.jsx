@@ -51,11 +51,11 @@ function RubroTooltip({ active, payload }) {
   );
 }
 
-function SemanaTooltip({ active, payload, label }) {
+function DiaTooltip({ active, payload, label }) {
   if (!active || !payload?.length) return null;
   return (
     <div className="bg-navy-700 border border-border-medium rounded-lg px-3 py-2 shadow-lg">
-      <p className="text-[10px] font-mono text-text-tertiary mb-0.5">semana del {label}</p>
+      <p className="text-[10px] font-mono text-text-tertiary mb-0.5">{label}</p>
       <p className="text-[12px] font-bold text-text-primary font-mono">{payload[0].value.toLocaleString('es-AR')} avisos</p>
     </div>
   );
@@ -71,7 +71,7 @@ function SocietarioStats() {
 
   if (!s || !s.total_historico) return null;
   const pie = pieFromRubros(s.por_rubro);
-  const serie = (s.serie || []).map((p) => ({ semana: p.semana.slice(5), total: p.total }));
+  const serie = (s.serie || []).map((p) => ({ dia: p.dia.slice(5), total: p.total }));
 
   const KPIS = [
     { label: 'Esta semana', value: s.semana, sub: 'vs. semana anterior', color: 'text-celeste', delta: <Delta actual={s.semana} anterior={s.semana_anterior} /> },
@@ -102,7 +102,7 @@ function SocietarioStats() {
         {/* Pulso semanal + torta por rubro */}
         <div className="grid grid-cols-1 lg:grid-cols-[1.4fr_1fr] gap-8 mt-8">
           <div>
-            <p className="eyebrow mb-3"><span className="eyebrow-num">PULSO</span><span className="ml-2">altas por semana · 12 semanas</span></p>
+            <p className="eyebrow mb-3"><span className="eyebrow-num">PULSO</span><span className="ml-2">altas por día · últimos 7 días</span></p>
             <ResponsiveContainer width="100%" height={180}>
               <AreaChart data={serie} margin={{ left: -16, right: 4, top: 4 }}>
                 <defs>
@@ -112,9 +112,9 @@ function SocietarioStats() {
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="rgba(116, 172, 223, 0.08)" vertical={false} />
-                <XAxis dataKey="semana" tick={{ fill: '#636E85', fontSize: 9 }} axisLine={false} tickLine={false} interval="preserveStartEnd" />
-                <YAxis tick={{ fill: '#636E85', fontSize: 10 }} axisLine={false} tickLine={false} />
-                <Tooltip content={<SemanaTooltip />} cursor={{ stroke: 'rgba(116,172,223,0.2)' }} />
+                <XAxis dataKey="dia" tick={{ fill: '#636E85', fontSize: 9 }} axisLine={false} tickLine={false} />
+                <YAxis tick={{ fill: '#636E85', fontSize: 10 }} axisLine={false} tickLine={false} allowDecimals={false} />
+                <Tooltip content={<DiaTooltip />} cursor={{ stroke: 'rgba(116,172,223,0.2)' }} />
                 <Area type="monotone" dataKey="total" stroke="#74ACDF" strokeWidth={2} fill="url(#fillAvisos)" animationDuration={1100} />
               </AreaChart>
             </ResponsiveContainer>
