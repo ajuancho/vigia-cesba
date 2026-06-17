@@ -78,43 +78,74 @@ async def list_avisos(
 
 
 class AvisoStats(BaseModel):
-    total: int
-    days: int
-    por_rubro: list[dict]  # [{rubro, cantidad}] orden desc
+    total_historico: int
+    semana: int
+    semana_anterior: int
+    mes: int
+    mes_anterior: int
+    rubros_distintos: int
+    por_rubro: list[dict]  # últimos 30 días, [{rubro, cantidad}] desc
+    serie: list[dict]      # últimas 12 semanas, [{semana: 'YYYY-MM-DD', total}]
 
 
 @router.get("/stats", response_model=AvisoStats)
-async def avisos_stats(days: int = Query(7, ge=1, le=90)) -> AvisoStats:
-    """Resumen del Radar societario: total de avisos en la ventana + desglose por
-    rubro (para el conteo + torta de la página de avisos)."""
+async def avisos_stats() -> AvisoStats:
+    """Panel del Radar societario: KPIs (semana/mes con su período previo para el
+    delta), serie semanal (12 semanas) y desglose por rubro (30 días, para la
+    torta). Calca el shape de `/stats/dashboard` del corpus normativo."""
     Session = get_sessionmaker()
     async with Session() as session:
-        total = (
+        kpi = (
             await session.execute(
                 text(
-                    "SELECT COUNT(*) FROM aviso_societario "
-                    "WHERE fecha > CURRENT_DATE - make_interval(days => :days)"
-                ),
-                {"days": days},
+                    """
+                    SELECT
+                      COUNT(*) AS total_historico,
+                      COUNT(*) FILTER (WHERE fecha > CURRENT_DATE - 7) AS semana,
+                      COUNT(*) FILTER (WHERE fecha > CURRENT_DATE - 14 AND fecha <= CURRENT_DATE - 7) AS semana_anterior,
+                      COUNT(*) FILTER (WHERE fecha > CURRENT_DATE - 30) AS mes,
+                      COUNT(*) FILTER (WHERE fecha > CURRENT_DATE - 60 AND fecha <= CURRENT_DATE - 30) AS mes_anterior,
+                      COUNT(DISTINCT rubro) FILTER (WHERE fecha > CURRENT_DATE - 30) AS rubros_distintos
+                    FROM aviso_societario
+                    """
+                )
             )
-        ).scalar_one()
-        rows = (
+        ).one()
+        por_rubro = (
             await session.execute(
                 text(
                     """
                     SELECT COALESCE(rubro, 'Sin rubro') AS rubro, COUNT(*) AS c
                     FROM aviso_societario
-                    WHERE fecha > CURRENT_DATE - make_interval(days => :days)
+                    WHERE fecha > CURRENT_DATE - 30
                     GROUP BY 1 ORDER BY c DESC
                     """
-                ),
-                {"days": days},
+                )
             )
         ).all()
+        serie = (
+            await session.execute(
+                text(
+                    """
+                    SELECT to_char(date_trunc('week', fecha), 'YYYY-MM-DD') AS semana,
+                           COUNT(*) AS total
+                    FROM aviso_societario
+                    WHERE fecha > CURRENT_DATE - 84
+                    GROUP BY 1 ORDER BY 1
+                    """
+                )
+            )
+        ).all()
+
     return AvisoStats(
-        total=int(total or 0),
-        days=days,
-        por_rubro=[{"rubro": r[0], "cantidad": int(r[1])} for r in rows],
+        total_historico=int(kpi.total_historico or 0),
+        semana=int(kpi.semana or 0),
+        semana_anterior=int(kpi.semana_anterior or 0),
+        mes=int(kpi.mes or 0),
+        mes_anterior=int(kpi.mes_anterior or 0),
+        rubros_distintos=int(kpi.rubros_distintos or 0),
+        por_rubro=[{"rubro": r[0], "cantidad": int(r[1])} for r in por_rubro],
+        serie=[{"semana": r[0], "total": int(r[1])} for r in serie],
     )
 
 

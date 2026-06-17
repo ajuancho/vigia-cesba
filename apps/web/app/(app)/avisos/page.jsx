@@ -1,9 +1,12 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts';
+import {
+  PieChart, Pie, Cell, Tooltip, ResponsiveContainer,
+  AreaChart, Area, CartesianGrid, XAxis, YAxis,
+} from 'recharts';
 import { api } from '@/lib/api';
-import { Building2, Search, ExternalLink, Clock } from 'lucide-react';
+import { Building2, Search, ExternalLink, Clock, TrendingUp, TrendingDown, Minus } from 'lucide-react';
 import FadeIn from '@/components/FadeIn';
 import CountUp from '@/components/CountUp';
 
@@ -24,6 +27,19 @@ function pieFromRubros(porRubro, topN = 7) {
   return slices;
 }
 
+function Delta({ actual, anterior }) {
+  if (!anterior) return null;
+  const pct = Math.round(((actual - anterior) / anterior) * 100);
+  const up = pct > 0;
+  const Icon = pct === 0 ? Minus : up ? TrendingUp : TrendingDown;
+  const cls = pct === 0 ? 'text-text-tertiary' : up ? 'text-status-green' : 'text-status-red';
+  return (
+    <span className={`inline-flex items-center gap-1 text-[11px] font-semibold font-mono ${cls}`}>
+      <Icon size={11} /> {up ? '+' : ''}{pct}%
+    </span>
+  );
+}
+
 function RubroTooltip({ active, payload }) {
   if (!active || !payload?.length) return null;
   const p = payload[0];
@@ -35,50 +51,100 @@ function RubroTooltip({ active, payload }) {
   );
 }
 
-/* Resumen societario: altas de la última semana + torta por rubro (calca el ActivityStrip del feed). */
-function SocietarioStrip() {
-  const [stats, setStats] = useState(null);
+function SemanaTooltip({ active, payload, label }) {
+  if (!active || !payload?.length) return null;
+  return (
+    <div className="bg-navy-700 border border-border-medium rounded-lg px-3 py-2 shadow-lg">
+      <p className="text-[10px] font-mono text-text-tertiary mb-0.5">semana del {label}</p>
+      <p className="text-[12px] font-bold text-text-primary font-mono">{payload[0].value.toLocaleString('es-AR')} avisos</p>
+    </div>
+  );
+}
+
+/* Panel societario: KPIs con delta + pulso semanal + torta por rubro (calca /dashboard). */
+function SocietarioStats() {
+  const [s, setS] = useState(null);
 
   useEffect(() => {
-    api.avisosStats({ days: 7 }).then(setStats).catch(() => {});
+    api.avisosStats().then(setS).catch(() => {});
   }, []);
 
-  if (!stats || !stats.total) return null;
-  const pie = pieFromRubros(stats.por_rubro);
+  if (!s || !s.total_historico) return null;
+  const pie = pieFromRubros(s.por_rubro);
+  const serie = (s.serie || []).map((p) => ({ semana: p.semana.slice(5), total: p.total }));
+
+  const KPIS = [
+    { label: 'Esta semana', value: s.semana, sub: 'vs. semana anterior', color: 'text-celeste', delta: <Delta actual={s.semana} anterior={s.semana_anterior} /> },
+    { label: 'Últimos 30 días', value: s.mes, sub: 'vs. 30 días previos', color: 'text-sol', delta: <Delta actual={s.mes} anterior={s.mes_anterior} /> },
+    { label: 'Rubros activos', value: s.rubros_distintos, sub: 'últimos 30 días', color: 'text-sol-bright', delta: null },
+    { label: 'Total histórico', value: s.total_historico, sub: 'avisos indexados', color: 'text-text-primary', delta: null },
+  ];
 
   return (
     <FadeIn delay={60}>
-      <div className="mb-8 border-t-2 border-text-primary/70 pt-4">
-        <div className="flex flex-wrap items-center justify-between gap-6">
-          <div className="shrink-0">
-            <p className="eyebrow mb-2"><span className="eyebrow-num">ACTIVIDAD</span><span className="ml-2">últimos 7 días</span></p>
-            <p className="font-mono font-bold text-4xl text-celeste leading-none">
-              <CountUp value={stats.total} />
-            </p>
-            <p className="text-[11px] text-text-tertiary mt-1">altas societarias esta semana</p>
-          </div>
-          <div className="flex items-center gap-4 flex-1 min-w-[280px] justify-end">
-            <div className="w-[140px] h-[140px] shrink-0">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie data={pie} cx="50%" cy="50%" innerRadius={40} outerRadius={66} paddingAngle={1.5} dataKey="value" animationDuration={1000} stroke="none">
-                    {pie.map((_, i) => (
-                      <Cell key={i} fill={RUBRO_COLORS[i % RUBRO_COLORS.length]} />
-                    ))}
-                  </Pie>
-                  <Tooltip content={<RubroTooltip />} />
-                </PieChart>
-              </ResponsiveContainer>
+      <div className="mb-10">
+        {/* KPIs */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 border-t-2 border-text-primary/70">
+          {KPIS.map(({ label, value, sub, color, delta }, i) => (
+            <div key={label} className="pt-4 pb-5 pr-4 lg:border-r border-border-light lg:px-5 first:pl-0">
+              <p className={`font-mono font-bold tracking-tight text-[clamp(1.9rem,3.4vw,2.8rem)] leading-none mb-1.5 ${color}`}>
+                {value != null ? <CountUp value={value} /> : '—'}
+              </p>
+              <div className="flex items-center gap-2 mb-0.5">
+                <p className="text-[12px] font-bold text-text-primary" style={{ fontFamily: 'var(--font-display)' }}>{label}</p>
+                {delta}
+              </div>
+              <p className="text-[10px] text-text-tertiary">{sub}</p>
             </div>
-            <ul className="space-y-1 min-w-[150px] max-w-[240px]">
-              {pie.map((s, i) => (
-                <li key={s.name} className="flex items-center gap-2 text-[11px] text-text-secondary">
-                  <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: RUBRO_COLORS[i % RUBRO_COLORS.length] }} />
-                  <span className="truncate flex-1" title={sentence(s.name)}>{sentence(s.name)}</span>
-                  <span className="font-mono text-text-tertiary shrink-0">{s.value}</span>
-                </li>
-              ))}
-            </ul>
+          ))}
+        </div>
+
+        {/* Pulso semanal + torta por rubro */}
+        <div className="grid grid-cols-1 lg:grid-cols-[1.4fr_1fr] gap-8 mt-8">
+          <div>
+            <p className="eyebrow mb-3"><span className="eyebrow-num">PULSO</span><span className="ml-2">altas por semana · 12 semanas</span></p>
+            <ResponsiveContainer width="100%" height={180}>
+              <AreaChart data={serie} margin={{ left: -16, right: 4, top: 4 }}>
+                <defs>
+                  <linearGradient id="fillAvisos" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#74ACDF" stopOpacity={0.35} />
+                    <stop offset="100%" stopColor="#74ACDF" stopOpacity={0.02} />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(116, 172, 223, 0.08)" vertical={false} />
+                <XAxis dataKey="semana" tick={{ fill: '#636E85', fontSize: 9 }} axisLine={false} tickLine={false} interval="preserveStartEnd" />
+                <YAxis tick={{ fill: '#636E85', fontSize: 10 }} axisLine={false} tickLine={false} />
+                <Tooltip content={<SemanaTooltip />} cursor={{ stroke: 'rgba(116,172,223,0.2)' }} />
+                <Area type="monotone" dataKey="total" stroke="#74ACDF" strokeWidth={2} fill="url(#fillAvisos)" animationDuration={1100} />
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
+
+          <div>
+            <p className="eyebrow mb-3"><span className="eyebrow-num">TIPOS</span><span className="ml-2">por rubro · 30 días</span></p>
+            <div className="flex items-center gap-3">
+              <div className="w-[130px] h-[130px] shrink-0">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie data={pie} cx="50%" cy="50%" innerRadius={38} outerRadius={62} paddingAngle={1.5} dataKey="value" animationDuration={1000} stroke="none">
+                      {pie.map((_, i) => (
+                        <Cell key={i} fill={RUBRO_COLORS[i % RUBRO_COLORS.length]} />
+                      ))}
+                    </Pie>
+                    <Tooltip content={<RubroTooltip />} />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+              <ul className="flex-1 space-y-1 min-w-0">
+                {pie.map((slice, i) => (
+                  <li key={slice.name} className="flex items-center gap-2 text-[11px] text-text-secondary">
+                    <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: RUBRO_COLORS[i % RUBRO_COLORS.length] }} />
+                    <span className="truncate flex-1" title={sentence(slice.name)}>{sentence(slice.name)}</span>
+                    <span className="font-mono text-text-tertiary shrink-0 tabular-nums">{slice.value}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
         </div>
       </div>
@@ -129,7 +195,7 @@ export default function AvisosView() {
         </div>
       </FadeIn>
 
-      <SocietarioStrip />
+      <SocietarioStats />
 
       <FadeIn delay={80}>
         <form onSubmit={submit} className="grid grid-cols-1 md:grid-cols-[1fr_280px_auto] gap-4 mb-8 items-end">
