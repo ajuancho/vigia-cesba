@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import ssl
 from typing import Any
 
@@ -36,7 +37,7 @@ async def get_json(client: httpx.AsyncClient, path: str, **kwargs: Any) -> Any:
         with attempt:
             resp = await client.get(path, **kwargs)
             resp.raise_for_status()
-            return resp.json()
+            return json.loads(resp.content)
     raise RuntimeError("unreachable")
 
 
