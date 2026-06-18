@@ -106,6 +106,17 @@ celery_app.conf.update(
             "task": "vigia_workers.tasks.ingest_consultas_publicas",
             "schedule": crontab(hour=12, minute=0),
         },
+        # BOCBA — Boletín Oficial de la Ciudad de Buenos Aires. API REST sin
+        # autenticación. Publica normalmente a las 08:00–09:00 ART; retry 13:00
+        # por si la edición sale tarde. Lookback 5 días idempotente.
+        "ingest-bocba": {
+            "task": "vigia_workers.tasks.ingest_bocba",
+            "schedule": crontab(hour=9, minute=0),
+        },
+        "ingest-bocba-retry": {
+            "task": "vigia_workers.tasks.ingest_bocba",
+            "schedule": crontab(hour=13, minute=0),
+        },
         # Comunicaciones A del BCRA — diario post-publicación (patrón InvestArg).
         "ingest-bcra-comunicaciones": {
             "task": "vigia_workers.tasks.ingest_bcra_comunicaciones",

@@ -20,6 +20,12 @@ class Settings(BaseSettings):
     # los endpoints gated devuelven 402 trial_expired salvo plan != "free".
     trial_days: int = 30
 
+    # Cuando se define, todas las queries a `norma` se acotán a esta jurisdicción
+    # sin necesidad de filtros en el frontend. Permite desplegar la misma
+    # codebase como instancia CABA ("CABA") o nacional (vacío = sin restricción).
+    # Env var: VIGIA_JURISDICCION_SCOPE
+    vigia_jurisdiccion_scope: str = ""
+
     @property
     def cors_origins(self) -> list[str]:
         return [o.strip() for o in self.api_cors_origins.split(",") if o.strip()]

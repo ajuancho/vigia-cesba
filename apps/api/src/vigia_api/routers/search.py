@@ -8,6 +8,7 @@ from pydantic import BaseModel
 from sqlalchemy import text
 
 from vigia_api.core.db import get_sessionmaker
+from vigia_api.core.scope import scope_where
 
 router = APIRouter(prefix="/search", tags=["search"])
 
@@ -63,6 +64,10 @@ async def search(
     if jurisdiccion:
         where.append("jurisdiccion = :jur")
         params["jur"] = jurisdiccion
+
+    # Scope de instancia: si VIGIA_JURISDICCION_SCOPE está definido, se acota
+    # automáticamente (tiene precedencia sobre el parámetro `jurisdiccion`).
+    where, params = scope_where(where, params)
 
     where_sql = ("WHERE " + " AND ".join(where)) if where else ""
     rank_sql = (

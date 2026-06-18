@@ -5,6 +5,7 @@ from fastapi import APIRouter, Query
 from sqlalchemy import text
 
 from vigia_api.core.db import get_sessionmaker
+from vigia_api.core.scope import scope_where
 from vigia_shared.schemas import (
     DashboardStats,
     DnuAnio,
@@ -23,25 +24,34 @@ router = APIRouter(prefix="/stats", tags=["stats"])
 @router.get("/dashboard", response_model=DashboardStats)
 async def dashboard() -> DashboardStats:
     Session = get_sessionmaker()
+    scope_conds, scope_params = scope_where([], {})
+    scope_and = (" AND " + " AND ".join(scope_conds)) if scope_conds else ""
+    scope_where_clause = ("WHERE " + " AND ".join(scope_conds)) if scope_conds else ""
     async with Session() as session:
-        total = (await session.execute(text("SELECT COUNT(*) FROM norma"))).scalar_one()
+        total = (
+            await session.execute(
+                text(f"SELECT COUNT(*) FROM norma {scope_where_clause}"), scope_params
+            )
+        ).scalar_one()
         por_tipo = (
             await session.execute(
-                text("SELECT tipo, COUNT(*) c FROM norma GROUP BY tipo ORDER BY c DESC")
+                text(f"SELECT tipo, COUNT(*) c FROM norma {scope_where_clause} GROUP BY tipo ORDER BY c DESC"),
+                scope_params,
             )
         ).all()
         por_sector = (
             await session.execute(
                 text(
-                    "SELECT sector, COUNT(*) c FROM norma "
-                    "WHERE sector IS NOT NULL GROUP BY sector ORDER BY c DESC"
-                )
+                    f"SELECT sector, COUNT(*) c FROM norma "
+                    f"WHERE sector IS NOT NULL{scope_and} GROUP BY sector ORDER BY c DESC"
+                ),
+                scope_params,
             )
         ).all()
         rec = (
             await session.execute(
                 text(
-                    """
+                    f"""
                     SELECT
                       COUNT(*) FILTER (WHERE fecha_publicacion >= current_date - 7)  AS semana,
                       COUNT(*) FILTER (WHERE fecha_publicacion >= current_date - 14
@@ -54,10 +64,13 @@ async def dashboard() -> DashboardStats:
                       COUNT(*) FILTER (WHERE tipo = 'DNU'
                                          AND fecha_publicacion >= date_trunc('year', current_date)) AS dnu_anio
                     FROM norma
-                    WHERE fecha_publicacion >= current_date - 60
-                       OR (tipo = 'DNU' AND fecha_publicacion >= date_trunc('year', current_date))
+                    WHERE (
+                        fecha_publicacion >= current_date - 60
+                        OR (tipo = 'DNU' AND fecha_publicacion >= date_trunc('year', current_date))
+                    ){scope_and}
                     """
-                )
+                ),
+                scope_params,
             )
         ).one()
     return DashboardStats(
@@ -86,28 +99,32 @@ async def series(
     YYYY-MM-DD) acotadas a los últimos ~`months`*4.3 semanas.
     """
     Session = get_sessionmaker()
+    scope_conds, scope_params = scope_where([], {})
+    scope_and = (" AND " + " AND ".join(scope_conds)) if scope_conds else ""
     if granularity == "week":
-        sql = """
+        sql = f"""
             SELECT to_char(date_trunc('week', fecha_publicacion), 'YYYY-MM-DD') AS periodo,
                    tipo, COUNT(*) c
             FROM norma
             WHERE fecha_publicacion >= date_trunc('week', current_date) - make_interval(weeks => :periods)
               AND fecha_publicacion < date_trunc('week', current_date) + interval '1 week'
+              {scope_and}
             GROUP BY 1, 2
             ORDER BY 1
         """
-        params = {"periods": months * 4}
+        params = {"periods": months * 4, **scope_params}
     else:
-        sql = """
+        sql = f"""
             SELECT to_char(date_trunc('month', fecha_publicacion), 'YYYY-MM') AS periodo,
                    tipo, COUNT(*) c
             FROM norma
             WHERE fecha_publicacion >= date_trunc('month', current_date) - make_interval(months => :periods)
               AND fecha_publicacion < date_trunc('month', current_date) + interval '1 month'
+              {scope_and}
             GROUP BY 1, 2
             ORDER BY 1
         """
-        params = {"periods": months}
+        params = {"periods": months, **scope_params}
 
     async with Session() as session:
         rows = (await session.execute(text(sql), params)).all()
@@ -128,21 +145,24 @@ async def organismos(
 ) -> list[OrganismoStat]:
     """Top organismos emisores del período reciente (quién está regulando)."""
     Session = get_sessionmaker()
+    scope_conds, scope_params = scope_where([], {})
+    scope_and = (" AND " + " AND ".join(scope_conds)) if scope_conds else ""
     async with Session() as session:
         rows = (
             await session.execute(
                 text(
-                    """
+                    f"""
                     SELECT organismo, COUNT(*) c
                     FROM norma
                     WHERE organismo IS NOT NULL
                       AND fecha_publicacion >= current_date - make_interval(days => :days)
+                      {scope_and}
                     GROUP BY organismo
                     ORDER BY c DESC
                     LIMIT :limit
                     """
                 ),
-                {"days": days, "limit": limit},
+                {"days": days, "limit": limit, **scope_params},
             )
         ).all()
     return [OrganismoStat(organismo=r[0], cantidad=int(r[1])) for r in rows]
@@ -152,13 +172,17 @@ async def organismos(
 async def emisores() -> list[EmisorStat]:
     """Conteo por emisor canónico (ARCA, CNV, …) — alimenta el facet del feed."""
     Session = get_sessionmaker()
+    scope_conds, scope_params = scope_where([], {})
+    scope_where_clause = ("WHERE " + " AND ".join(scope_conds)) if scope_conds else ""
+    scope_and = (" AND " + " AND ".join(scope_conds)) if scope_conds else ""
     async with Session() as session:
         rows = (
             await session.execute(
                 text(
-                    "SELECT emisor, COUNT(*) c FROM norma "
-                    "WHERE emisor IS NOT NULL GROUP BY emisor ORDER BY c DESC"
-                )
+                    f"SELECT emisor, COUNT(*) c FROM norma "
+                    f"WHERE emisor IS NOT NULL{scope_and} GROUP BY emisor ORDER BY c DESC"
+                ),
+                scope_params,
             )
         ).all()
     return [EmisorStat(emisor=r[0], cantidad=int(r[1])) for r in rows]

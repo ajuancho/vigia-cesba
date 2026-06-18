@@ -5,6 +5,7 @@ from fastapi import APIRouter, HTTPException, Query
 from sqlalchemy import func, select
 
 from vigia_api.core.db import get_sessionmaker
+from vigia_api.core.scope import norma_filters
 from vigia_shared.models import DnuTracking, Norma, SourceCatalog
 from vigia_shared.relevancia import PESO_TIPO, es_tramite
 from vigia_shared.schemas import NormaDetail, NormaListItem, NormaPage
@@ -31,7 +32,7 @@ async def ediciones(
     que el cliente colapsa en una línea. Orden: peso editorial del tipo.
     """
     Session = get_sessionmaker()
-    filters = []
+    filters = norma_filters()
     if tipo:
         filters.append(Norma.tipo == tipo)
     if sector:
@@ -107,7 +108,7 @@ async def list_normas(
     offset: int = Query(0, ge=0, le=100000),
 ) -> NormaPage:
     Session = get_sessionmaker()
-    filters = []
+    filters = norma_filters()
     if tipo:
         filters.append(Norma.tipo == tipo)
     if impacto:
@@ -156,7 +157,7 @@ async def get_norma(norma_id: int) -> NormaDetail:
             await session.execute(
                 select(Norma, SourceCatalog.name, SourceCatalog.code)
                 .join(SourceCatalog, SourceCatalog.id == Norma.source_id, isouter=True)
-                .where(Norma.id == norma_id)
+                .where(Norma.id == norma_id, *norma_filters())
             )
         ).first()
     if row is None:

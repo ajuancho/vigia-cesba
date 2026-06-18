@@ -35,7 +35,7 @@ export default function Header({ onMenuToggle }) {
 
         <div className="flex items-center gap-3">
           <span className="text-[10px] font-medium border tint-green px-2.5 py-1 rounded-full">
-            ● Datos reales · InfoLEG / Boletín Oficial
+            ● Datos reales · Boletín Oficial CABA
           </span>
           <button className="relative p-1.5 rounded text-text-secondary hover:text-text-primary hover:bg-bg-tertiary transition-colors">
             <Bell size={16} />

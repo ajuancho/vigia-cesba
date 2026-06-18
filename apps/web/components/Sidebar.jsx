@@ -2,15 +2,13 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Newspaper, BarChart3, Search, Bell, Shield, X, Eye, Landmark, Building2 } from 'lucide-react';
+import { Newspaper, BarChart3, Search, Bell, X, ScrollText, Landmark } from 'lucide-react';
 
 const NAV_ITEMS = [
-  { to: '/feed', label: 'Feed Normativo', icon: Newspaper },
-  { to: '/dashboard', label: 'Estadísticas', icon: BarChart3 },
+  { to: '/feed', label: 'Boletín del día', icon: Newspaper },
   { to: '/search', label: 'Buscador', icon: Search },
   { to: '/alerts', label: 'Alertas', icon: Bell },
-  { to: '/dnu', label: 'Tracker DNU', icon: Shield },
-  { to: '/avisos', label: 'Radar societario', icon: Building2 },
+  { to: '/dashboard', label: 'Estadísticas', icon: BarChart3 },
 ];
 
 export default function Sidebar({ open, onClose }) {
@@ -29,11 +27,11 @@ export default function Sidebar({ open, onClose }) {
           <div className="flex items-center justify-between">
             <Link href="/" className="flex items-center gap-2.5 group">
               <div className="w-8 h-8 rounded-lg bg-celeste/10 border border-celeste/30 flex items-center justify-center group-hover:bg-celeste/20 transition-colors">
-                <Eye size={16} className="text-celeste" />
+                <ScrollText size={16} className="text-celeste" />
               </div>
               <div>
-                <h1 className="text-sm font-bold text-text-primary tracking-wide">VIGÍA</h1>
-                <p className="text-[9px] text-text-tertiary uppercase tracking-[0.15em] font-mono">por OpenArg</p>
+                <h1 className="text-sm font-bold text-text-primary tracking-wide">BOCBA</h1>
+                <p className="text-[9px] text-text-tertiary uppercase tracking-[0.15em] font-mono">CESBA · CABA</p>
               </div>
             </Link>
             <button onClick={onClose} className="lg:hidden text-text-tertiary hover:text-text-primary">
@@ -68,7 +66,7 @@ export default function Sidebar({ open, onClose }) {
         <div className="px-4 py-4 border-t border-border-light">
           <div className="flex items-center gap-2">
             <Landmark size={12} className="text-text-tertiary" />
-            <p className="text-[10px] text-text-tertiary font-mono">Colossus Lab · BA</p>
+            <p className="text-[10px] text-text-tertiary font-mono">CESBA · Ciudad de Buenos Aires</p>
           </div>
         </div>
       </aside>

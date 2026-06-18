@@ -1,23 +1,23 @@
 import './globals.css';
 import Providers from '@/components/Providers';
 
-const TITLE = 'Vigía — Inteligencia Legislativa Argentina';
+const TITLE = 'Monitor Normativo CABA — CESBA';
 const DESCRIPTION =
-  'La normativa argentina, vigilada. Monitoreo del Boletín Oficial y el Congreso: 533.000+ normas indexadas, búsqueda full-text, alertas por email y tracker de DNU. Por OpenArg.';
+  'La normativa de la Ciudad de Buenos Aires, al día. Monitoreo del Boletín Oficial CABA: normas indexadas, búsqueda full-text y alertas por email. Herramienta interna del CESBA.';
 
 export const metadata = {
-  metadataBase: new URL('https://vigia.openarg.org'),
+  metadataBase: new URL('https://normativa.cesba.gob.ar'),
   title: {
     default: TITLE,
-    template: '%s · Vigía',
+    template: '%s · Monitor BOCBA',
   },
   description: DESCRIPTION,
-  keywords: ['boletín oficial', 'normativa argentina', 'DNU', 'InfoLEG', 'inteligencia legislativa', 'compliance', 'OpenArg'],
+  keywords: ['boletín oficial CABA', 'normativa CABA', 'BOCBA', 'legislación porteña', 'CESBA', 'Ciudad de Buenos Aires'],
   openGraph: {
     title: TITLE,
     description: DESCRIPTION,
-    url: 'https://vigia.openarg.org',
-    siteName: 'Vigía por OpenArg',
+    url: 'https://normativa.cesba.gob.ar',
+    siteName: 'Monitor Normativo CABA · CESBA',
     locale: 'es_AR',
     type: 'website',
   },
@@ -27,8 +27,8 @@ export const metadata = {
     description: DESCRIPTION,
   },
   robots: {
-    index: true,
-    follow: true,
+    index: false,
+    follow: false,
   },
 };
 

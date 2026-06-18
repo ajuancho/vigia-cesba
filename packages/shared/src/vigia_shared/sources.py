@@ -96,6 +96,15 @@ SOURCES: dict[str, dict] = {
         # No crea normas (actualiza dnu_tracking): sin SLO de frescura propia.
         "freshness_slo_days": None,
     },
+    "bocba": {
+        "code": "bocba",
+        "name": "Boletín Oficial CABA — edición del día (boletinoficial.buenosaires.gob.ar)",
+        "kind": "api",
+        "base_url": "https://api-restboletinoficial.buenosaires.gob.ar",
+        "cadence_hours": 24,
+        # Publica cada día hábil; 4 días tolera fin de semana largo.
+        "freshness_slo_days": 4,
+    },
 }
 
 # Campos que van a la tabla source_catalog (los upserta cada task de ingesta).

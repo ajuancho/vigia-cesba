@@ -73,6 +73,7 @@ class Norma(Base):
         Index("ix_norma_tipo_sector", "tipo", "sector"),
         Index("ix_norma_emisor", "emisor"),
         Index("ix_norma_impacto", "impacto"),
+        Index("ix_norma_jurisdiccion", "jurisdiccion"),
     )
 
     id: Mapped[int] = mapped_column(BigInteger, primary_key=True)

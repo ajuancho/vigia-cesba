@@ -24,7 +24,8 @@ from pathlib import Path
 from typing import Any
 
 from vigia_connectors import (
-    BoraAviso, BoraClient, HcdnClient, HcdnProyecto, InfoLegClient, InfoLegNorm,
+    BoraAviso, BoraClient, BocbaClient, BocbaNorma,
+    HcdnClient, HcdnProyecto, InfoLegClient, InfoLegNorm,
     SenadoClient, SenadoProyecto,
 )
 from vigia_connectors.bora import looks_like_dnu
@@ -37,6 +38,7 @@ from vigia_workers.persistence import mark_source_run, run_async, upsert_normas,
 INFOLEG_SOURCE = catalog_fields("infoleg")
 HCDN_SOURCE = catalog_fields("hcdn_proyectos")
 BORA_SOURCE = catalog_fields("bora_primera")
+BOCBA_SOURCE = catalog_fields("bocba")
 
 # Cuántos registros por batch al persistir el corpus completo.
 # Tope: asyncpg admite máx 32767 parámetros bind por statement
@@ -627,6 +629,98 @@ def ingest_infoleg_full(dry_run: bool = False) -> dict[str, Any]:
         return {"source": "infoleg", "mode": "full", **counts}
 
     return run_async(_wrapped())
+
+
+def _bocba_to_row(n: BocbaNorma) -> dict[str, Any]:
+    """Mapea una BocbaNorma al shape de la tabla `norma`."""
+    titulo = n.nombre
+    return {
+        "external_id": str(n.id_norma),
+        "tipo": n.tipo_slug(),
+        "numero": n.numero,
+        "titulo": titulo,
+        "resumen": n.sumario,
+        "resumen_ia": None,
+        "fecha_publicacion": n.fecha,
+        "jurisdiccion": "CABA",
+        "sector": n.detect_sector(),
+        "organismo": n.organismo,
+        "emisor": detect_emisor(n.organismo),
+        "estado": "Publicada",
+        "impacto": None,
+        "bora_seccion": n.seccion_nombre,
+        "entidades": None,
+        "tags": [n.seccion, n.tipo_nombre.lower()],
+        "url": n.url_norma,
+        "raw": {
+            "id_norma": n.id_norma,
+            "numero_boletin": n.numero_boletin,
+            "seccion": n.seccion,
+            "tipo_nombre": n.tipo_nombre,
+            "id_sdin": n.id_sdin,
+            "fecha": n.fecha.isoformat() if n.fecha else None,
+        },
+    }
+
+
+@celery_app.task(name="vigia_workers.tasks.ingest_bocba")
+def ingest_bocba(dry_run: bool = False, lookback_days: int = 5) -> dict[str, Any]:
+    """Ingesta el Boletín Oficial de la Ciudad de Buenos Aires (BOCBA).
+
+    Usa la API REST oficial (sin scraping). El lookback re-ingesta los últimos
+    N días: idempotente (upsert) y auto-recupera outages sin task manual.
+    Días sin boletín (feriados / fin de semana) son silenciosos (lista vacía).
+    """
+    from datetime import timedelta
+
+    dry = _is_dry_run(dry_run)
+    hoy = date.today()
+    fechas = [hoy - timedelta(days=d) for d in range(lookback_days)]
+
+    async def _run() -> dict[str, Any]:
+        totals = _empty_totals()
+        sample: list[dict[str, Any]] = []
+        normas_hoy = 0
+        async with BocbaClient() as client:
+            for fecha in fechas:
+                normas = await client.fetch_boletin(fecha)
+                if fecha == hoy:
+                    normas_hoy = len(normas)
+                if not normas:
+                    continue
+                rows = [_bocba_to_row(n) for n in normas]
+                if dry:
+                    totals["rows"] += len(rows)
+                    sample.extend(_dry_sample_row(r) for r in rows[: max(0, _DRY_SAMPLE - len(sample))])
+                    continue
+                await aplicar_resumen_ia(rows, {})
+                _acc(totals, await upsert_normas(BOCBA_SOURCE, rows))
+        if dry:
+            return {"rows": totals["rows"], "sample": sample, "normas_hoy": normas_hoy}
+        return {**totals, "normas_hoy": normas_hoy}
+
+    if dry:
+        result = run_async(_run())
+        return {"source": "bocba", "dry_run": True, **result}
+
+    async def _wrapped() -> dict[str, Any]:
+        counts = await with_status([BOCBA_SOURCE["code"]], _run)
+        return {"source": "bocba", **counts}
+
+    result = run_async(_wrapped())
+
+    if result.get("normas_hoy", 0) == 0 and hoy.weekday() < 5:
+        run_async(
+            mark_source_run(
+                BOCBA_SOURCE["code"],
+                status="warn",
+                error="0 normas en día hábil — ¿feriado porteño o cambió la API del BOCBA?",
+            )
+        )
+
+    from vigia_workers.alerts import _match_all
+    result["matching"] = run_async(_match_all())
+    return result
 
 
 @celery_app.task(name="vigia_workers.tasks.backfill_emisores")

@@ -1,18 +1,18 @@
 @import "tailwindcss";
 
 /* ============================================================
-   Vigía — Design System (familia OpenArg)
-   Dark cinematic · paleta Argentina (celeste + sol) · data-mono
-   Tokens calcados de openarg_frontend/src/app/globals.css
+   Monitor Normativo CABA — Design System
+   Dark cinematic · paleta GCBA (azul institucional + amarillo BA)
+   Herramienta interna del CESBA
    ============================================================ */
 
 @theme {
-  /* ── Argentina ─────────────────────────────────────────── */
-  --color-celeste: #74ACDF;
-  --color-celeste-bright: #93C5F8;
-  --color-celeste-muted: #5A8FBD;
-  --color-sol: #F6B40E;
-  --color-sol-bright: #FFD04A;
+  /* ── GCBA / CABA ────────────────────────────────────────── */
+  --color-celeste: #0066B3;
+  --color-celeste-bright: #3399DD;
+  --color-celeste-muted: #004A8F;
+  --color-sol: #FFCC00;
+  --color-sol-bright: #FFE066;
 
   /* ── Surfaces (mapeadas sobre los nombres legacy de Vigía) ── */
   --color-bg-primary: #0D1117;   /* cards / surface */
@@ -54,8 +54,8 @@
     background-color: var(--color-bg-secondary);
     /* Glow celeste top-left + sol bottom-right, anclados al viewport (OpenArg) */
     background-image:
-      radial-gradient(ellipse 1400px 900px at 12% -10%, rgba(116, 172, 223, 0.10), transparent 55%),
-      radial-gradient(ellipse 1100px 800px at 100% 105%, rgba(246, 180, 14, 0.05), transparent 60%);
+      radial-gradient(ellipse 1400px 900px at 12% -10%, rgba(0, 102, 179, 0.10), transparent 55%),
+      radial-gradient(ellipse 1100px 800px at 100% 105%, rgba(255, 204, 0, 0.05), transparent 60%);
     background-attachment: fixed;
     color: var(--color-text-primary);
     font-family: var(--font-sans);
@@ -136,11 +136,11 @@
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
   }
 
-  /* Franja-bandera ceremonial (OpenArg .flag-stripe) */
+  /* Franja GCBA — amarillo BA institucional */
   .flag-stripe {
-    height: 2px;
-    background: linear-gradient(90deg, #74ACDF 33%, #FFFFFF 33%, #FFFFFF 66%, #74ACDF 66%);
-    opacity: 0.85;
+    height: 3px;
+    background: #FFCC00;
+    opacity: 0.90;
   }
 
   /* Tints semánticos para badges/chips (idioma rgba de OpenArg) */

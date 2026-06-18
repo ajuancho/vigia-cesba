@@ -1,7 +1,6 @@
 import Link from 'next/link';
-import { Eye, Newspaper, Search, Bell, Shield, ArrowRight, Building2, BarChart3 } from 'lucide-react';
+import { ScrollText, Newspaper, Search, Bell, ArrowRight, BarChart3 } from 'lucide-react';
 import FadeIn from '@/components/FadeIn';
-import TypingDemo from '@/components/TypingDemo';
 
 export const revalidate = 300;
 
@@ -19,41 +18,33 @@ async function getStats() {
 
 const MODULES = [
   {
-    num: '01', icon: Newspaper, title: 'Feed Normativo', href: '/feed',
-    desc: 'El Boletín del día como un diario: lo importante arriba, el trámite colapsado, filtrable por organismo emisor, y cada norma nueva con su resumen IA — qué resuelve y a quién afecta.',
+    num: '01', icon: Newspaper, title: 'Boletín del día', href: '/feed',
+    desc: 'El Boletín Oficial CABA como un diario: lo importante arriba, el trámite colapsado, filtrable por organismo y cada norma con su resumen IA.',
   },
   {
     num: '02', icon: Search, title: 'Buscador', href: '/search',
-    desc: 'Full-text search en español sobre todo el corpus normativo. Lenguaje natural, ranking y snippets.',
+    desc: 'Full-text search en español sobre toda la normativa porteña. Lenguaje natural, ranking por relevancia y snippets en contexto.',
   },
   {
     num: '03', icon: Bell, title: 'Alertas', href: '/alerts',
-    desc: 'Suscribite por keyword y sector. Cuando una norma, comunicación o edicto matchea, te llega un digest por email.',
+    desc: 'Suscribite por keyword y sector. Cuando una norma matchea, recibís un digest por email con el resumen y el vínculo al texto oficial.',
   },
   {
-    num: '04', icon: Shield, title: 'Tracker DNU', href: '/dnu',
-    desc: 'Cada DNU con su estado bicameral real: dictaminados, pendientes y sin tratamiento, desde los datos del Congreso.',
-  },
-  {
-    num: '05', icon: Building2, title: 'Radar societario', href: '/avisos',
-    desc: 'La 2ª sección del Boletín, buscable: constituciones, asambleas y edictos. Vigilá una empresa por razón social.',
-  },
-  {
-    num: '06', icon: BarChart3, title: 'Estadísticas', href: '/dashboard',
-    desc: 'El pulso normativo en números: actividad por tipo y sector, organismos más activos, tendencias.',
+    num: '04', icon: BarChart3, title: 'Estadísticas', href: '/dashboard',
+    desc: 'El pulso normativo porteño en números: actividad por tipo y sector, organismos más activos, tendencias históricas.',
   },
 ];
 
 const PIPELINE = [
-  { num: '01', label: 'Ingesta', desc: 'Nueve fuentes oficiales — BORA, InfoLEG, ambas cámaras del Congreso, BCRA — con workers diarios', color: 'text-celeste' },
-  { num: '02', label: 'Normalización', desc: 'Tipo, sector, estado de tramitación y organismo emisor canónico (ARCA, CNV, BCRA…) detectados', color: 'text-sol' },
-  { num: '03', label: 'Síntesis IA', desc: 'Cada norma nueva del Boletín, resumida en lenguaje claro: qué resuelve y a quién afecta', color: 'text-sol-bright' },
+  { num: '01', label: 'Ingesta', desc: 'API REST oficial del BOCBA — scraping diario con workers automáticos cada mañana', color: 'text-celeste' },
+  { num: '02', label: 'Normalización', desc: 'Tipo, sector y organismo emisor detectados automáticamente sobre cada norma publicada', color: 'text-sol' },
+  { num: '03', label: 'Síntesis IA', desc: 'Cada norma nueva resumida en lenguaje claro: qué resuelve y a quién afecta', color: 'text-sol-bright' },
   { num: '04', label: 'Alertas', desc: 'Índice full-text en español + matching por keyword y digest por email', color: 'text-text-primary' },
 ];
 
 export default async function Landing() {
   const stats = await getStats();
-  const total = stats?.total_normas ?? 990;
+  const total = stats?.total_normas ?? 0;
   const sectores = stats?.por_sector?.length ?? 9;
   const fmt = (n) => n.toLocaleString('es-AR');
 
@@ -66,17 +57,13 @@ export default async function Landing() {
         <div className="max-w-5xl mx-auto px-5 md:px-10 h-14 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
             <div className="w-7 h-7 rounded-lg bg-celeste/10 border border-celeste/30 flex items-center justify-center">
-              <Eye size={14} className="text-celeste" />
+              <ScrollText size={14} className="text-celeste" />
             </div>
             <div>
-              <p className="text-[13px] font-bold text-text-primary leading-none" style={{ fontFamily: 'var(--font-display)' }}>VIGÍA</p>
-              <p className="text-[8px] text-text-tertiary uppercase tracking-[0.18em] font-mono mt-0.5">por OpenArg</p>
+              <p className="text-[13px] font-bold text-text-primary leading-none" style={{ fontFamily: 'var(--font-display)' }}>BOCBA</p>
+              <p className="text-[8px] text-text-tertiary uppercase tracking-[0.18em] font-mono mt-0.5">Monitor Normativo · CESBA</p>
             </div>
           </div>
-          <nav className="hidden md:flex items-center gap-6 text-[12px] font-mono text-text-secondary">
-            <a href="#plataforma" className="hover:text-text-primary transition-colors">Plataforma</a>
-            <a href="#como-funciona" className="hover:text-text-primary transition-colors">Cómo funciona</a>
-          </nav>
           <div className="flex items-center gap-2">
             <Link href="/auth/signin" className="hidden sm:block text-[12px] text-text-secondary hover:text-text-primary px-3 py-1.5 transition-colors">
               Iniciar sesión
@@ -93,52 +80,48 @@ export default async function Landing() {
         <section className="pt-16 pb-14 md:pt-24 md:pb-20 text-center">
           <FadeIn>
             <p className="eyebrow mb-5">
-              <span className="eyebrow-num">N.º 01 / MMXXVI</span>
+              <span className="eyebrow-num">CESBA</span>
               <span className="mx-2 text-text-tertiary">·</span>
-              Inteligencia legislativa y regulatoria
+              Consejo Económico y Social de la Ciudad de Buenos Aires
             </p>
           </FadeIn>
           <FadeIn delay={80}>
             <h1 className="display-hero text-text-primary mb-6">
-              La normativa argentina,
+              La normativa porteña,
               <br />
-              <em>vigilada.</em>
+              <em>al día.</em>
             </h1>
           </FadeIn>
           <FadeIn delay={160}>
             <p className="text-[15px] md:text-base text-text-secondary max-w-xl mx-auto leading-relaxed mb-9">
-              Vigía monitorea el <strong className="text-text-primary font-semibold">Boletín Oficial del día</strong>,
-              ambas cámaras del Congreso, el BCRA y las consultas públicas; lo indexa, lo{' '}
-              <strong className="text-text-primary font-semibold">resume con IA en lenguaje claro</strong> y
-              te avisa cuando algo que te importa cambia. Datos públicos, frescos cada mañana,
-              sin leer {fmt(total)} normas a mano.
+              Monitor interno del <strong className="text-text-primary font-semibold">Boletín Oficial de la Ciudad de Buenos Aires</strong>.
+              Cada norma indexada, resumida con IA en lenguaje claro,
+              y con alertas por email cuando algo que te importa se publica.
+              Datos oficiales, frescos cada mañana.
             </p>
           </FadeIn>
           <FadeIn delay={240}>
-            <TypingDemo />
-          </FadeIn>
-          <FadeIn delay={320}>
             <div className="flex items-center justify-center gap-6 mt-9 text-[13px] font-medium">
               <Link href="/feed" className="textlink">
-                Entrar a la plataforma <span className="arrow">→</span>
+                Ver el boletín de hoy <span className="arrow">→</span>
               </Link>
               <Link href="/auth/signin" className="textlink">
-                Crear cuenta <span className="arrow">→</span>
+                Iniciar sesión <span className="arrow">→</span>
               </Link>
             </div>
           </FadeIn>
         </section>
 
-        {/* ── Escala (stats editoriales) ── */}
+        {/* ── Escala ── */}
         <section className="border-t border-border-light py-12 md:py-16">
           <FadeIn>
-            <p className="eyebrow mb-8"><span className="eyebrow-num">I.</span> <span className="ml-2">Escala</span></p>
+            <p className="eyebrow mb-8"><span className="eyebrow-num">I.</span> <span className="ml-2">El corpus</span></p>
           </FadeIn>
           {[
-            { num: `${fmt(total)}+`, color: 'text-celeste', label: 'Normas indexadas', detail: 'Leyes, decretos, DNU, resoluciones, proyectos parlamentarios, comunicaciones del BCRA y consultas públicas.' },
-            { num: '9', color: 'text-sol', label: 'Fuentes oficiales', detail: 'Boletín Oficial (1ª y 2ª sección), InfoLEG, Diputados y Senado (proyectos, movimientos y dictámenes), BCRA y consultas públicas.' },
-            { num: String(sectores), color: 'text-sol-bright', label: 'Sectores detectados', detail: 'Energía, minería, salud, trabajo, tecnología y más, etiquetados automáticamente.' },
-            { num: '24/7', color: 'text-text-primary', label: 'Monitoreo continuo', detail: 'Ingesta diaria con SLOs de frescura por fuente: si un dato se atrasa, lo sabemos antes que vos.' },
+            { num: total > 0 ? `${fmt(total)}+` : '—', color: 'text-celeste', label: 'Normas indexadas', detail: 'Decretos, resoluciones, disposiciones, edictos y avisos del Boletín Oficial de la Ciudad de Buenos Aires.' },
+            { num: '1', color: 'text-sol', label: 'Fuente oficial', detail: 'API REST del Boletín Oficial CABA (boletinoficial.buenosaires.gob.ar) — datos directos, sin intermediarios.' },
+            { num: String(sectores), color: 'text-sol-bright', label: 'Sectores detectados', detail: 'Salud, educación, ambiente, tecnología, transporte y más, etiquetados automáticamente por keywords.' },
+            { num: '24/7', color: 'text-text-primary', label: 'Monitoreo continuo', detail: 'Ingesta diaria a las 09:00 con retry a las 13:00. SLO de frescura: si el boletín se atrasa, lo sabemos.' },
           ].map((row, i) => (
             <FadeIn key={row.label} delay={i * 80}>
               <div className="grid grid-cols-1 md:grid-cols-[200px_220px_1fr] gap-2 md:gap-6 items-baseline py-6 border-b border-border-light">
@@ -154,9 +137,9 @@ export default async function Landing() {
         <section id="plataforma" className="border-t border-border-light py-12 md:py-16 scroll-mt-16">
           <FadeIn>
             <p className="eyebrow mb-3"><span className="eyebrow-num">II.</span> <span className="ml-2">La plataforma</span></p>
-            <h2 className="display-section text-text-primary mb-10">Seis módulos, <em>un solo radar.</em></h2>
+            <h2 className="display-section text-text-primary mb-10">Cuatro módulos, <em>un solo radar.</em></h2>
           </FadeIn>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 border-t-2 border-text-primary/80">
+          <div className="grid grid-cols-1 sm:grid-cols-2 border-t-2 border-text-primary/80">
             {MODULES.map(({ num, icon: Icon, title, desc, href }, i) => (
               <FadeIn key={num} delay={i * 70} className="h-full">
                 <Link href={href} className="group flex flex-col gap-3 p-5 min-h-[190px] border-b sm:border-r border-border-light hover:bg-bg-primary transition-colors h-full">
@@ -201,18 +184,18 @@ export default async function Landing() {
         <section className="border-t border-border-light py-14 md:py-20">
           <FadeIn>
             <div className="card max-w-2xl mx-auto p-8 md:p-10 text-center relative overflow-hidden">
-              <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(ellipse 70% 90% at 50% -20%, rgba(116,172,223,0.10), transparent 60%)' }} />
-              <p className="eyebrow mb-4"><span className="eyebrow-num">IV.</span> <span className="ml-2">Empezá a vigilar</span></p>
+              <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(ellipse 70% 90% at 50% -20%, rgba(0,102,179,0.10), transparent 60%)' }} />
+              <p className="eyebrow mb-4"><span className="eyebrow-num">IV.</span> <span className="ml-2">Acceso</span></p>
               <h2 className="display-section text-text-primary mb-4">
-                Dejá de leer el Boletín. <em>Dejá que te avise.</em>
+                La Ciudad publica. <em>Vos te enterás.</em>
               </h2>
               <p className="text-[13px] text-text-secondary max-w-md mx-auto mb-7 leading-relaxed">
-                Con tu cuenta gratuita accedés al feed, el buscador, las alertas por email
-                y un workspace para tu equipo. Los datos son públicos; tu monitoreo es tuyo.
+                Herramienta interna del CESBA para el monitoreo de la normativa porteña.
+                Acceso con cuenta institucional.
               </p>
               <div className="flex items-center justify-center gap-4 flex-wrap">
                 <Link href="/feed" className="btn-celeste rounded-full px-6 py-2.5 text-[13px] font-bold inline-flex items-center gap-2">
-                  Entrar a la plataforma <ArrowRight size={14} />
+                  Ver el boletín de hoy <ArrowRight size={14} />
                 </Link>
                 <Link href="/auth/signin" className="textlink text-[13px] font-medium">
                   Iniciar sesión <span className="arrow">→</span>
@@ -223,48 +206,36 @@ export default async function Landing() {
         </section>
       </main>
 
-      {/* ── Colophon ── */}
+      {/* ── Footer ── */}
       <footer className="border-t border-border-light">
         <div className="max-w-5xl mx-auto px-5 md:px-10 py-10">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-8">
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-8 mb-8">
             <div>
-              <p className="text-[13px] font-bold text-text-primary mb-1" style={{ fontFamily: 'var(--font-display)' }}>VIGÍA</p>
-              <p className="text-[10px] text-text-tertiary font-mono uppercase tracking-[0.15em] mb-2">por OpenArg</p>
-              <p className="text-[11px] text-text-secondary leading-relaxed">Inteligencia legislativa y regulatoria argentina.</p>
+              <p className="text-[13px] font-bold text-text-primary mb-1" style={{ fontFamily: 'var(--font-display)' }}>BOCBA</p>
+              <p className="text-[10px] text-text-tertiary font-mono uppercase tracking-[0.15em] mb-2">Monitor Normativo · CESBA</p>
+              <p className="text-[11px] text-text-secondary leading-relaxed">Monitoreo del Boletín Oficial de la Ciudad de Buenos Aires.</p>
             </div>
             <div>
               <p className="eyebrow mb-3">Plataforma</p>
               <ul className="space-y-1.5 text-[12px] text-text-secondary">
-                <li><Link href="/feed" className="hover:text-celeste transition-colors">Feed Normativo</Link></li>
+                <li><Link href="/feed" className="hover:text-celeste transition-colors">Boletín del día</Link></li>
                 <li><Link href="/search" className="hover:text-celeste transition-colors">Buscador</Link></li>
                 <li><Link href="/alerts" className="hover:text-celeste transition-colors">Alertas</Link></li>
-                <li><Link href="/dnu" className="hover:text-celeste transition-colors">Tracker DNU</Link></li>
-                <li><Link href="/avisos" className="hover:text-celeste transition-colors">Radar societario</Link></li>
+                <li><Link href="/dashboard" className="hover:text-celeste transition-colors">Estadísticas</Link></li>
               </ul>
             </div>
             <div>
-              <p className="eyebrow mb-3">Fuentes</p>
+              <p className="eyebrow mb-3">Fuente</p>
               <ul className="space-y-1.5 text-[12px] text-text-secondary">
-                <li>Boletín Oficial — 1ª y 2ª sección</li>
-                <li>InfoLEG — Min. Justicia</li>
-                <li>Congreso — Diputados y Senado (proyectos, movimientos, dictámenes)</li>
-                <li>Comisión Bicameral DNU</li>
-                <li>BCRA — Comunicaciones "A"</li>
-                <li>Consultas públicas nacionales</li>
-              </ul>
-            </div>
-            <div>
-              <p className="eyebrow mb-3">Colossus Lab</p>
-              <ul className="space-y-1.5 text-[12px] text-text-secondary">
-                <li><a href="https://openarg.org" target="_blank" rel="noreferrer" className="hover:text-celeste transition-colors">OpenArg</a></li>
-                <li><a href="https://github.com/colossus-lab/vigia" target="_blank" rel="noreferrer" className="hover:text-celeste transition-colors">Código abierto · MIT</a></li>
-                <li><Link href="/legal" className="hover:text-celeste transition-colors">Términos y privacidad</Link></li>
+                <li>Boletín Oficial CABA</li>
+                <li>api-restboletinoficial.buenosaires.gob.ar</li>
+                <li>Actualización diaria automática</li>
               </ul>
             </div>
           </div>
           <div className="pt-5 border-t border-border-light flex flex-wrap items-center justify-between gap-2">
-            <p className="text-[10px] text-text-tertiary font-mono">MMXXVI · Hecho en Buenos Aires por Colossus Lab</p>
-            <p className="text-[10px] text-text-tertiary font-mono">Compuesto en Familjen Grotesk e Inter · Datos públicos verificables</p>
+            <p className="text-[10px] text-text-tertiary font-mono">CESBA · Consejo Económico y Social de la Ciudad de Buenos Aires</p>
+            <p className="text-[10px] text-text-tertiary font-mono">Datos públicos — boletinoficial.buenosaires.gob.ar</p>
           </div>
         </div>
       </footer>
