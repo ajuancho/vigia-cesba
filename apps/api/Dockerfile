@@ -11,8 +11,6 @@ RUN pip install --no-cache-dir uv
 COPY pyproject.toml ./
 COPY packages ./packages
 COPY apps/api ./apps/api
-COPY db ./db
-
 RUN uv pip install --system -e ./packages/shared -e ./packages/connectors -e ./apps/api
 
 EXPOSE 8000
