@@ -1,30 +1,68 @@
-"""Envío de email via Resend (HTTP API). No-op limpio si falta RESEND_API_KEY.
+"""Envío de email. Dos backends, elegidos por entorno (sin tocar el código):
 
-La key vive SOLO en el entorno (.env del EC2 / Secrets Manager) — nunca en el
-repo. Dominio `openarg.org` verificado en Resend (DKIM/SPF en Route53).
+- **SMTP** (ej. Gmail): si hay ``SMTP_HOST`` + ``SMTP_USER`` + ``SMTP_PASSWORD``.
+  Para Gmail: host ``smtp.gmail.com``, puerto 587, y una *Contraseña de
+  aplicación* de 16 caracteres (NO la contraseña de la cuenta; requiere 2FA).
+- **Resend** (HTTP API): si hay ``RESEND_API_KEY`` y no hay SMTP configurado.
+
+Si no hay ninguno, es no-op limpio (loguea y sigue). Las credenciales viven
+SOLO en el entorno — nunca en el repo.
 """
 from __future__ import annotations
 
-import html
+import html as _html
 import os
+import smtplib
+from email.message import EmailMessage
+from email.utils import parseaddr
 
 import httpx
 
 
 def _esc(value) -> str:
     """Escapa texto controlable por usuario/terceros antes de interpolarlo en HTML."""
-    return html.escape(str(value)) if value is not None else ""
+    return _html.escape(str(value)) if value is not None else ""
 
 RESEND_API_KEY = os.environ.get("RESEND_API_KEY", "")
 ALERTS_FROM_EMAIL = os.environ.get("ALERTS_FROM_EMAIL", "Vigía <alertas@openarg.org>")
 WEB_BASE_URL = os.environ.get("WEB_BASE_URL", "https://vigia.openarg.org").rstrip("/")
 RESEND_URL = "https://api.resend.com/emails"
 
+# SMTP (ej. Gmail). Si SMTP_HOST está seteado, este backend tiene prioridad.
+SMTP_HOST = os.environ.get("SMTP_HOST", "")
+SMTP_PORT = int(os.environ.get("SMTP_PORT", "587"))
+SMTP_USER = os.environ.get("SMTP_USER", "")
+SMTP_PASSWORD = os.environ.get("SMTP_PASSWORD", "")
+
+
+def _send_smtp(*, to: str, subject: str, html: str) -> dict:
+    """Envía via SMTP con STARTTLS (Gmail: smtp.gmail.com:587)."""
+    msg = EmailMessage()
+    msg["Subject"] = subject
+    # Gmail reescribe el From al de la cuenta autenticada; respetamos el display
+    # name de ALERTS_FROM_EMAIL pero la dirección efectiva es SMTP_USER.
+    display_name, addr = parseaddr(ALERTS_FROM_EMAIL)
+    msg["From"] = f"{display_name} <{SMTP_USER}>" if display_name else SMTP_USER
+    msg["To"] = to
+    msg.set_content("Tu cliente no soporta HTML. Abrí el monitor en " + WEB_BASE_URL)
+    msg.add_alternative(html, subtype="html")
+    try:
+        with smtplib.SMTP(SMTP_HOST, SMTP_PORT, timeout=20) as server:
+            server.starttls()
+            server.login(SMTP_USER, SMTP_PASSWORD)
+            server.send_message(msg)
+        return {"sent": True, "to": to, "backend": "smtp"}
+    except Exception as exc:  # pragma: no cover
+        print(f"[notifications] error SMTP a {to}: {exc!r}")
+        return {"error": str(exc), "to": to}
+
 
 def send_email(*, to: str, subject: str, html: str) -> dict:
-    """Envía un email. Si no hay API key, loguea y devuelve {'skipped': True}."""
+    """Envía un email por el backend disponible (SMTP > Resend > no-op)."""
+    if SMTP_HOST and SMTP_USER and SMTP_PASSWORD:
+        return _send_smtp(to=to, subject=subject, html=html)
     if not RESEND_API_KEY:
-        print(f"[notifications] (sin RESEND_API_KEY) email a {to}: {subject}")
+        print(f"[notifications] (sin backend de email) email a {to}: {subject}")
         return {"skipped": True, "to": to}
     try:
         resp = httpx.post(
@@ -34,7 +72,7 @@ def send_email(*, to: str, subject: str, html: str) -> dict:
             timeout=15.0,
         )
         resp.raise_for_status()
-        return {"sent": True, "to": to, "id": resp.json().get("id")}
+        return {"sent": True, "to": to, "id": resp.json().get("id"), "backend": "resend"}
     except Exception as exc:  # pragma: no cover
         print(f"[notifications] error enviando a {to}: {exc!r}")
         return {"error": str(exc), "to": to}
