@@ -237,6 +237,11 @@ export default async function Landing() {
             <p className="text-[10px] text-text-tertiary font-mono">CESBA · Consejo Económico y Social de la Ciudad de Buenos Aires</p>
             <p className="text-[10px] text-text-tertiary font-mono">Datos públicos — boletinoficial.buenosaires.gob.ar</p>
           </div>
+          <p className="text-[10px] text-text-tertiary font-mono mt-3">
+            Basado en{' '}
+            <a href="https://github.com/colossus-lab/vigia" target="_blank" rel="noopener noreferrer" className="hover:text-celeste transition-colors underline underline-offset-2">Vigía</a>
+            , de Colossus Lab · Licencia MIT
+          </p>
         </div>
       </footer>
     </div>

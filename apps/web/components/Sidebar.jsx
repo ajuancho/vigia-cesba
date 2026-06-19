@@ -63,11 +63,16 @@ export default function Sidebar({ open, onClose }) {
         </nav>
 
         {/* Footer */}
-        <div className="px-4 py-4 border-t border-border-light">
+        <div className="px-4 py-4 border-t border-border-light space-y-2">
           <div className="flex items-center gap-2">
             <Landmark size={12} className="text-text-tertiary" />
             <p className="text-[10px] text-text-tertiary font-mono">CESBA · Ciudad de Buenos Aires</p>
           </div>
+          <p className="text-[9px] text-text-tertiary/70 font-mono leading-relaxed">
+            Basado en{' '}
+            <a href="https://github.com/colossus-lab/vigia" target="_blank" rel="noopener noreferrer" className="hover:text-celeste transition-colors">Vigía</a>
+            , de Colossus Lab · MIT
+          </p>
         </div>
       </aside>
     </>
