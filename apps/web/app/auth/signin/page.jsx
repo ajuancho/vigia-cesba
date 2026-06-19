@@ -4,13 +4,13 @@ import { Suspense, useState } from 'react';
 import Link from 'next/link';
 import { signIn } from 'next-auth/react';
 import { useSearchParams } from 'next/navigation';
-import { Eye, Bell, Users, History, ArrowLeft } from 'lucide-react';
+import { ScrollText, Bell, Users, History, ArrowLeft } from 'lucide-react';
 import { AUTH_ENABLED } from '@/lib/authClient';
 import FadeIn from '@/components/FadeIn';
 
 const BENEFITS = [
   { icon: Bell, text: 'Alertas por keyword y sector, con digest por email' },
-  { icon: Users, text: 'Un workspace para tu equipo — invitá miembros' },
+  { icon: Users, text: 'Seguí la normativa porteña que te importa' },
   { icon: History, text: 'Monitoreo persistente: nada se pierde entre sesiones' },
 ];
 
@@ -41,16 +41,16 @@ function SignInInner() {
           <div className="relative">
             <div className="flex items-center gap-2.5 mb-7">
               <div className="w-10 h-10 rounded-lg bg-celeste/10 border border-celeste/30 flex items-center justify-center">
-                <Eye size={20} className="text-celeste" />
+                <ScrollText size={20} className="text-celeste" />
               </div>
               <div>
-                <p className="text-[14px] font-bold text-text-primary leading-none" style={{ fontFamily: 'var(--font-display)' }}>VIGÍA</p>
-                <p className="text-[8px] text-text-tertiary uppercase tracking-[0.18em] font-mono mt-0.5">por OpenArg</p>
+                <p className="text-[14px] font-bold text-text-primary leading-none" style={{ fontFamily: 'var(--font-display)' }}>BOCBA</p>
+                <p className="text-[8px] text-text-tertiary uppercase tracking-[0.18em] font-mono mt-0.5">Monitor Normativo · CESBA</p>
               </div>
             </div>
 
             <p className="eyebrow mb-2"><span className="eyebrow-num">ACCESO</span></p>
-            <h1 className="display-section text-text-primary mb-6">Entrá a <em>Vigía.</em></h1>
+            <h1 className="display-section text-text-primary mb-6">Entrá al <em>monitor.</em></h1>
 
             <ul className="space-y-3 mb-7">
               {BENEFITS.map(({ icon: Icon, text }) => (
@@ -101,7 +101,7 @@ function SignInInner() {
         </div>
       </FadeIn>
 
-      <p className="text-[10px] text-text-tertiary font-mono mt-6">Datos públicos verificables · Colossus Lab · BA</p>
+      <p className="text-[10px] text-text-tertiary font-mono mt-6">Datos públicos · Boletín Oficial CABA · CESBA</p>
     </div>
   );
 }
