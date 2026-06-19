@@ -1,96 +1,93 @@
-<p align="center">
-  <a href="https://vigia.openarg.org">
-    <img src="docs/hero.png" alt="Vigía — La normativa argentina, vigilada" width="100%">
-  </a>
-</p>
-
-<h1 align="center">Vigía — Inteligencia Legislativa y Regulatoria</h1>
+<h1 align="center">Monitor Normativo CABA — CESBA</h1>
 
 <p align="center">
-  <strong>La normativa argentina, vigilada.</strong><br>
-  Monitoreo del Boletín Oficial, el Congreso y el sector público — en tiempo real y en lenguaje claro.
+  <strong>La normativa porteña, al día.</strong><br>
+  Monitoreo del Boletín Oficial de la Ciudad de Buenos Aires (BOCBA) — indexado,
+  resumido en lenguaje claro y con alertas por email.
 </p>
 
 <p align="center">
-  <a href="https://vigia.openarg.org"><strong>🔗 Abrir Vigía → vigia.openarg.org</strong></a><br>
-  <sub>Proyecto open source de <a href="https://colossuslab.com.ar">Colossus Lab</a> · familia <a href="https://openarg.org">OpenArg</a> · Licencia MIT</sub>
+  <sub>Herramienta interna del <a href="https://www.cesba.gob.ar">CESBA</a> — Consejo Económico
+  y Social de la Ciudad de Buenos Aires.</sub>
 </p>
 
 ---
 
-## ¿Qué es Vigía?
+## 🙏 Atribución y créditos
 
-Vigía centraliza, analiza y alerta sobre toda la producción normativa argentina. En vez de leer
-el Boletín Oficial a mano, accedés a un solo radar que ingesta **533.000+ normas** de ocho fuentes
-oficiales, las resume con IA en lenguaje claro y te avisa cuando algo que te importa cambia.
+Este proyecto es una **adaptación (fork) de [Vigía](https://github.com/colossus-lab/vigia)**,
+una plataforma open source de inteligencia legislativa y regulatoria desarrollada por
+**[Colossus Lab](https://colossuslab.com.ar)** (familia [OpenArg](https://openarg.org)).
 
-Pensado para **empresas, estudios jurídicos y áreas de compliance** que necesitan saber, cada
-mañana, qué se publicó y a quién afecta — sin ruido.
+> El trabajo original — la arquitectura completa, los conectores, el pipeline de ingesta,
+> el sistema de alertas, el frontend y todo el diseño — fue creado por Colossus Lab y se
+> distribuye bajo Licencia MIT. Esta versión únicamente **adapta Vigía para el Boletín
+> Oficial de la Ciudad de Buenos Aires** y lo rebrandea para uso interno del CESBA.
+>
+> **Todo el crédito por la base técnica corresponde a Colossus Lab.**
+> Repositorio original: **https://github.com/colossus-lab/vigia**
 
-> **Empezá ahora:** entrá a **[vigia.openarg.org](https://vigia.openarg.org)**. El feed, el buscador
-> y las estadísticas son **públicos** (no requieren cuenta). Crear una cuenta gratuita habilita las
-> alertas por email y un workspace para tu equipo.
+Si este proyecto te resulta útil, considerá visitar y apoyar el trabajo original de
+Colossus Lab.
 
 ---
 
-## Guía de uso
+## ¿Qué es esto?
 
-Vigía son **seis módulos, un solo radar**. Así se usa cada uno:
+El **Monitor Normativo CABA** centraliza, indexa y alerta sobre la producción normativa
+de la Ciudad de Buenos Aires. En vez de leer el Boletín Oficial porteño a mano, accedés a
+un solo radar que ingesta el BOCBA todos los días, lo organiza por tipo, organismo y sector,
+y te avisa cuando algo que te importa se publica.
 
-### 📰 Feed Normativo — `/feed`
-El Boletín del día como un diario: lo importante arriba, el trámite colapsado. Cada norma nueva
-viene con su **resumen IA** en lenguaje claro (qué resuelve y a quién afecta), su tipo (DNU, decreto,
-ley, resolución, proyecto…), organismo y sector.
+### Diferencias respecto del Vigía original
 
-> **Tip:** filtrá por tipo o sector para quedarte solo con lo que te incumbe.
+Esta adaptación se enfoca **exclusivamente en la jurisdicción CABA**:
+
+- **Fuente única:** la [API REST oficial del BOCBA](https://api-restboletinoficial.buenosaires.gob.ar)
+  (en lugar de las ocho fuentes nacionales del proyecto original).
+- **Scope automático:** todas las consultas se acotan a `jurisdiccion = CABA` vía la
+  variable `VIGIA_JURISDICCION_SCOPE`, sin filtros manuales en el frontend.
+- **Branding CESBA:** paleta institucional GCBA, identidad del Consejo y módulos acotados
+  a lo porteño (sin tracker de DNU nacionales ni radar societario).
+
+---
+
+## Módulos
+
+### 📰 Boletín del día — `/feed`
+El BOCBA del día como un diario: lo importante arriba, el trámite colapsado. Cada norma con
+su tipo, organismo emisor y sector.
 
 ### 🔎 Buscador — `/search`
-Búsqueda **full-text en español** sobre todo el corpus normativo. Escribí en lenguaje natural y
-obtené resultados rankeados con snippets resaltados. Combiná con filtros por tipo, sector y
-jurisdicción para acotar.
+Búsqueda **full-text en español** sobre toda la normativa porteña indexada, con snippets
+resaltados y filtros por tipo y sector.
 
-### 🔔 Alertas — `/alerts`  *(requiere cuenta)*
-Suscribite por **keyword y sector**. Cuando una norma, comunicación o edicto matchea tu criterio,
-te llega un **digest por email**. Ideal para vigilar un tema regulatorio, un organismo o una
-palabra clave de tu industria sin revisar el feed todos los días.
-
-1. Iniciá sesión y entrá a **Alertas**.
-2. Creá una alerta con tus keywords y/o sectores.
-3. Vigía hace el matching automáticamente (cada hora) y te notifica.
-
-### 🛡️ Tracker DNU — `/dnu`
-Seguimiento de cada **Decreto de Necesidad y Urgencia** con su estado bicameral real: dictaminados,
-pendientes y sin tratamiento, derivado de los datos del Congreso.
-
-### 🏢 Radar societario — `/avisos`
-La **2ª sección del Boletín**, buscable: constituciones, asambleas y edictos societarios. Vigilá una
-empresa por razón social y enterate de sus movimientos.
+### 🔔 Alertas — `/alerts` *(requiere cuenta)*
+Suscribite por **keyword y sector**. Cuando una norma matchea tu criterio, te llega un
+**digest por email**. El matching corre automáticamente cada hora.
 
 ### 📊 Estadísticas — `/dashboard`
-El pulso normativo en números: actividad por tipo y sector, organismos más activos y tendencias de
-producción legislativa.
-
-### 👤 Cuenta, workspaces y prueba gratuita
-- **Modo demo:** sin login, con acceso público a los datos (feed, buscador, stats).
-- **Cuenta gratuita:** habilita alertas y un **workspace** para tu equipo (miembros e invitaciones).
-- **Prueba gratuita:** 30 días por workspace para las funciones gestionadas; al vencer se solicita
-  pasar a un plan de miembro.
+El pulso normativo porteño en números: actividad por tipo y sector, organismos más activos
+y tendencias históricas.
 
 ---
 
-## Fuentes de datos
+## Stack técnico
 
-Datos **públicos y verificables**, refrescados cada mañana con SLOs de frescura por fuente:
+Heredado del proyecto original (Colossus Lab):
 
-- **Boletín Oficial (BORA)** — 1ª sección (normas) y 2ª sección (avisos societarios)
-- **InfoLEG** — base de legislación nacional (Min. de Justicia)
-- **HCDN — Diputados** — proyectos, movimientos y dictámenes
-- **Comisión Bicameral de DNU** — estado de tratamiento
-- **BCRA** — Comunicaciones "A"
-- **Consultas públicas** nacionales
+- **Backend:** FastAPI + SQLAlchemy 2.0 async + Postgres 16/pgvector
+- **Workers:** Celery + Redis (ingesta diaria + matching de alertas vía beat schedule)
+- **Frontend:** Next.js 16 (App Router) + NextAuth (Google OAuth)
+- **Conector BOCBA:** cliente async sobre la API REST oficial (`packages/connectors`)
+
+Guía de despliegue de esta instancia: [`infra/DEPLOY-CESBA.md`](infra/DEPLOY-CESBA.md).
 
 ---
 
 ## Licencia
 
-Este proyecto se distribuye bajo la [Licencia MIT](LICENSE).
+Distribuido bajo [Licencia MIT](LICENSE) — **Copyright (c) 2026 Colossus Lab**.
+
+Esta adaptación conserva la licencia y el copyright originales conforme exige la MIT.
+Las modificaciones para CESBA se publican bajo los mismos términos.
