@@ -47,65 +47,13 @@ celery_app.conf.update(
     timezone="America/Argentina/Buenos_Aires",
     enable_utc=False,
     beat_schedule={
-        # InfoLEG / Boletín Oficial — corpus completo (incluye lo último publicado),
-        # diario 03:00 ART. El dataset oficial se refresca semanalmente, correrlo
-        # a diario garantiza tomar cada actualización apenas sale.
-        "ingest-infoleg-full": {
-            "task": "vigia_workers.tasks.ingest_infoleg_full",
-            "schedule": crontab(hour=3, minute=0),
-        },
-        # Reconcile BORA↔InfoLEG post corpus full: la gemela InfoLEG reemplaza
-        # a la fila BORA (anti-duplicados del feed).
-        "reconcile-bora-infoleg": {
-            "task": "vigia_workers.reconcile.reconcile_bora_infoleg",
-            "schedule": crontab(hour=4, minute=30),
-        },
-        # BORA 1ª sección — frescura diaria real (el BO publica de madrugada).
-        # Retry 12:00 por si la edición sale tarde. Lookback 5 días idempotente.
-        "ingest-bora-primera": {
-            "task": "vigia_workers.tasks.ingest_bora_primera",
-            "schedule": crontab(hour=7, minute=0),
-        },
-        "ingest-bora-primera-retry": {
-            "task": "vigia_workers.tasks.ingest_bora_primera",
-            "schedule": crontab(hour=12, minute=0),
-        },
-        # HCDN proyectos parlamentarios — el dataset se actualiza a diario.
-        "ingest-hcdn-proyectos": {
-            "task": "vigia_workers.tasks.ingest_hcdn_proyectos",
-            "schedule": crontab(hour=8, minute=0),
-        },
-        # Movimientos de proyectos HCDN — DEBE correr después de
-        # ingest-hcdn-proyectos (08:00), que pisa `estado` con "En trámite";
-        # esta task lo re-deriva (el pisado se auto-repara a diario).
-        "ingest-hcdn-movimientos": {
-            "task": "vigia_workers.movimientos.ingest_hcdn_movimientos",
-            "schedule": crontab(hour=8, minute=30),
-        },
-        # Senado — proyectos recientes (scrape del buscador HSN). Solo origen=S
-        # (los de Diputados ya entran por hcdn-proyectos). Fuera de la ventana
-        # HCDN (08:00–08:30) para no competir por el worker.
-        "ingest-senado-proyectos": {
-            "task": "vigia_workers.tasks.ingest_senado_proyectos",
-            "schedule": crontab(hour=8, minute=45),
-        },
-        # Dictámenes de la Comisión Bicameral DNU (HCDN CKAN) — diario.
-        # Después de hcdn-proyectos (08:00): el join usa los proyectos del día.
-        "ingest-bicameral-dnu": {
-            "task": "vigia_workers.bicameral.ingest_bicameral_dnu",
-            "schedule": crontab(hour=9, minute=30),
-        },
-        # BORA 2ª sección → aviso_societario (Radar societario) — diario,
-        # separado de la 1ª para aislar fallos y carga.
-        "ingest-bora-segunda": {
-            "task": "vigia_workers.societario.ingest_bora_segunda",
-            "schedule": crontab(hour=10, minute=30),
-        },
-        # Consultas públicas (señal temprana) — diario al mediodía.
-        "ingest-consultas-publicas": {
-            "task": "vigia_workers.tasks.ingest_consultas_publicas",
-            "schedule": crontab(hour=12, minute=0),
-        },
+        # ─────────────────────────────────────────────────────────────────
+        # Instancia CESBA — solo BOCBA (Boletín Oficial CABA).
+        # Las tasks nacionales (InfoLEG, BORA, HCDN, Senado, BCRA, bicameral,
+        # consultas públicas) están deshabilitadas en este fork: no aplican al
+        # corpus porteño y sus fuentes no están configuradas. El código sigue
+        # disponible si en el futuro se quiere ampliar el alcance.
+        # ─────────────────────────────────────────────────────────────────
         # BOCBA — Boletín Oficial de la Ciudad de Buenos Aires. API REST sin
         # autenticación. Publica normalmente a las 08:00–09:00 ART; retry 13:00
         # por si la edición sale tarde. Lookback 5 días idempotente.
@@ -116,11 +64,6 @@ celery_app.conf.update(
         "ingest-bocba-retry": {
             "task": "vigia_workers.tasks.ingest_bocba",
             "schedule": crontab(hour=13, minute=0),
-        },
-        # Comunicaciones A del BCRA — diario post-publicación (patrón InvestArg).
-        "ingest-bcra-comunicaciones": {
-            "task": "vigia_workers.tasks.ingest_bcra_comunicaciones",
-            "schedule": crontab(hour=20, minute=30),
         },
         # Matching de alertas + notificaciones — cada hora.
         "match-alertas": {
