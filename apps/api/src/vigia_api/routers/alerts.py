@@ -6,7 +6,7 @@ se gestionan las suscripciones y se leen los matches.
 from __future__ import annotations
 
 from datetime import date as Date
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -79,6 +79,38 @@ class MatchOut(BaseModel):
     titulo: str
     fecha_publicacion: Date | None
     matched_at: datetime
+
+
+class NovedadesOut(BaseModel):
+    nuevas: int
+    ultima: datetime | None
+
+
+@router.get("/novedades", response_model=NovedadesOut)
+async def novedades(
+    ctx: Annotated[WorkspaceContext, Depends(require_active_plan)],
+    desde: datetime | None = None,
+) -> NovedadesOut:
+    """Matches de las alertas del workspace posteriores a `desde` (campana del header).
+
+    El "visto hasta" lo guarda el cliente (última visita a /alerts); sin `desde`
+    cuenta los últimos 7 días.
+    """
+    _require_real_workspace(ctx)
+    if desde is None:
+        desde = datetime.now(timezone.utc) - timedelta(days=7)
+    elif desde.tzinfo is None:
+        desde = desde.replace(tzinfo=timezone.utc)
+    Session = get_sessionmaker()
+    async with Session() as session:
+        nuevas, ultima = (
+            await session.execute(
+                select(func.count(AlertaMatch.id), func.max(AlertaMatch.matched_at))
+                .join(Alerta, Alerta.id == AlertaMatch.alerta_id)
+                .where(Alerta.workspace_id == ctx.workspace_id, AlertaMatch.matched_at > desde)
+            )
+        ).one()
+    return NovedadesOut(nuevas=int(nuevas or 0), ultima=ultima)
 
 
 @router.get("", response_model=list[AlertaOut])

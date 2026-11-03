@@ -1,8 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Menu, Bell } from 'lucide-react';
+import { Menu } from 'lucide-react';
 import AuthButton from '@/components/AuthButton';
+import AlertasCampana from '@/components/AlertasCampana';
 
 export default function Header({ onMenuToggle }) {
   const [time, setTime] = useState(null);
@@ -38,10 +39,7 @@ export default function Header({ onMenuToggle }) {
           <span className="text-[10px] font-medium border tint-green px-2.5 py-1 rounded-full">
             ● Datos reales · Boletín Oficial CABA
           </span>
-          <button className="relative p-1.5 rounded text-text-secondary hover:text-text-primary hover:bg-bg-tertiary transition-colors">
-            <Bell size={16} />
-            <span className="absolute top-0.5 right-0.5 w-1.5 h-1.5 rounded-full bg-status-red" />
-          </button>
+          <AlertasCampana />
           <AuthButton />
         </div>
       </div>
