@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Newspaper, Search, Bell, ArrowRight, BarChart3 } from 'lucide-react';
+import { Newspaper, Search, Bell, ArrowRight, BarChart3, FileBarChart } from 'lucide-react';
 import FadeIn from '@/components/FadeIn';
 
 export const revalidate = 300;
@@ -33,13 +33,10 @@ const MODULES = [
     icon: BarChart3, title: 'Estadísticas', href: '/dashboard',
     desc: 'El pulso normativo porteño en números: actividad por tipo y sector, organismos más activos, tendencias históricas.',
   },
-];
-
-const PIPELINE = [
-  { num: '01', label: 'Ingesta', desc: 'API REST oficial del BOCBA: lectura diaria con procesos automáticos cada mañana.' },
-  { num: '02', label: 'Normalización', desc: 'Tipo, sector y organismo emisor detectados automáticamente sobre cada norma publicada.' },
-  { num: '03', label: 'Síntesis IA', desc: 'Cada norma nueva resumida en lenguaje claro: qué resuelve y a quién afecta.' },
-  { num: '04', label: 'Alertas', desc: 'Índice de texto completo en español, coincidencias por palabra clave y resumen por correo.' },
+  {
+    icon: FileBarChart, title: 'Reportes', href: '/reportes',
+    desc: 'Pedí un reporte con tus palabras o armalo con filtros: por ejemplo, las licitaciones de obra pública del último año. Con gráficos, CSV y envío programado por correo. Requiere iniciar sesión.',
+  },
 ];
 
 export default async function Landing() {
@@ -106,8 +103,8 @@ export default async function Landing() {
               <Link href="/feed" className="btn-celeste inline-flex items-center gap-2.5 min-h-12 px-6 text-[13px] font-bold">
                 Ver el boletín de hoy <ArrowRight size={18} />
               </Link>
-              <Link href="#como-funciona" className="btn-ghost-invert inline-flex items-center min-h-12 px-6 text-[13px] font-semibold">
-                Cómo funciona
+              <Link href="#plataforma" className="btn-ghost-invert inline-flex items-center min-h-12 px-6 text-[13px] font-semibold">
+                Conocé la plataforma
               </Link>
             </div>
           </FadeIn>
@@ -136,10 +133,10 @@ export default async function Landing() {
           <FadeIn>
             <div className="title-rule flex flex-col gap-2">
               <h2 className="display-section text-petroleo">La plataforma</h2>
-              <p className="text-[17px] md:text-[19px] text-text-tertiary">cuatro módulos, un solo radar normativo</p>
+              <p className="text-[17px] md:text-[19px] text-text-tertiary">cinco módulos, un solo radar normativo</p>
             </div>
           </FadeIn>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
             {MODULES.map(({ icon: Icon, title, desc, href }, i) => (
               <FadeIn key={title} delay={i * 70} className="h-full">
                 <Link href={href} className="card card-accent group h-full flex flex-col gap-3.5 px-6 py-7 shadow-[0_4px_14px_rgba(21,59,112,0.10)] hover:shadow-[0_18px_48px_rgba(21,59,112,0.16)] transition-shadow">
@@ -156,31 +153,8 @@ export default async function Landing() {
         </div>
       </section>
 
-      {/* ── Cómo funciona ── */}
-      <section id="como-funciona" className="bg-petroleo text-white scroll-mt-16">
-        <div className="max-w-6xl mx-auto px-5 md:px-10 py-16 md:py-22 flex flex-col gap-10 md:gap-12">
-          <FadeIn>
-            <div className="border-l-4 border-verde-vital pl-5 flex flex-col gap-2">
-              <h2 className="display-section">Cómo funciona</h2>
-              <p className="text-[17px] md:text-[19px] font-light text-white/85">del boletín a tu correo, en cuatro pasos</p>
-            </div>
-          </FadeIn>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 border-t border-white/30">
-            {PIPELINE.map(({ num, label, desc }, i) => (
-              <FadeIn key={num} delay={i * 70}>
-                <div className="pt-7 pb-2 pr-6 flex flex-col gap-2.5">
-                  <span className="text-[29px] font-light text-verde-vital tabular-nums">{num}</span>
-                  <span className="text-[14px] font-bold tracking-[0.06em] uppercase">{label}</span>
-                  <span className="text-[14px] leading-relaxed text-white/85">{desc}</span>
-                </div>
-              </FadeIn>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* ── Acceso ── */}
-      <section className="bg-white">
+      <section className="bg-humo border-t border-nube">
         <div className="max-w-6xl mx-auto px-5 md:px-10 py-16 md:py-22 flex flex-wrap gap-8 items-center justify-between">
           <FadeIn>
             <div className="flex flex-col gap-2 max-w-2xl">
