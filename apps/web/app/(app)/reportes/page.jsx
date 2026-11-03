@@ -19,7 +19,7 @@ function mensajeError(e) {
   if (status === 503 && e.detail === 'ia_no_configurada') return 'El análisis con IA no está activado en el servidor (VIGIA_AI_PROVIDER).';
   if (status === 502 && e.detail === 'ia_fallo') return 'El servicio de IA no respondió. Probá de nuevo en unos minutos.';
   if (status === 422) return 'Algún filtro tiene un valor inválido. Revisá las fechas y volvé a intentar.';
-  if (status >= 500) return 'Error del servidor al procesar el reporte. Si el módulo es nuevo, puede faltar aplicar la migración 0009_reportes.';
+  if (status >= 500) return 'Error del servidor al procesar el reporte. Si se actualizó hace poco, puede faltar aplicar las migraciones (alembic upgrade head desde la consola del worker).';
   return String(e?.message || e);
 }
 import FadeIn from '@/components/FadeIn';
