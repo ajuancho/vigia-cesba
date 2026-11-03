@@ -38,7 +38,6 @@ class WorkspaceMe(BaseModel):
     slug: str
     name: str
     plan: str
-    trial_ends_at: datetime | None = None
     role: str
     seat_limit: int
     seats_used: int
@@ -67,8 +66,6 @@ class InviteOut(BaseModel):
 
 @router.get("/me", response_model=WorkspaceMe)
 async def me(ctx: Annotated[WorkspaceContext, Depends(current_workspace)]) -> WorkspaceMe:
-    # Exento del check de trial: el cliente necesita poder leer su propio estado
-    # (plan, trial_ends_at) incluso con el trial vencido.
     Session = get_sessionmaker()
     async with Session() as session:
         ws = await session.get(Workspace, ctx.workspace_id)
@@ -78,7 +75,7 @@ async def me(ctx: Annotated[WorkspaceContext, Depends(current_workspace)]) -> Wo
             select(func.count()).select_from(WorkspaceMember).where(WorkspaceMember.workspace_id == ws.id)
         )
     return WorkspaceMe(
-        id=ws.id, slug=ws.slug, name=ws.name, plan=ws.plan, trial_ends_at=ctx.trial_ends_at,
+        id=ws.id, slug=ws.slug, name=ws.name, plan=ws.plan,
         role=ctx.role, seat_limit=ws.seat_limit, seats_used=int(seats or 0),
         onboarded=ws.onboarded_at is not None, sectores_interes=ws.sectores_interes,
     )
@@ -108,7 +105,7 @@ async def onboarding(
             select(func.count()).select_from(WorkspaceMember).where(WorkspaceMember.workspace_id == ws.id)
         )
     return WorkspaceMe(
-        id=ws.id, slug=ws.slug, name=ws.name, plan=ws.plan, trial_ends_at=ctx.trial_ends_at,
+        id=ws.id, slug=ws.slug, name=ws.name, plan=ws.plan,
         role=ctx.role, seat_limit=ws.seat_limit, seats_used=int(seats or 0),
         onboarded=True, sectores_interes=ws.sectores_interes,
     )

@@ -16,10 +16,6 @@ class Settings(BaseSettings):
     auth_jwt_ttl_seconds: int = 60 * 60 * 24  # 24h
     auth_enabled: bool = False  # False = modo demo abierto
 
-    # Free trial: días de uso pleno desde la creación del workspace. Al vencer,
-    # los endpoints gated devuelven 402 trial_expired salvo plan != "free".
-    trial_days: int = 30
-
     # Cuando se define, todas las queries a `norma` se acotán a esta jurisdicción
     # sin necesidad de filtros en el frontend. Permite desplegar la misma
     # codebase como instancia CABA ("CABA") o nacional (vacío = sin restricción).

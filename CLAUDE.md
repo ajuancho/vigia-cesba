@@ -68,7 +68,7 @@ El web se redeploya solo con cada push (Vercel Git integration). Runbook complet
 - **Orden de beats importa**: `ingest_hcdn_proyectos` (08:00) pisa `norma.estado` a diario; `ingest_hcdn_movimientos` (08:30) lo re-deriva. No invertirlos.
 - **Fuentes nuevas**: runbook en `infra/DEPLOY.md` (dry-run → backfill → `match_alertas(notify=False)` → beat). Registry con SLOs en `vigia_shared/sources.py`; estado operativo sin ssh en `GET /health/sources`.
 - **BORA 2ª NO entra a `norma`**: va a `aviso_societario` (tabla y FTS propios, router `/avisos`, página "Radar societario") para no contaminar feed/stats/alertas.
-- **Free trial**: 30 días por workspace (`Workspace.created_at` + `VIGIA_TRIAL_DAYS`); al vencer, 402 `trial_expired` en endpoints gated + cartel inamovible en el web. Membresía manual: `UPDATE workspace SET plan='member'` (runbook en DEPLOY.md).
+- **Sin free trial**: el período de prueba (402 `trial_expired` + cartel `TrialGate`) fue eliminado; `require_active_plan` quedó como pass-through, punto único para reintroducir gating por plan.
 
 ## Diseño / UX
 

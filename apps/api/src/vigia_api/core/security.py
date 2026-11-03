@@ -9,7 +9,6 @@ from __future__ import annotations
 
 import time
 from dataclasses import dataclass
-from datetime import datetime, timedelta, timezone
 from typing import Annotated
 
 import jwt
@@ -27,18 +26,10 @@ class WorkspaceContext:
     workspace_id: int
     role: str
     plan: str
-    trial_ends_at: datetime | None = None
 
     @property
     def is_owner(self) -> bool:
         return self.role == "owner"
-
-    @property
-    def trial_expired(self) -> bool:
-        """True solo para plan free con trial vencido. Cualquier otro plan = membresía."""
-        if self.plan != "free" or self.trial_ends_at is None:
-            return False
-        return datetime.now(timezone.utc) > self.trial_ends_at
 
 
 def sign_jwt(*, user_id: int, workspace_id: int, role: str, settings: Settings | None = None) -> str:
@@ -65,14 +56,6 @@ def verify_jwt(token: str, settings: Settings | None = None) -> dict:
         ) from exc
 
 
-def trial_ends_at_for(created_at: datetime | None, settings: Settings) -> datetime | None:
-    if created_at is None:
-        return None
-    if created_at.tzinfo is None:
-        created_at = created_at.replace(tzinfo=timezone.utc)
-    return created_at + timedelta(days=settings.trial_days)
-
-
 async def _load_workspace_context(
     user_id: int, workspace_id: int, settings: Settings
 ) -> WorkspaceContext:
@@ -97,7 +80,6 @@ async def _load_workspace_context(
         workspace_id=ws.id,
         role=member.role,
         plan=ws.plan,
-        trial_ends_at=trial_ends_at_for(ws.created_at, settings),
     )
 
 
@@ -127,15 +109,7 @@ async def current_workspace(
 async def require_active_plan(
     ctx: Annotated[WorkspaceContext, Depends(current_workspace)],
 ) -> WorkspaceContext:
-    """Dependency: 402 si el free trial del workspace venció (plan free + 30 días).
-
-    La membresía se otorga manualmente (plan != "free") escribiendo a
-    devops@colossuslab.org. No aplica en modo demo ni al accept de invitaciones
-    (que debe funcionar para unirse a un workspace con membresía).
+    """Dependency de los endpoints gated. Sin período de prueba: todo workspace
+    autenticado tiene acceso pleno (punto único para reintroducir gating por plan).
     """
-    if ctx.trial_expired:
-        raise HTTPException(
-            status_code=status.HTTP_402_PAYMENT_REQUIRED,
-            detail="trial_expired",
-        )
     return ctx

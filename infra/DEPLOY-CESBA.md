@@ -233,9 +233,10 @@ Los resúmenes aparecen en el feed como "Análisis automático" debajo de cada n
 
 ---
 
-## Otorgar membresía (bypass del trial)
+## Membresías
 
-Para que los usuarios del CESBA no vean el cartel de trial:
+No hay período de prueba: todos los workspaces tienen acceso pleno. Para
+marcar un workspace como miembro (dato informativo):
 
 ```bash
 # Ver todos los workspaces
@@ -246,9 +247,6 @@ docker compose -f docker-compose.prod.yml exec db \
 docker compose -f docker-compose.prod.yml exec db \
   psql -U bocba bocba -c "UPDATE workspace SET plan = 'member' WHERE slug = '<slug>';"
 ```
-
-O simplemente dejar `VIGIA_TRIAL_DAYS=3650` en el `.env` (10 años de trial
-efectivo — adecuado para uso interno sin facturación).
 
 ---
 
