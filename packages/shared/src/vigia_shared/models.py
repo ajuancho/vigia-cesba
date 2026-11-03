@@ -222,7 +222,10 @@ class Reporte(Base):
     """
 
     __tablename__ = "reporte"
-    __table_args__ = (Index("ix_reporte_workspace", "workspace_id"),)
+    __table_args__ = (
+        Index("ix_reporte_workspace", "workspace_id"),
+        Index("ix_reporte_proximo_envio", "proximo_envio"),
+    )
 
     id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
     workspace_id: Mapped[int] = mapped_column(
@@ -231,6 +234,12 @@ class Reporte(Base):
     user_id: Mapped[int | None] = mapped_column(ForeignKey("app_user.id", ondelete="SET NULL"))
     nombre: Mapped[str] = mapped_column(String(255), nullable=False)
     config: Mapped[dict[str, Any]] = mapped_column(JSONB, nullable=False)
+    # Envío periódico por email (ver `vigia_shared.reportes.siguiente_envio`).
+    # NULL = no programado. `proximo_envio` NULL = programación pausada.
+    programacion: Mapped[dict[str, Any] | None] = mapped_column(JSONB)
+    proximo_envio: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    ultimo_envio: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    ultimo_estado: Mapped[str | None] = mapped_column(String(255))
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), nullable=False
     )

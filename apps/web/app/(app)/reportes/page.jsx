@@ -6,7 +6,7 @@ import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid,
 } from 'recharts';
 import {
-  FileBarChart, Play, Save, Download, Printer, Sparkles, Trash2, Plus, X, ExternalLink, Lock, Wand2,
+  FileBarChart, Play, Save, Download, Printer, Sparkles, Trash2, Plus, X, ExternalLink, Lock, Wand2, CalendarClock,
 } from 'lucide-react';
 import { authedFetch, authedFetchBlob, AUTH_ENABLED } from '@/lib/authClient';
 
@@ -23,6 +23,7 @@ function mensajeError(e) {
   return String(e?.message || e);
 }
 import FadeIn from '@/components/FadeIn';
+import ProgramacionReporte from '@/components/ProgramacionReporte';
 
 const PAGE = 100;
 const fmt = (n) => (n ?? 0).toLocaleString('es-AR');
@@ -213,6 +214,16 @@ export default function ReportesView() {
 
   useEffect(() => { cargarGuardados(); }, [cargarGuardados]);
 
+  // Deep link /reportes?r=<id> (botón "Abrir en el monitor" de los emails programados).
+  const [deepLink, setDeepLink] = useState(() => (typeof window === 'undefined' ? null : new URLSearchParams(window.location.search).get('r')));
+  useEffect(() => {
+    if (!deepLink || !guardados.length) return;
+    const g = guardados.find((x) => String(x.id) === deepLink);
+    setDeepLink(null);
+    if (g) abrir(g.config, { id: g.id, nombre: g.nombre });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [deepLink, guardados]);
+
   const seccionesKey = f.secciones.join('|');
   useEffect(() => {
     if (!connected) return;
@@ -393,7 +404,9 @@ export default function ReportesView() {
                   <span className="eyebrow mr-1">Guardados</span>
                   {guardados.map((g) => (
                     <span key={g.id} className={`inline-flex items-center rounded border text-[12px] ${actual?.id === g.id ? 'border-petroleo bg-petroleo text-white' : 'border-border-medium bg-white text-text-secondary'}`}>
-                      <button type="button" onClick={() => abrir(g.config, { id: g.id, nombre: g.nombre })} className="px-3 min-h-9">{g.nombre}</button>
+                      <button type="button" onClick={() => abrir(g.config, { id: g.id, nombre: g.nombre })} className="px-3 min-h-9 inline-flex items-center gap-1.5">
+                        {g.programacion?.activa && <CalendarClock size={13} aria-label="Programado" />}{g.nombre}
+                      </button>
                       <button type="button" onClick={() => borrar(g)} aria-label={`Borrar ${g.nombre}`} className="px-2 min-h-9 opacity-70 hover:opacity-100">
                         <Trash2 size={13} />
                       </button>
@@ -504,6 +517,20 @@ export default function ReportesView() {
                   </button>
                 </div>
               </div>
+              {actual && guardados.find((g) => g.id === actual.id) ? (
+                <ProgramacionReporte
+                  key={actual.id}
+                  reporte={guardados.find((g) => g.id === actual.id)}
+                  jwt={jwt}
+                  emailDefault={session?.user?.email}
+                  mensajeError={mensajeError}
+                  onCambio={(r) => setGuardados((prev) => prev.map((g) => (g.id === r.id ? r : g)))}
+                />
+              ) : (
+                <p className="border-t border-border-light pt-4 text-[12px] text-text-tertiary inline-flex items-center gap-2">
+                  <CalendarClock size={14} strokeWidth={1.75} /> Guardá el reporte para programar su envío periódico por email.
+                </p>
+              )}
               {err && (
                 <p role="alert" className="text-[13px] text-status-red bg-[rgba(180,35,24,0.06)] border border-[rgba(180,35,24,0.25)] rounded px-3 py-2">
                   {err}

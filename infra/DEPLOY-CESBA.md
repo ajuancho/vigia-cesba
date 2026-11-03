@@ -266,6 +266,17 @@ docker compose -f docker-compose.prod.yml run --rm worker \
 (`VIGIA_AI_PROVIDER`, ver "Resúmenes IA"). Apagado, el botón responde
 `503 ia_no_configurada` y el resto del reporte funciona igual.
 
+**Reportes programados** (migración `0010_reporte_programacion`): un reporte
+guardado puede enviarse por email (diario, semanal o mensual, hora ART) con
+resumen, primeras 25 filas, CSV adjunto y análisis IA opcional. Lo manda la task
+`enviar_reportes_programados` del worker, cada 15 min por **celery beat**, así
+que beat tiene que estar corriendo. Usa el mismo backend de email que las
+alertas (`SMTP_*` o `RESEND_API_KEY`) y `WEB_BASE_URL` para el link "Abrir en
+el monitor". Estado de cada envío en `reporte.ultimo_estado`.
+
+En Railway: el push redeploya API y worker; la migración se aplica desde la
+consola del servicio **worker** (`alembic -c db/alembic.ini upgrade head`).
+
 **Límite actual:** montos y adjudicatarios no vienen en la API del BOCBA (solo
 en el PDF de cada aviso); su extracción queda para una fase 2.
 

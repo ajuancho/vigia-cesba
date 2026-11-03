@@ -13,41 +13,39 @@ no vienen en la API (solo en el PDF de cada aviso): quedan para una fase 2.
 """
 from __future__ import annotations
 
-import csv
-import io
 import json
 from datetime import date as Date
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Annotated, Any, Literal
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from fastapi.responses import StreamingResponse
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, EmailStr, Field
 from sqlalchemy import delete, select, text
 
 from vigia_api.core.db import get_sessionmaker
-from vigia_api.core.scope import scope_where
+from vigia_api.core.scope import jurisdiccion_scope
 from vigia_api.core.security import WorkspaceContext, require_active_plan
 from vigia_api.services import ai
 from vigia_shared.models import Reporte
+from vigia_shared.reportes import (
+    CSV_MAX,
+    ETAPA_EXPR,
+    ORDEN_SQL,
+    TIPO_EXPR,
+    agregados,
+    build_where,
+    csv_text,
+    SYSTEM_ANALISIS,
+    fila_dict,
+    filas_sql,
+    prompt_analisis,
+    siguiente_envio,
+)
 
 router = APIRouter(prefix="/reportes", tags=["reportes"])
 
-# Tipo de procedimiento / tipo de norma tal como lo publica el boletín.
-TIPO_EXPR = "COALESCE(raw->>'tipo_nombre', tipo)"
-# Etapa de una licitación, tomada del título: "<tipo> / <etapa>  N° …".
-ETAPA_EXPR = r"NULLIF(btrim(substring(titulo from ' / ([^/]+?)\s+N[°º]')), '')"
-
 LISTADO_MAX = 500      # filas por página en pantalla
-CSV_MAX = 20000        # tope de filas exportables
-TOP_ORGANISMOS = 12
-
-_ORDEN_SQL = {
-    "fecha_desc": "fecha_publicacion DESC NULLS LAST, id DESC",
-    "fecha_asc": "fecha_publicacion ASC NULLS LAST, id ASC",
-    "organismo": "organismo ASC NULLS LAST, fecha_publicacion DESC NULLS LAST",
-    "tipo": f"{TIPO_EXPR} ASC, fecha_publicacion DESC NULLS LAST",
-}
 
 
 def _require_real_workspace(ctx: WorkspaceContext) -> None:
@@ -124,12 +122,32 @@ class ReporteIn(BaseModel):
     config: ReporteConfig
 
 
+class Programacion(BaseModel):
+    """Envío periódico por email de un reporte guardado (hora ART)."""
+
+    activa: bool = True
+    frecuencia: Literal["diaria", "semanal", "mensual"] = "semanal"
+    hora: int = Field(8, ge=0, le=23)
+    dia_semana: int = Field(0, ge=0, le=6)   # lunes = 0
+    dia_mes: int = Field(1, ge=1, le=28)
+    # nuevo = solo lo ingestado desde el envío anterior; ventana = últimos `dias` días
+    periodo: Literal["nuevo", "ventana"] = "nuevo"
+    dias: int = Field(7, ge=1, le=366)
+    destinatarios: list[EmailStr] = Field(min_length=1, max_length=10)
+    solo_si_hay: bool = True
+    incluir_ia: bool = False
+
+
 class ReporteOut(BaseModel):
     id: int
     nombre: str
     config: ReporteConfig
     created_at: datetime
     updated_at: datetime
+    programacion: Programacion | None = None
+    proximo_envio: datetime | None = None
+    ultimo_envio: datetime | None = None
+    ultimo_estado: str | None = None
 
 
 class AnalisisOut(BaseModel):
@@ -138,92 +156,20 @@ class AnalisisOut(BaseModel):
 
 def _where(f: Filtros) -> tuple[str, dict[str, Any]]:
     """WHERE + params para los filtros del constructor (con scope de jurisdicción)."""
-    conds: list[str] = []
-    params: dict[str, Any] = {}
-    if f.secciones:
-        conds.append("bora_seccion = ANY(:secciones)")
-        params["secciones"] = f.secciones
-    if f.tipos:
-        conds.append(f"{TIPO_EXPR} = ANY(:tipos)")
-        params["tipos"] = f.tipos
-    if f.etapas:
-        conds.append(f"{ETAPA_EXPR} = ANY(:etapas)")
-        params["etapas"] = f.etapas
-    if f.organismos:
-        conds.append("organismo = ANY(:organismos)")
-        params["organismos"] = f.organismos
-    if f.desde:
-        conds.append("fecha_publicacion >= :desde")
-        params["desde"] = f.desde
-    if f.hasta:
-        conds.append("fecha_publicacion <= :hasta")
-        params["hasta"] = f.hasta
-    if f.texto and f.texto.strip():
-        conds.append("search_vector @@ websearch_to_tsquery('spanish', :texto)")
-        params["texto"] = f.texto.strip()
-    conds, params = scope_where(conds, params)
-    return ("WHERE " + " AND ".join(conds)) if conds else "", params
+    return build_where(f.model_dump(), jurisdiccion=jurisdiccion_scope())
 
 
 def _filas_sql(where: str, orden: str) -> str:
-    return f"""
-        SELECT id, fecha_publicacion, {TIPO_EXPR} AS tipo, {ETAPA_EXPR} AS etapa,
-               numero, titulo, resumen, organismo, url
-        FROM norma {where}
-        ORDER BY {_ORDEN_SQL[orden]}
-        LIMIT :_limit OFFSET :_offset
-    """
+    return filas_sql(where, orden)
 
 
 def _fila(r: Any) -> Fila:
-    return Fila(
-        id=r[0], fecha=r[1], tipo=r[2], etapa=r[3], numero=r[4],
-        titulo=r[5], objeto=r[6], organismo=r[7], url=r[8],
-    )
+    return Fila(**fila_dict(r))
 
 
 async def _agregados(session, where: str, params: dict[str, Any]) -> tuple[int, Agregados]:
-    async def conteo(expr: str, limit: int | None = None) -> list[Conteo]:
-        lim = f" LIMIT {int(limit)}" if limit else ""
-        rows = (
-            await session.execute(
-                text(
-                    f"SELECT v, c FROM (SELECT {expr} AS v, COUNT(*) c FROM norma {where} "
-                    f"GROUP BY 1) t WHERE v IS NOT NULL ORDER BY c DESC{lim}"
-                ),
-                params,
-            )
-        ).all()
-        return [Conteo(valor=str(r[0]), cantidad=int(r[1])) for r in rows]
-
-    resumen = (
-        await session.execute(
-            text(
-                f"SELECT COUNT(*), COUNT(DISTINCT organismo), MIN(fecha_publicacion), "
-                f"MAX(fecha_publicacion) FROM norma {where}"
-            ),
-            params,
-        )
-    ).one()
-    por_mes = (
-        await session.execute(
-            text(
-                f"SELECT to_char(date_trunc('month', fecha_publicacion), 'YYYY-MM') m, COUNT(*) "
-                f"FROM norma {where} {'AND' if where else 'WHERE'} fecha_publicacion IS NOT NULL "
-                f"GROUP BY m ORDER BY m"
-            ),
-            params,
-        )
-    ).all()
-    return int(resumen[0] or 0), Agregados(
-        por_mes=[Conteo(valor=r[0], cantidad=int(r[1])) for r in por_mes],
-        por_organismo=await conteo("organismo", TOP_ORGANISMOS),
-        por_tipo=await conteo(TIPO_EXPR, 20),
-        por_etapa=await conteo(ETAPA_EXPR, 10),
-        organismos_distintos=int(resumen[1] or 0),
-        desde=resumen[2],
-        hasta=resumen[3],
-    )
+    total, ag = await agregados(session, where, params)
+    return total, Agregados(**ag)
 
 
 @router.get("/opciones", response_model=Opciones)
@@ -300,38 +246,12 @@ async def exportar_csv(
                 {**params, "_limit": CSV_MAX, "_offset": 0},
             )
         ).all()
-    buf = io.StringIO()
-    buf.write("﻿")
-    w = csv.writer(buf, delimiter=";")
-    w.writerow(["Fecha", "Tipo", "Etapa", "Número", "Título", "Objeto", "Organismo", "URL"])
-    for r in rows:
-        f = _fila(r)
-        w.writerow([
-            f.fecha.strftime("%d/%m/%Y") if f.fecha else "",
-            f.tipo or "", f.etapa or "", f.numero or "", f.titulo,
-            f.objeto or "", f.organismo or "", f.url or "",
-        ])
+    contenido = csv_text([fila_dict(r) for r in rows])
     return StreamingResponse(
-        iter([buf.getvalue()]),
+        iter([contenido]),
         media_type="text/csv; charset=utf-8",
         headers={"Content-Disposition": 'attachment; filename="reporte.csv"'},
     )
-
-
-_SYSTEM_ANALISIS = (
-    "Sos analista del Consejo Económico y Social de la Ciudad de Buenos Aires (CESBA). "
-    "Escribís el análisis de un reporte sobre publicaciones del Boletín Oficial de la Ciudad.\n"
-    "Reglas:\n"
-    "- Español rioplatense, registro institucional, claro. 3 a 5 párrafos breves.\n"
-    "- Usá SOLO las cifras y datos que te paso. No inventes montos, adjudicatarios, "
-    "porcentajes ni causas que no estén en los datos. Si calculás un porcentaje, "
-    "que salga de las cifras dadas.\n"
-    "- Números con convención argentina (1.284; 54,9%).\n"
-    "- Destacá: volumen y evolución en el tiempo, organismos que concentran la actividad, "
-    "tipos de procedimiento y etapas, y temas recurrentes en los objetos de la muestra.\n"
-    "- Si los datos no alcanzan para una conclusión, decilo.\n"
-    "- Sin títulos, sin markdown, sin viñetas, sin preámbulos."
-)
 
 
 @router.post("/analisis", response_model=AnalisisOut)
@@ -356,25 +276,11 @@ async def analisis(
     if total == 0:
         return AnalisisOut(texto="El reporte no tiene resultados para analizar con los filtros elegidos.")
 
-    datos = {
-        "filtros": config.filtros.model_dump(mode="json", exclude_defaults=True),
-        "total_publicaciones": total,
-        "periodo": {"desde": str(ag.desde), "hasta": str(ag.hasta)},
-        "organismos_distintos": ag.organismos_distintos,
-        "por_mes": [c.model_dump() for c in ag.por_mes],
-        "top_organismos": [c.model_dump() for c in ag.por_organismo],
-        "por_tipo": [c.model_dump() for c in ag.por_tipo],
-        "por_etapa": [c.model_dump() for c in ag.por_etapa],
-        "muestra_reciente": [
-            {"fecha": str(r[1]), "tipo": r[2], "etapa": r[3], "objeto": r[6], "organismo": r[7]}
-            for r in muestra
-        ],
-    }
-    prompt = (
-        "Datos del reporte (JSON). La muestra son las publicaciones más recientes, "
-        "no el total:\n" + json.dumps(datos, ensure_ascii=False, default=str)
+    prompt = prompt_analisis(
+        config.filtros.model_dump(mode="json", exclude_defaults=True),
+        total, ag.model_dump(), [fila_dict(r) for r in muestra],
     )
-    texto = await ai.completar(system=_SYSTEM_ANALISIS, prompt=prompt)
+    texto = await ai.completar(system=SYSTEM_ANALISIS, prompt=prompt)
     if not texto:
         raise HTTPException(status_code=status.HTTP_502_BAD_GATEWAY, detail="ia_fallo")
     return AnalisisOut(texto=texto)
@@ -510,7 +416,7 @@ async def interpretar(
         texto=str(texto).strip()[:200] if texto else None,
     )
     formato = data.get("formato") if data.get("formato") in ("listado", "analisis") else "analisis"
-    orden = data.get("orden") if data.get("orden") in _ORDEN_SQL else "fecha_desc"
+    orden = data.get("orden") if data.get("orden") in ORDEN_SQL else "fecha_desc"
     return InterpretacionOut(
         config=ReporteConfig(filtros=filtros, formato=formato, orden=orden),
         explicacion=str(data.get("explicacion") or "").strip()[:500],
@@ -525,6 +431,8 @@ def _out(r: Reporte) -> ReporteOut:
     return ReporteOut(
         id=r.id, nombre=r.nombre, config=ReporteConfig.model_validate(r.config),
         created_at=r.created_at, updated_at=r.updated_at,
+        programacion=Programacion.model_validate(r.programacion) if r.programacion else None,
+        proximo_envio=r.proximo_envio, ultimo_envio=r.ultimo_envio, ultimo_estado=r.ultimo_estado,
     )
 
 
@@ -594,3 +502,64 @@ async def borrar(
         await session.commit()
     if res.rowcount == 0:
         raise HTTPException(404, "reporte_not_found")
+
+
+async def _reporte_propio(session, reporte_id: int, ctx: WorkspaceContext) -> Reporte:
+    r = await session.get(Reporte, reporte_id)
+    if r is None or r.workspace_id != ctx.workspace_id:
+        raise HTTPException(404, "reporte_not_found")
+    return r
+
+
+@router.put("/{reporte_id}/programacion", response_model=ReporteOut)
+async def programar(
+    reporte_id: int,
+    body: Programacion,
+    ctx: Annotated[WorkspaceContext, Depends(require_active_plan)],
+) -> ReporteOut:
+    """Crea o cambia el envío periódico por email de un reporte guardado."""
+    _require_real_workspace(ctx)
+    Session = get_sessionmaker()
+    async with Session() as session:
+        r = await _reporte_propio(session, reporte_id, ctx)
+        prog = body.model_dump(mode="json")
+        r.programacion = prog
+        r.proximo_envio = siguiente_envio(prog, datetime.now(timezone.utc)) if body.activa else None
+        await session.commit()
+        await session.refresh(r)
+        return _out(r)
+
+
+@router.delete("/{reporte_id}/programacion", response_model=ReporteOut)
+async def desprogramar(
+    reporte_id: int,
+    ctx: Annotated[WorkspaceContext, Depends(require_active_plan)],
+) -> ReporteOut:
+    """Quita el envío programado (el reporte guardado queda)."""
+    _require_real_workspace(ctx)
+    Session = get_sessionmaker()
+    async with Session() as session:
+        r = await _reporte_propio(session, reporte_id, ctx)
+        r.programacion = None
+        r.proximo_envio = None
+        await session.commit()
+        await session.refresh(r)
+        return _out(r)
+
+
+@router.post("/{reporte_id}/enviar-ahora", response_model=ReporteOut)
+async def enviar_ahora(
+    reporte_id: int,
+    ctx: Annotated[WorkspaceContext, Depends(require_active_plan)],
+) -> ReporteOut:
+    """Adelanta el próximo envío: el worker lo manda en su siguiente pasada (≤ 15 min)."""
+    _require_real_workspace(ctx)
+    Session = get_sessionmaker()
+    async with Session() as session:
+        r = await _reporte_propio(session, reporte_id, ctx)
+        if not r.programacion:
+            raise HTTPException(409, "reporte_sin_programacion")
+        r.proximo_envio = datetime.now(timezone.utc)
+        await session.commit()
+        await session.refresh(r)
+        return _out(r)

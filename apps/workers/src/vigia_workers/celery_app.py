@@ -21,6 +21,7 @@ celery_app = Celery(
         "vigia_workers.movimientos",
         "vigia_workers.societario",
         "vigia_workers.maintenance",
+        "vigia_workers.reportes_programados",
     ],
 )
 
@@ -69,6 +70,11 @@ celery_app.conf.update(
         "match-alertas": {
             "task": "vigia_workers.alerts.match_alertas",
             "schedule": crontab(minute=15),
+        },
+        # Reportes programados por email — cada 15 min manda los que vencieron.
+        "enviar-reportes-programados": {
+            "task": "vigia_workers.reportes_programados.enviar_reportes_programados",
+            "schedule": crontab(minute="*/15"),
         },
         # Frescura de fuentes contra SLOs (vigia_shared.sources) — cada 6 h.
         # Detecta datasets estancados aunque la task corra "ok".

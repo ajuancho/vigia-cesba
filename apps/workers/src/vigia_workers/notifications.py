@@ -10,6 +10,7 @@ SOLO en el entorno — nunca en el repo.
 """
 from __future__ import annotations
 
+import base64
 import html as _html
 import os
 import smtplib
@@ -35,7 +36,11 @@ SMTP_USER = os.environ.get("SMTP_USER", "")
 SMTP_PASSWORD = os.environ.get("SMTP_PASSWORD", "")
 
 
-def _send_smtp(*, to: str, subject: str, html: str) -> dict:
+# Adjunto: (nombre de archivo, bytes, media type "tipo/subtipo").
+Adjunto = tuple[str, bytes, str]
+
+
+def _send_smtp(*, to: str, subject: str, html: str, adjuntos: list[Adjunto] | None = None) -> dict:
     """Envía via SMTP con STARTTLS (Gmail: smtp.gmail.com:587)."""
     msg = EmailMessage()
     msg["Subject"] = subject
@@ -46,6 +51,9 @@ def _send_smtp(*, to: str, subject: str, html: str) -> dict:
     msg["To"] = to
     msg.set_content("Tu cliente no soporta HTML. Abrí el monitor en " + WEB_BASE_URL)
     msg.add_alternative(html, subtype="html")
+    for nombre, data, mime in adjuntos or []:
+        maintype, subtype = mime.split("/", 1)
+        msg.add_attachment(data, maintype=maintype, subtype=subtype, filename=nombre)
     try:
         with smtplib.SMTP(SMTP_HOST, SMTP_PORT, timeout=20) as server:
             server.starttls()
@@ -57,10 +65,10 @@ def _send_smtp(*, to: str, subject: str, html: str) -> dict:
         return {"error": str(exc), "to": to}
 
 
-def send_email(*, to: str, subject: str, html: str) -> dict:
+def send_email(*, to: str, subject: str, html: str, adjuntos: list[Adjunto] | None = None) -> dict:
     """Envía un email por el backend disponible (SMTP > Resend > no-op)."""
     if SMTP_HOST and SMTP_USER and SMTP_PASSWORD:
-        return _send_smtp(to=to, subject=subject, html=html)
+        return _send_smtp(to=to, subject=subject, html=html, adjuntos=adjuntos)
     if not RESEND_API_KEY:
         print(f"[notifications] (sin backend de email) email a {to}: {subject}")
         return {"skipped": True, "to": to}
@@ -68,7 +76,13 @@ def send_email(*, to: str, subject: str, html: str) -> dict:
         resp = httpx.post(
             RESEND_URL,
             headers={"Authorization": f"Bearer {RESEND_API_KEY}", "Content-Type": "application/json"},
-            json={"from": ALERTS_FROM_EMAIL, "to": [to], "subject": subject, "html": html},
+            json={
+                "from": ALERTS_FROM_EMAIL, "to": [to], "subject": subject, "html": html,
+                **({"attachments": [
+                    {"filename": nombre, "content": base64.b64encode(data).decode()}
+                    for nombre, data, _ in adjuntos
+                ]} if adjuntos else {}),
+            },
             timeout=15.0,
         )
         resp.raise_for_status()
