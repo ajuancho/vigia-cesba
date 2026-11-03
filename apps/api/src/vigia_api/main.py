@@ -14,6 +14,7 @@ from vigia_api.routers import (
     health,
     invitations,
     normas,
+    reportes,
     search,
     stats,
     workspaces,
@@ -57,6 +58,7 @@ def create_app() -> FastAPI:
     app.include_router(account.router)
     app.include_router(invitations.router)
     app.include_router(alerts.router)
+    app.include_router(reportes.router)
     app.include_router(normas.router)
     app.include_router(search.router)
     app.include_router(stats.router)

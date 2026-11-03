@@ -2,13 +2,14 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Newspaper, BarChart3, Search, Bell, X } from 'lucide-react';
+import { Newspaper, BarChart3, Search, Bell, FileBarChart, X } from 'lucide-react';
 
 const NAV_ITEMS = [
   { to: '/feed', label: 'Boletín del día', icon: Newspaper },
   { to: '/search', label: 'Buscador', icon: Search },
   { to: '/alerts', label: 'Alertas', icon: Bell },
   { to: '/dashboard', label: 'Estadísticas', icon: BarChart3 },
+  { to: '/reportes', label: 'Reportes', icon: FileBarChart },
 ];
 
 export default function Sidebar({ open, onClose }) {
@@ -18,7 +19,7 @@ export default function Sidebar({ open, onClose }) {
       {open && <div className="fixed inset-0 bg-navy-950/30 z-40 lg:hidden" onClick={onClose} />}
 
       <aside
-        className={`grad-institucional fixed top-0 left-0 h-full w-60 text-white z-50 flex flex-col overflow-hidden transition-transform duration-200 lg:translate-x-0 ${
+        className={`grad-institucional print:hidden fixed top-0 left-0 h-full w-60 text-white z-50 flex flex-col overflow-hidden transition-transform duration-200 lg:translate-x-0 ${
           open ? 'translate-x-0' : '-translate-x-full'
         }`}
       >

@@ -233,6 +233,44 @@ Los resúmenes aparecen en el feed como "Análisis automático" debajo de cada n
 
 ---
 
+## Reportes
+
+Módulo `/reportes` (solo usuarios logueados): constructor de reportes sobre el
+corpus (sección, tipo de procedimiento, etapa, organismo, período, texto) con
+listado, gráficos, CSV, impresión y análisis escrito con IA. Los reportes
+guardados viven en la tabla `reporte` (migración `0009_reportes`).
+
+Al actualizar a esta versión:
+
+```bash
+git pull
+# Construir desde este repo: las imágenes ghcr.io/colossus-lab/* son las del
+# upstream y NO traen los cambios del CESBA. La API suma la dependencia anthropic.
+docker compose -f docker-compose.prod.yml build api migrate
+docker compose -f docker-compose.prod.yml run --rm --no-deps migrate   # aplica 0009_reportes
+docker compose -f docker-compose.prod.yml up -d --no-build api
+```
+
+**Historial:** los reportes analizan lo que haya en la base. Para tener un año
+de licitaciones, backfill de 365 días (idempotente; ~365 llamadas a la API del
+BOCBA) y después el matching silencioso del Paso 3:
+
+```bash
+docker compose -f docker-compose.prod.yml run --rm worker \
+  python -c "from vigia_workers.tasks import ingest_bocba as t; print(t(lookback_days=365))"
+docker compose -f docker-compose.prod.yml run --rm worker \
+  python -c "from vigia_workers.alerts import match_alertas as t; print(t(notify=False))"
+```
+
+**Análisis con IA:** usa la misma configuración que los resúmenes
+(`VIGIA_AI_PROVIDER`, ver "Resúmenes IA"). Apagado, el botón responde
+`503 ia_no_configurada` y el resto del reporte funciona igual.
+
+**Límite actual:** montos y adjudicatarios no vienen en la API del BOCBA (solo
+en el PDF de cada aviso); su extracción queda para una fase 2.
+
+---
+
 ## Membresías
 
 No hay período de prueba: todos los workspaces tienen acceso pleno. Para

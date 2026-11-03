@@ -19,11 +19,12 @@ export default function Header({ onMenuToggle }) {
   const formattedTime = time ? time.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' }) : '';
 
   return (
-    <header className="sticky top-0 z-30 bg-bg-primary/85 backdrop-blur border-b border-border-light">
+    <header className="print:hidden sticky top-0 z-30 bg-bg-primary/85 backdrop-blur border-b border-border-light">
       <div className="flex items-center justify-between px-4 md:px-6 lg:px-8 h-14">
         <div className="flex items-center gap-4">
           <button
             onClick={onMenuToggle}
+            aria-label="Abrir menú"
             className="lg:hidden p-1.5 rounded text-text-secondary hover:text-text-primary hover:bg-bg-tertiary transition-colors"
           >
             <Menu size={18} />

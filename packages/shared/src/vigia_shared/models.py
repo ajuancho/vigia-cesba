@@ -74,6 +74,7 @@ class Norma(Base):
         Index("ix_norma_emisor", "emisor"),
         Index("ix_norma_impacto", "impacto"),
         Index("ix_norma_jurisdiccion", "jurisdiccion"),
+        Index("ix_norma_bora_seccion", "bora_seccion"),
     )
 
     id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
@@ -209,6 +210,32 @@ class Alerta(Base):
 
     matches: Mapped[list[AlertaMatch]] = relationship(
         back_populates="alerta", cascade="all, delete-orphan"
+    )
+
+
+class Reporte(Base):
+    """Reporte guardado de un workspace: nombre + configuración del constructor.
+
+    `config` guarda los filtros (secciones, tipos, etapas, organismos, período,
+    texto), el formato (listado | análisis) y el orden. El reporte se recalcula
+    cada vez que se abre: guarda la consulta, no los resultados.
+    """
+
+    __tablename__ = "reporte"
+    __table_args__ = (Index("ix_reporte_workspace", "workspace_id"),)
+
+    id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    workspace_id: Mapped[int] = mapped_column(
+        ForeignKey("workspace.id", ondelete="CASCADE"), nullable=False
+    )
+    user_id: Mapped[int | None] = mapped_column(ForeignKey("app_user.id", ondelete="SET NULL"))
+    nombre: Mapped[str] = mapped_column(String(255), nullable=False)
+    config: Mapped[dict[str, Any]] = mapped_column(JSONB, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), nullable=False
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False
     )
 
 

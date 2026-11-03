@@ -10,11 +10,11 @@ export default function AppLayout({ children }) {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <div className="flag-stripe fixed top-0 inset-x-0 z-[60]" />
+      <div className="flag-stripe print:hidden fixed top-0 inset-x-0 z-[60]" />
       <div className="flex flex-1">
         <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
-        <div className="flex-1 flex flex-col min-h-screen lg:ml-60">
+        <div className="flex-1 flex flex-col min-h-screen lg:ml-60 print:ml-0">
           <Header onMenuToggle={() => setSidebarOpen(!sidebarOpen)} />
           <main className="flex-1 p-4 md:p-6 lg:p-8 overflow-auto">
             <OnboardingBanner />
