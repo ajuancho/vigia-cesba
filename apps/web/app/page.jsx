@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Newspaper, Search, Bell, ArrowRight, BarChart3, FileBarChart } from 'lucide-react';
+import { Newspaper, Search, Bell, ArrowRight, BarChart3, FileBarChart, Landmark } from 'lucide-react';
 import FadeIn from '@/components/FadeIn';
 
 export const revalidate = 300;
@@ -22,12 +22,16 @@ const MODULES = [
     desc: 'El Boletín Oficial CABA como un diario: lo importante arriba, el trámite colapsado, filtrable por organismo y cada norma con su resumen IA.',
   },
   {
+    icon: Landmark, title: 'Legislatura', href: '/legislatura',
+    desc: 'Los proyectos y expedientes que ingresan a la Legislatura porteña, con su autoría y estado de trámite, desde que se presentan hasta su sanción.',
+  },
+  {
     icon: Search, title: 'Buscador', href: '/search',
-    desc: 'Búsqueda de texto completo en español sobre toda la normativa porteña, con ranking por relevancia y fragmentos en contexto.',
+    desc: 'Búsqueda de texto completo en español sobre el Boletín Oficial y los expedientes de la Legislatura, con ranking por relevancia y fragmentos en contexto.',
   },
   {
     icon: Bell, title: 'Alertas', href: '/alerts',
-    desc: 'Suscribite por palabra clave y sector. Cuando una norma coincide, recibís un resumen por correo con el vínculo al texto oficial.',
+    desc: 'Suscribite por palabra clave y sector. Cuando una norma o un proyecto coincide, recibís un resumen por correo con el vínculo al texto oficial.',
   },
   {
     icon: BarChart3, title: 'Estadísticas', href: '/dashboard',
@@ -46,10 +50,10 @@ export default async function Landing() {
   const fmt = (n) => n.toLocaleString('es-AR');
 
   const CIFRAS = [
-    { num: total > 0 ? fmt(total) : '—', label: 'Normas indexadas', detail: 'decretos, resoluciones, disposiciones, edictos y avisos' },
-    { num: '1', label: 'Fuente oficial', detail: 'api del boletín oficial de la ciudad, sin intermediarios' },
+    { num: total > 0 ? fmt(total) : '—', label: 'Normas y expedientes', detail: 'normas del boletín oficial y proyectos de la legislatura porteña' },
+    { num: '2', label: 'Fuentes oficiales', detail: 'boletín oficial y legislatura de la ciudad, sin intermediarios' },
     { num: String(sectores), label: 'Sectores detectados', detail: 'salud, educación, ambiente, transporte y más' },
-    { num: '24/7', label: 'Monitoreo continuo', detail: 'ingesta diaria a las 9:00 hs con reintento a las 13:00 hs' },
+    { num: '24/7', label: 'Monitoreo continuo', detail: 'legislatura a las 7:30 hs · boletín a las 9:00 hs, con reintento a las 13:00 hs' },
   ];
 
   return (
@@ -65,7 +69,7 @@ export default async function Landing() {
             <img src="/brand/cesba-logo-blanco.png" alt="CESBA — Consejo Económico y Social de la Ciudad de Buenos Aires" width={64} height={64} className="w-14 h-14 md:w-16 md:h-16" />
             <span className="flex flex-col gap-0.5 border-l border-white/30 pl-3.5">
               <span className="text-[14px] md:text-[15px] font-bold tracking-[0.06em]">MONITOR BOCBA</span>
-              <span className="hidden sm:block text-[12px] text-white/85">boletín oficial de la ciudad</span>
+              <span className="hidden sm:block text-[12px] text-white/85">normativa de la ciudad</span>
             </span>
           </Link>
           <div className="flex items-center gap-2">
@@ -88,14 +92,15 @@ export default async function Landing() {
             <div className="title-rule-vital flex flex-col gap-4">
               <h1 className="display-hero max-w-4xl">La normativa porteña, al día</h1>
               <p className="text-[19px] md:text-[23px] font-light leading-snug">
-                monitor interno del boletín oficial de la ciudad de buenos aires
+                monitor interno del boletín oficial y la legislatura de la ciudad de buenos aires
               </p>
             </div>
           </FadeIn>
           <FadeIn delay={160}>
             <p className="max-w-xl text-[16px] md:text-[17px] leading-relaxed text-white/85">
-              Cada norma indexada, resumida con IA en lenguaje claro y con alertas por correo
-              cuando se publica algo que te importa. Datos oficiales, actualizados cada mañana.
+              Cada norma del Boletín Oficial y cada proyecto de la Legislatura, indexados y con
+              alertas por correo cuando se publica o se presenta algo que te importa. Datos
+              oficiales, actualizados cada mañana.
             </p>
           </FadeIn>
           <FadeIn delay={240}>
@@ -133,10 +138,10 @@ export default async function Landing() {
           <FadeIn>
             <div className="title-rule flex flex-col gap-2">
               <h2 className="display-section text-petroleo">La plataforma</h2>
-              <p className="text-[17px] md:text-[19px] text-text-tertiary">cinco módulos, un solo radar normativo</p>
+              <p className="text-[17px] md:text-[19px] text-text-tertiary">seis módulos, un solo radar normativo</p>
             </div>
           </FadeIn>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {MODULES.map(({ icon: Icon, title, desc, href }, i) => (
               <FadeIn key={title} delay={i * 70} className="h-full">
                 <Link href={href} className="card card-accent group h-full flex flex-col gap-3.5 px-6 py-7 shadow-[0_4px_14px_rgba(21,59,112,0.10)] hover:shadow-[0_18px_48px_rgba(21,59,112,0.16)] transition-shadow">
@@ -178,14 +183,16 @@ export default async function Landing() {
             <div className="flex flex-col">
               <span className="text-[12px] font-semibold tracking-[0.14em] text-white/70 mb-1">PLATAFORMA</span>
               <Link href="/feed" className="hover:underline">Boletín del día</Link>
+              <Link href="/legislatura" className="hover:underline">Legislatura</Link>
               <Link href="/search" className="hover:underline">Buscador</Link>
               <Link href="/alerts" className="hover:underline">Alertas</Link>
               <Link href="/dashboard" className="hover:underline">Estadísticas</Link>
+              <Link href="/reportes" className="hover:underline">Reportes</Link>
             </div>
             <div className="flex flex-col">
-              <span className="text-[12px] font-semibold tracking-[0.14em] text-white/70 mb-1">FUENTE</span>
+              <span className="text-[12px] font-semibold tracking-[0.14em] text-white/70 mb-1">FUENTES</span>
               <span>Boletín Oficial CABA</span>
-              <span>api-restboletinoficial.buenosaires.gob.ar</span>
+              <span>Legislatura de la Ciudad de Buenos Aires</span>
               <span>Actualización diaria automática</span>
             </div>
           </div>

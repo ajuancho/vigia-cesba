@@ -12,8 +12,8 @@ const SECCIONES = [
     num: 'I.',
     titulo: 'El servicio',
     cuerpo: [
-      <>El Monitor BOCBA es la herramienta del <strong className="text-text-primary">Consejo Económico y Social de la Ciudad de Buenos Aires (CESBA)</strong> para el monitoreo de la normativa porteña. Lee el Boletín Oficial de la Ciudad de Buenos Aires, indexa cada norma y te avisa cuando aparece normativa que te interesa. Está basado en Vigía, software libre de Colossus Lab.</>,
-      <>El corpus normativo que mostramos es <strong className="text-text-primary">información pública</strong>: proviene del Boletín Oficial de la Ciudad de Buenos Aires y cada norma linkea a su fuente original verificable.</>,
+      <>El Monitor BOCBA es la herramienta del <strong className="text-text-primary">Consejo Económico y Social de la Ciudad de Buenos Aires (CESBA)</strong> para el monitoreo de la normativa porteña. Lee el Boletín Oficial de la Ciudad de Buenos Aires y los expedientes de la Legislatura porteña, indexa cada norma y proyecto y te avisa cuando aparece normativa que te interesa. Está basado en Vigía, software libre de Colossus Lab.</>,
+      <>El corpus normativo que mostramos es <strong className="text-text-primary">información pública</strong>: proviene del Boletín Oficial de la Ciudad de Buenos Aires y de la Legislatura de la Ciudad, y cada norma o expediente linkea a su fuente original verificable.</>,
     ],
   },
   {

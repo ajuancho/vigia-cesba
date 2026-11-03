@@ -3,7 +3,7 @@ import Providers from '@/components/Providers';
 
 const TITLE = 'Monitor Normativo CABA — CESBA';
 const DESCRIPTION =
-  'La normativa de la Ciudad de Buenos Aires, al día. Monitoreo del Boletín Oficial CABA: normas indexadas, búsqueda full-text y alertas por email. Herramienta interna del CESBA.';
+  'La normativa de la Ciudad de Buenos Aires, al día. Monitoreo del Boletín Oficial CABA y de los proyectos de la Legislatura porteña: búsqueda, alertas por email y reportes. Herramienta interna del CESBA.';
 
 export const metadata = {
   metadataBase: new URL('https://normativa.cesba.gob.ar'),
@@ -12,7 +12,7 @@ export const metadata = {
     template: '%s · Monitor BOCBA',
   },
   description: DESCRIPTION,
-  keywords: ['boletín oficial CABA', 'normativa CABA', 'BOCBA', 'legislación porteña', 'CESBA', 'Ciudad de Buenos Aires'],
+  keywords: ['boletín oficial CABA', 'normativa CABA', 'BOCBA', 'Legislatura porteña', 'proyectos de ley CABA', 'legislación porteña', 'CESBA', 'Ciudad de Buenos Aires'],
   openGraph: {
     title: TITLE,
     description: DESCRIPTION,

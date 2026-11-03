@@ -46,7 +46,7 @@ export default async function OpengraphImage() {
             <div style={{ display: 'flex', flexDirection: 'column' }}>
               <span style={{ fontWeight: 700, fontSize: 84, lineHeight: 1.02, letterSpacing: 2 }}>LA NORMATIVA PORTEÑA,</span>
               <span style={{ fontWeight: 700, fontSize: 84, lineHeight: 1.02, letterSpacing: 2 }}>AL DÍA</span>
-              <span style={{ fontWeight: 300, fontSize: 34, marginTop: 22 }}>monitor del boletín oficial de la ciudad de buenos aires</span>
+              <span style={{ fontWeight: 300, fontSize: 34, marginTop: 22 }}>boletín oficial y legislatura de la ciudad de buenos aires</span>
             </div>
           </div>
         </div>
