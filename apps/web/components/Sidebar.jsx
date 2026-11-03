@@ -2,10 +2,11 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Newspaper, BarChart3, Search, Bell, FileBarChart, X } from 'lucide-react';
+import { Newspaper, BarChart3, Search, Bell, FileBarChart, Landmark, X } from 'lucide-react';
 
 const NAV_ITEMS = [
   { to: '/feed', label: 'Boletín del día', icon: Newspaper },
+  { to: '/legislatura', label: 'Legislatura', icon: Landmark },
   { to: '/search', label: 'Buscador', icon: Search },
   { to: '/alerts', label: 'Alertas', icon: Bell },
   { to: '/dashboard', label: 'Estadísticas', icon: BarChart3 },

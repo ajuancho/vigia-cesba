@@ -105,6 +105,15 @@ SOURCES: dict[str, dict] = {
         # Publica cada día hábil; 4 días tolera fin de semana largo.
         "freshness_slo_days": 4,
     },
+    "legislatura": {
+        "code": "legislatura",
+        "name": "Legislatura CABA — expedientes (parlamentaria.legislatura.gob.ar)",
+        "kind": "scrape",
+        "base_url": "https://parlamentaria.legislatura.gob.ar",
+        "cadence_hours": 24,
+        # Entran expedientes casi todos los días hábiles; receso de verano aparte.
+        "freshness_slo_days": 7,
+    },
 }
 
 # Campos que van a la tabla source_catalog (los upserta cada task de ingesta).

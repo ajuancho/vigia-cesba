@@ -5,7 +5,7 @@ export const TIPOS_NORMA = {
   LEY: { label: 'Ley', color: '#18596C', description: 'Ley sancionada por el Congreso' },
   RESOLUCION: { label: 'Resolución', color: '#18A6C2', description: 'Resolución ministerial' },
   DISPOSICION: { label: 'Disposición', color: '#4E83FB', description: 'Disposición administrativa' },
-  PROYECTO: { label: 'Proyecto', color: '#54BBC7', description: 'Proyecto de ley en trámite' },
+  PROYECTO: { label: 'Proyecto', color: '#54BBC7', description: 'Expediente de la Legislatura porteña' },
   COMUNICACION: { label: 'Comunicación', color: '#00B2D1', description: 'Comunicación del BCRA (serie A)' },
   CONSULTA: { label: 'Consulta', color: '#7FB8C9', description: 'Consulta pública / anteproyecto en consulta' },
   OTRA: { label: 'Otra', color: '#93989E', description: 'Otra norma' },

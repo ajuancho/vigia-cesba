@@ -66,6 +66,18 @@ celery_app.conf.update(
             "task": "vigia_workers.tasks.ingest_bocba",
             "schedule": crontab(hour=13, minute=0),
         },
+        # Legislatura CABA — expedientes iniciados en los últimos 30 días (y su
+        # estado actual). Corre antes del matching de alertas de las 8:15.
+        "ingest-legislatura": {
+            "task": "vigia_workers.tasks.ingest_legislatura",
+            "schedule": crontab(hour=7, minute=30),
+        },
+        # Refresco semanal de estado/sanción de los expedientes del último año.
+        "refresh-legislatura": {
+            "task": "vigia_workers.tasks.ingest_legislatura",
+            "schedule": crontab(day_of_week=0, hour=6, minute=30),
+            "kwargs": {"lookback_days": 400},
+        },
         # Matching de alertas + notificaciones — cada hora.
         "match-alertas": {
             "task": "vigia_workers.alerts.match_alertas",

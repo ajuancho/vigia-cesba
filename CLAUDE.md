@@ -68,6 +68,7 @@ El web se redeploya solo con cada push (Vercel Git integration). Runbook complet
 - **Orden de beats importa**: `ingest_hcdn_proyectos` (08:00) pisa `norma.estado` a diario; `ingest_hcdn_movimientos` (08:30) lo re-deriva. No invertirlos.
 - **Fuentes nuevas**: runbook en `infra/DEPLOY.md` (dry-run → backfill → `match_alertas(notify=False)` → beat). Registry con SLOs en `vigia_shared/sources.py`; estado operativo sin ssh en `GET /health/sources`.
 - **BORA 2ª NO entra a `norma`**: va a `aviso_societario` (tabla y FTS propios, router `/avisos`, página "Radar societario") para no contaminar feed/stats/alertas.
+- **Legislatura CABA**: web service ASMX no documentado del buscador oficial (`GetExpedienteAvanzada`, filtra por fecha de INICIO y devuelve estado actual). Se guarda como `PROYECTO` con `bora_seccion='Legislatura'`; el feed `/normas/ediciones` lo excluye. Backfill → `match_alertas(notify=False)` (runbook en DEPLOY-CESBA.md).
 - **Sin free trial**: el período de prueba (402 `trial_expired` + cartel `TrialGate`) fue eliminado; `require_active_plan` quedó como pass-through, punto único para reintroducir gating por plan.
 
 ## Diseño / UX

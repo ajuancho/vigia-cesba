@@ -1,0 +1,1486 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ArrayOfExpedienteAvanzado xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://tempuri.org/">
+  <expedienteAvanzado>
+    <id_expediente>143054</id_expediente>
+    <nro_de_expediente>3425-D-2026</nro_de_expediente>
+    <fch_inicio>30/10/2026 16:35:03</fch_inicio>
+    <autor_des>GONZÁLEZ, ANDREA MARIANA</autor_des>
+    <coautores_des>BIELLI, MARÍA; CAPORICCIO, FRANCISCO; FREIRE, VICTORIA; GRILLO, ALEJANDRO OMAR; LA BLUNDA, ANDRÉS; LAMMENS , MATÍAS; MODARELLI, JUAN PABLO; NEGRI, CLAUDIA; NEIRA, CLAUDIA; PEÑAFORT, GRACIANA; SALVATIERRA, ALEJANDRO; VELÁZQUEZ, DELFINA</coautores_des>
+    <autor_id>30939</autor_id>
+    <coautores_id>30844, 30943, 30916, 30915, 30918, 30914, 30892, 30936, 30716, 30917, 30941, 30919</coautores_id>
+    <tipo_proyecto_des>LEY</tipo_proyecto_des>
+    <fch_movimiento>3/11/2026 14:40:56</fch_movimiento>
+    <ubicacion_des>MEP</ubicacion_des>
+    <descripcion>ESPERANDO ENVIO A COMISION (ESPERANDO RECEPCION)</descripcion>
+    <id_proyecto_tipo>1</id_proyecto_tipo>
+    <id_business_party>51</id_business_party>
+    <nro_de_orden_JefeGob />
+    <TieneSancion>0</TieneSancion>
+    <sumario>SISTEMA INTEGRAL DE ACOMPAÑAMIENTO TERRITORIAL PARA ADOLESCENTES EN SITUACIÓN DE VULNERABILIDAD SOCIAL DE LA CIUDAD</sumario>
+    <urlDoc>228310</urlDoc>
+  </expedienteAvanzado>
+  <expedienteAvanzado>
+    <id_expediente>143012</id_expediente>
+    <nro_de_expediente>3387-E-2026</nro_de_expediente>
+    <fch_inicio>28/10/2026 12:48:16</fch_inicio>
+    <autor_des>JOSE MANUEL ESTRADA, INSTITUTO</autor_des>
+    <coautores_des />
+    <autor_id>2290</autor_id>
+    <coautores_id />
+    <tipo_proyecto_des>ESCUELAS</tipo_proyecto_des>
+    <fch_movimiento>3/11/2026 14:15:13</fch_movimiento>
+    <ubicacion_des>EDUCACIÓN, CIENCIA Y TECNOLOGÍA</ubicacion_des>
+    <descripcion>EN COMISION</descripcion>
+    <id_proyecto_tipo>6</id_proyecto_tipo>
+    <id_business_party>520</id_business_party>
+    <nro_de_orden_JefeGob />
+    <TieneSancion>0</TieneSancion>
+    <sumario>BOLETO ESTUDIANTIL UNIVERSAL PARA TRANSPORTE PÚBLICO EN LA CIUDAD</sumario>
+    <urlDoc>228249</urlDoc>
+  </expedienteAvanzado>
+  <expedienteAvanzado>
+    <id_expediente>143069</id_expediente>
+    <nro_de_expediente>3439-D-2026</nro_de_expediente>
+    <fch_inicio>2/11/2026 17:11:16</fch_inicio>
+    <autor_des>KIENAST, MARINA</autor_des>
+    <coautores_des>ERNST, MARCELO GREGORIO; FERNÁNDEZ, JUAN IGNACIO; IMAS, SILVIA ; PELAYO, SOLANA; REY, SANDRA MÓNICA; SAIFERT, LEONARDO</coautores_des>
+    <autor_id>30886</autor_id>
+    <coautores_id>30951, 30935, 30910, 30931, 30923, 30900</coautores_id>
+    <tipo_proyecto_des>RESOLUCION</tipo_proyecto_des>
+    <fch_movimiento>3/11/2026 12:51:23</fch_movimiento>
+    <ubicacion_des>MEP</ubicacion_des>
+    <descripcion>ESPERANDO ENVIO A COMISION (ESPERANDO RECEPCION)</descripcion>
+    <id_proyecto_tipo>2</id_proyecto_tipo>
+    <id_business_party>51</id_business_party>
+    <nro_de_orden_JefeGob />
+    <TieneSancion>0</TieneSancion>
+    <sumario>INFORMES EN RELACIÓN CON EL ESPACIO DE ESTACIONAMIENTO PARA MOTOCICLETAS UBICADO FRENTE AL PALACIO BAROLO</sumario>
+    <urlDoc>228387</urlDoc>
+  </expedienteAvanzado>
+  <expedienteAvanzado>
+    <id_expediente>143068</id_expediente>
+    <nro_de_expediente>3438-D-2026</nro_de_expediente>
+    <fch_inicio>2/11/2026 17:09:28</fch_inicio>
+    <autor_des>KIENAST, MARINA</autor_des>
+    <coautores_des>ERNST, MARCELO GREGORIO; FERNÁNDEZ, JUAN IGNACIO; IMAS, SILVIA ; PELAYO, SOLANA; REY, SANDRA MÓNICA; SAIFERT, LEONARDO</coautores_des>
+    <autor_id>30886</autor_id>
+    <coautores_id>30951, 30935, 30910, 30931, 30923, 30900</coautores_id>
+    <tipo_proyecto_des>RESOLUCION</tipo_proyecto_des>
+    <fch_movimiento>3/11/2026 12:50:57</fch_movimiento>
+    <ubicacion_des>MEP</ubicacion_des>
+    <descripcion>ESPERANDO ENVIO A COMISION (ESPERANDO RECEPCION)</descripcion>
+    <id_proyecto_tipo>2</id_proyecto_tipo>
+    <id_business_party>51</id_business_party>
+    <nro_de_orden_JefeGob />
+    <TieneSancion>0</TieneSancion>
+    <sumario>INFORMES EN RELACIÓN CON LA PARADA DE COLECTIVOS Y EL COMERCIO DE VENTA DE CAFÉ Y DIARIOS UBICADOS EN LA INTERSECCIÓN DE LA AV. CORRIENTES Y LA CALLE PASTEUR</sumario>
+    <urlDoc>228386</urlDoc>
+  </expedienteAvanzado>
+  <expedienteAvanzado>
+    <id_expediente>143066</id_expediente>
+    <nro_de_expediente>3437-D-2026</nro_de_expediente>
+    <fch_inicio>2/11/2026 17:06:11</fch_inicio>
+    <autor_des>OCAÑA, MARÍA GRACIELA</autor_des>
+    <coautores_des>FERRARIO, EMMANUEL; RODRÍGUEZ LARRETA, HORACIO; TAGLIAFERRI, GUADALUPE</coautores_des>
+    <autor_id>30742</autor_id>
+    <coautores_id>30880, 30950, 30948</coautores_id>
+    <tipo_proyecto_des>RESOLUCION</tipo_proyecto_des>
+    <fch_movimiento>3/11/2026 12:50:27</fch_movimiento>
+    <ubicacion_des>MEP</ubicacion_des>
+    <descripcion>ESPERANDO ENVIO A COMISION (ESPERANDO RECEPCION)</descripcion>
+    <id_proyecto_tipo>2</id_proyecto_tipo>
+    <id_business_party>51</id_business_party>
+    <nro_de_orden_JefeGob />
+    <TieneSancion>0</TieneSancion>
+    <sumario>RECONOCIMIENTO A LOS ESTUDIANTES DE QUINTO AÑO, A LA PROFESORA CELESTE FARANDA,Y A LAS AUTORIDADES DEL COLEGIO CARDENAL COPELLO, POR EL DESARROLLO DE AGEUP: FUERA DE ÉPOCA, Y SE DISPONE LA ENTREGA DE DIPLOMAS</sumario>
+    <urlDoc>228384</urlDoc>
+  </expedienteAvanzado>
+  <expedienteAvanzado>
+    <id_expediente>143065</id_expediente>
+    <nro_de_expediente>3436-D-2026</nro_de_expediente>
+    <fch_inicio>2/11/2026 16:04:37</fch_inicio>
+    <autor_des>SALVATIERRA, ALEJANDRO</autor_des>
+    <coautores_des />
+    <autor_id>30941</autor_id>
+    <coautores_id />
+    <tipo_proyecto_des>DECLARACION</tipo_proyecto_des>
+    <fch_movimiento>3/11/2026 12:48:57</fch_movimiento>
+    <ubicacion_des>MEP</ubicacion_des>
+    <descripcion>ESPERANDO ENVIO A COMISION (ESPERANDO RECEPCION)</descripcion>
+    <id_proyecto_tipo>3</id_proyecto_tipo>
+    <id_business_party>51</id_business_party>
+    <nro_de_orden_JefeGob />
+    <TieneSancion>0</TieneSancion>
+    <sumario>SE DECLARA DE INTERÉS PARA LA COMUNICACIÓN SOCIAL EL LIBRO “ANTIRRACISMO. PENSAMIENTO Y PRAXIS EN CLAVE AFROLATINOAMERICANA” ESCRITO POR FEDERICO PITA.-</sumario>
+    <urlDoc>228383</urlDoc>
+  </expedienteAvanzado>
+  <expedienteAvanzado>
+    <id_expediente>143064</id_expediente>
+    <nro_de_expediente>3435-D-2026</nro_de_expediente>
+    <fch_inicio>2/11/2026 16:02:50</fch_inicio>
+    <autor_des>IAÑEZ, BERENICE</autor_des>
+    <coautores_des>BIELLI, MARÍA; GONZÁLEZ, ANDREA MARIANA</coautores_des>
+    <autor_id>30896</autor_id>
+    <coautores_id>30844, 30939</coautores_id>
+    <tipo_proyecto_des>RESOLUCION</tipo_proyecto_des>
+    <fch_movimiento>3/11/2026 12:47:14</fch_movimiento>
+    <ubicacion_des>MEP</ubicacion_des>
+    <descripcion>ESPERANDO ENVIO A COMISION (ESPERANDO RECEPCION)</descripcion>
+    <id_proyecto_tipo>2</id_proyecto_tipo>
+    <id_business_party>51</id_business_party>
+    <nro_de_orden_JefeGob />
+    <TieneSancion>0</TieneSancion>
+    <sumario>INFORMES REFERIDOS A CASA PUERTO, DEPENDIENTE DE LA DIRECCIÓN GENERAL DE POLÍTICAS SOCIALES EN ADICCIONES DEL MINISTERIO DE DESARROLLO HUMANO Y HÁBITAT.-</sumario>
+    <urlDoc>228382</urlDoc>
+  </expedienteAvanzado>
+  <expedienteAvanzado>
+    <id_expediente>143063</id_expediente>
+    <nro_de_expediente>3434-D-2026</nro_de_expediente>
+    <fch_inicio>2/11/2026 14:16:11</fch_inicio>
+    <autor_des>ROSSEN, BÁRBARA</autor_des>
+    <coautores_des />
+    <autor_id>30942</autor_id>
+    <coautores_id />
+    <tipo_proyecto_des>DECLARACION</tipo_proyecto_des>
+    <fch_movimiento>3/11/2026 12:46:50</fch_movimiento>
+    <ubicacion_des>MEP</ubicacion_des>
+    <descripcion>ESPERANDO ENVIO A COMISION (ESPERANDO RECEPCION)</descripcion>
+    <id_proyecto_tipo>3</id_proyecto_tipo>
+    <id_business_party>51</id_business_party>
+    <nro_de_orden_JefeGob />
+    <TieneSancion>0</TieneSancion>
+    <sumario>SE DECLARA DE INTERÉS PARA LA CULTURA Y LA COMUNICACIÓN SOCIAL EL LIBRO "LOS INMORTALES. UN CLÁSICO PORTEÑO DESDE 1951"</sumario>
+    <urlDoc>228381</urlDoc>
+  </expedienteAvanzado>
+  <expedienteAvanzado>
+    <id_expediente>143062</id_expediente>
+    <nro_de_expediente>3433-D-2026</nro_de_expediente>
+    <fch_inicio>2/11/2026 14:14:14</fch_inicio>
+    <autor_des>BARROETAVEÑA, MATÍAS</autor_des>
+    <coautores_des>GEMINIANI, NOEMÍ</coautores_des>
+    <autor_id>30841</autor_id>
+    <coautores_id>30940</coautores_id>
+    <tipo_proyecto_des>RESOLUCION</tipo_proyecto_des>
+    <fch_movimiento>3/11/2026 12:46:17</fch_movimiento>
+    <ubicacion_des>MEP</ubicacion_des>
+    <descripcion>ESPERANDO ENVIO A COMISION (ESPERANDO RECEPCION)</descripcion>
+    <id_proyecto_tipo>2</id_proyecto_tipo>
+    <id_business_party>51</id_business_party>
+    <nro_de_orden_JefeGob />
+    <TieneSancion>0</TieneSancion>
+    <sumario>INFORMES SOBRE DIVERSOS PUNTOS RESPECTO  DE EDIFICIOS DE VIVIENDA MULTIFAMILIARES</sumario>
+    <urlDoc>228380</urlDoc>
+  </expedienteAvanzado>
+  <expedienteAvanzado>
+    <id_expediente>143061</id_expediente>
+    <nro_de_expediente>3432-D-2026</nro_de_expediente>
+    <fch_inicio>2/11/2026 12:32:42</fch_inicio>
+    <autor_des>BARROETAVEÑA, MATÍAS</autor_des>
+    <coautores_des>GEMINIANI, NOEMÍ</coautores_des>
+    <autor_id>30841</autor_id>
+    <coautores_id>30940</coautores_id>
+    <tipo_proyecto_des>RESOLUCION</tipo_proyecto_des>
+    <fch_movimiento>3/11/2026 12:45:11</fch_movimiento>
+    <ubicacion_des>MEP</ubicacion_des>
+    <descripcion>ESPERANDO ENVIO A COMISION (ESPERANDO RECEPCION)</descripcion>
+    <id_proyecto_tipo>2</id_proyecto_tipo>
+    <id_business_party>51</id_business_party>
+    <nro_de_orden_JefeGob />
+    <TieneSancion>0</TieneSancion>
+    <sumario>INFORMES SOBRE LOS EXPEDIENTES ADMINISTRATIVOS TRAMITADOS MEDIANTE EL REGIMEN ESPECIAL DE REGULARIZACION DE CONSTRUCCIONES Y OBRAS LLEVADAS A CABO EN CONTRAVENCION , CREADO POR LA LEY 6478.-</sumario>
+    <urlDoc>228317</urlDoc>
+  </expedienteAvanzado>
+  <expedienteAvanzado>
+    <id_expediente>143060</id_expediente>
+    <nro_de_expediente>3431-D-2026</nro_de_expediente>
+    <fch_inicio>2/11/2026 12:27:46</fch_inicio>
+    <autor_des>MOLLARD, MARÍA FERNANDA</autor_des>
+    <coautores_des />
+    <autor_id>30908</autor_id>
+    <coautores_id />
+    <tipo_proyecto_des>DECLARACION</tipo_proyecto_des>
+    <fch_movimiento>3/11/2026 12:44:49</fch_movimiento>
+    <ubicacion_des>MEP</ubicacion_des>
+    <descripcion>ESPERANDO ENVIO A COMISION (ESPERANDO RECEPCION)</descripcion>
+    <id_proyecto_tipo>3</id_proyecto_tipo>
+    <id_business_party>51</id_business_party>
+    <nro_de_orden_JefeGob />
+    <TieneSancion>0</TieneSancion>
+    <sumario>SE CONMEMORA UN NUEVO ANIVERSARIO DE LA ELECCION GENERAL CELEBRADA EL 30 DE OCTUBRE DE 1983.-</sumario>
+    <urlDoc>228316</urlDoc>
+  </expedienteAvanzado>
+  <expedienteAvanzado>
+    <id_expediente>143059</id_expediente>
+    <nro_de_expediente>3430-D-2026</nro_de_expediente>
+    <fch_inicio>2/11/2026 12:19:25</fch_inicio>
+    <autor_des>BARROETAVEÑA, MATÍAS</autor_des>
+    <coautores_des>GEMINIANI, NOEMÍ</coautores_des>
+    <autor_id>30841</autor_id>
+    <coautores_id>30940</coautores_id>
+    <tipo_proyecto_des>DECLARACION</tipo_proyecto_des>
+    <fch_movimiento>3/11/2026 12:44:21</fch_movimiento>
+    <ubicacion_des>MEP</ubicacion_des>
+    <descripcion>ESPERANDO ENVIO A COMISION (ESPERANDO RECEPCION)</descripcion>
+    <id_proyecto_tipo>3</id_proyecto_tipo>
+    <id_business_party>51</id_business_party>
+    <nro_de_orden_JefeGob />
+    <TieneSancion>0</TieneSancion>
+    <sumario>SE DECLARA DE INTERES SOCIAL Y JURIDICO AL "CONGRESO NACIONAL DE PROPIEDAD HORIZONTAL " ORGANIZADO POR LA CAMARA ARGENTINA DE LA PROPIEDAD HORIZONTAL Y ACTIVIDADES INMOBILIARIAS (CAPHYAL) A REALIZARSE  LOS DIAS 12 Y 13 DE NOVIEMBRE EN LA SEDE DEL SCALA HOTEL.-</sumario>
+    <urlDoc>228315</urlDoc>
+  </expedienteAvanzado>
+  <expedienteAvanzado>
+    <id_expediente>143058</id_expediente>
+    <nro_de_expediente>3429-D-2026</nro_de_expediente>
+    <fch_inicio>2/11/2026 12:12:02</fch_inicio>
+    <autor_des>VELÁZQUEZ, DELFINA</autor_des>
+    <coautores_des>FREIRE, VICTORIA; LA BLUNDA, ANDRÉS; PEÑAFORT, GRACIANA</coautores_des>
+    <autor_id>30919</autor_id>
+    <coautores_id>30916, 30918, 30917</coautores_id>
+    <tipo_proyecto_des>DECLARACION</tipo_proyecto_des>
+    <fch_movimiento>3/11/2026 12:43:42</fch_movimiento>
+    <ubicacion_des>MEP</ubicacion_des>
+    <descripcion>ESPERANDO ENVIO A COMISION (ESPERANDO RECEPCION)</descripcion>
+    <id_proyecto_tipo>3</id_proyecto_tipo>
+    <id_business_party>51</id_business_party>
+    <nro_de_orden_JefeGob />
+    <TieneSancion>0</TieneSancion>
+    <sumario>SE DECLARA DE INTERES PARA LA PROMOCION Y DEFENSA DE LOS DERECHOS DE LAS MUJERES , GENEROS Y DIVERSIDADES A LA MUESTRA FOTOGARFICA "35 ORGULLOS : DEL EDICTO A LA LEY . MEMORIA , VISIBILIDAD Y LUCHA".-</sumario>
+    <urlDoc>228314</urlDoc>
+  </expedienteAvanzado>
+  <expedienteAvanzado>
+    <id_expediente>143057</id_expediente>
+    <nro_de_expediente>3428-D-2026</nro_de_expediente>
+    <fch_inicio>2/11/2026 12:07:36</fch_inicio>
+    <autor_des>VARTABEDIAN, DIEGO</autor_des>
+    <coautores_des />
+    <autor_id>30934</autor_id>
+    <coautores_id />
+    <tipo_proyecto_des>RESOLUCION</tipo_proyecto_des>
+    <fch_movimiento>3/11/2026 12:43:15</fch_movimiento>
+    <ubicacion_des>MEP</ubicacion_des>
+    <descripcion>ESPERANDO ENVIO A COMISION (ESPERANDO RECEPCION)</descripcion>
+    <id_proyecto_tipo>2</id_proyecto_tipo>
+    <id_business_party>51</id_business_party>
+    <nro_de_orden_JefeGob />
+    <TieneSancion>0</TieneSancion>
+    <sumario>BENEPLACITO POR LA CONSAGRACION DEL CLUB SOCIAL Y DEPORTIVO PINOCHO COMO CAMPEON DE LA COPA ARGENTINA DE FUTSAL MASCULINO . SE DISPONE LA ENTREGA DE UNA BANDEJA PROTOCOLAR.-</sumario>
+    <urlDoc>228313</urlDoc>
+  </expedienteAvanzado>
+  <expedienteAvanzado>
+    <id_expediente>143056</id_expediente>
+    <nro_de_expediente>3427-D-2026</nro_de_expediente>
+    <fch_inicio>2/11/2026 12:03:48</fch_inicio>
+    <autor_des>KIENAST, MARINA</autor_des>
+    <coautores_des>ARENAZA, JUAN PABLO; ERNST, MARCELO GREGORIO; FERNÁNDEZ, JUAN IGNACIO; FLEITAS, REBECA; FREGUIA, ANDREA; IMAS, SILVIA ; PELAYO, SOLANA; RAMÍREZ, MARÍA DEL PILAR; REY, SANDRA MÓNICA; SAIFERT, LEONARDO</coautores_des>
+    <autor_id>30886</autor_id>
+    <coautores_id>30680, 30951, 30935, 30899, 30933, 30910, 30931, 30921, 30923, 30900</coautores_id>
+    <tipo_proyecto_des>RESOLUCION</tipo_proyecto_des>
+    <fch_movimiento>3/11/2026 12:42:48</fch_movimiento>
+    <ubicacion_des>MEP</ubicacion_des>
+    <descripcion>ESPERANDO ENVIO A COMISION (ESPERANDO RECEPCION)</descripcion>
+    <id_proyecto_tipo>2</id_proyecto_tipo>
+    <id_business_party>51</id_business_party>
+    <nro_de_orden_JefeGob />
+    <TieneSancion>0</TieneSancion>
+    <sumario>INFORMES RESPECTO DE LAS LICENCIAS E INASISTENCIAS DEL PERSONAL DOCENTE DE LOS ESTABLECIMIENTOS EDUCATIVOS DE GESTION ESTATAL, CORRESPONDIENTES A LOS AÑOS 2024, 2025 Y 2026.-</sumario>
+    <urlDoc>228312</urlDoc>
+  </expedienteAvanzado>
+  <expedienteAvanzado>
+    <id_expediente>143055</id_expediente>
+    <nro_de_expediente>3426-D-2026</nro_de_expediente>
+    <fch_inicio>2/11/2026 10:03:19</fch_inicio>
+    <autor_des>LOUPIAS, FRANCISCO</autor_des>
+    <coautores_des>DEL GAISO, JUAN FACUNDO; GLIZE, PATRICIA INÉS</coautores_des>
+    <autor_id>30911</autor_id>
+    <coautores_id>30848, 30906</coautores_id>
+    <tipo_proyecto_des>RESOLUCION</tipo_proyecto_des>
+    <fch_movimiento>3/11/2026 12:42:21</fch_movimiento>
+    <ubicacion_des>MEP</ubicacion_des>
+    <descripcion>ESPERANDO ENVIO A COMISION (ESPERANDO RECEPCION)</descripcion>
+    <id_proyecto_tipo>2</id_proyecto_tipo>
+    <id_business_party>51</id_business_party>
+    <nro_de_orden_JefeGob />
+    <TieneSancion>0</TieneSancion>
+    <sumario>SE CONMEMORA EL 85° ANIVERSARIO DEL CLUB SOCIAL SPORTIVO DEVOTO  Y SE DISPONE LA COLOCACIÓN DE UNA PLACA</sumario>
+    <urlDoc>228311</urlDoc>
+  </expedienteAvanzado>
+  <expedienteAvanzado>
+    <id_expediente>143042</id_expediente>
+    <nro_de_expediente>3418-D-2026</nro_de_expediente>
+    <fch_inicio>30/10/2026 13:38:09</fch_inicio>
+    <autor_des>MONTENEGRO, LUCÍA</autor_des>
+    <coautores_des>FERNÁNDEZ, JUAN IGNACIO; SAIFERT, LEONARDO</coautores_des>
+    <autor_id>30898</autor_id>
+    <coautores_id>30935, 30900</coautores_id>
+    <tipo_proyecto_des>DECLARACION</tipo_proyecto_des>
+    <fch_movimiento>3/11/2026 12:41:13</fch_movimiento>
+    <ubicacion_des>MEP</ubicacion_des>
+    <descripcion>ESPERANDO ENVIO A COMISION (ESPERANDO RECEPCION)</descripcion>
+    <id_proyecto_tipo>3</id_proyecto_tipo>
+    <id_business_party>51</id_business_party>
+    <nro_de_orden_JefeGob />
+    <TieneSancion>0</TieneSancion>
+    <sumario>PESAR POR EL FALLECIMIENTO DEL VETERANO PILOTO DE MALVINAS, COMODORO (RE) CARLOS ALFREDO RINKE</sumario>
+    <urlDoc>228295</urlDoc>
+  </expedienteAvanzado>
+  <expedienteAvanzado>
+    <id_expediente>143038</id_expediente>
+    <nro_de_expediente>3414-D-2026</nro_de_expediente>
+    <fch_inicio>29/10/2026 16:10:01</fch_inicio>
+    <autor_des>TAGLIAFERRI, GUADALUPE</autor_des>
+    <coautores_des>ALIFRACO, EDGARDO NESTOR; NAGATA, SEBASTIÁN; OCAÑA, MARÍA GRACIELA</coautores_des>
+    <autor_id>30948</autor_id>
+    <coautores_id>30922, 30907, 30742</coautores_id>
+    <tipo_proyecto_des>RESOLUCION</tipo_proyecto_des>
+    <fch_movimiento>3/11/2026 11:28:43</fch_movimiento>
+    <ubicacion_des>SEGURIDAD</ubicacion_des>
+    <descripcion>EN COMISION</descripcion>
+    <id_proyecto_tipo>2</id_proyecto_tipo>
+    <id_business_party>543</id_business_party>
+    <nro_de_orden_JefeGob />
+    <TieneSancion>0</TieneSancion>
+    <sumario>INFORMES SOBRE LA SITUACIÓN ACTUAL DEL PREDIO CORRESPONDIENTE AL COMPLEJO PENITENCIARIO FEDERAL, UBICADO EN EL BARRIO DE VILLA DEVOTO</sumario>
+    <urlDoc>228288</urlDoc>
+  </expedienteAvanzado>
+  <expedienteAvanzado>
+    <id_expediente>143037</id_expediente>
+    <nro_de_expediente>3412-P-2026</nro_de_expediente>
+    <fch_inicio>29/10/2026 15:29:20</fch_inicio>
+    <autor_des>PEREZ, MARISA BEATRIZ</autor_des>
+    <coautores_des />
+    <autor_id>3233</autor_id>
+    <coautores_id />
+    <tipo_proyecto_des>HACE CONSIDERACIONES</tipo_proyecto_des>
+    <fch_movimiento>3/11/2026 11:20:19</fch_movimiento>
+    <ubicacion_des>PRESUPUESTO, HACIENDA, ADMINISTRACIÓN FINANCIERA Y POLÍTICA TRIBUTARIA</ubicacion_des>
+    <descripcion>EN COMISION</descripcion>
+    <id_proyecto_tipo>10</id_proyecto_tipo>
+    <id_business_party>539</id_business_party>
+    <nro_de_orden_JefeGob />
+    <TieneSancion>0</TieneSancion>
+    <sumario>SOBRE EL PRESUPUESTO 2027 Y EL ENCUADRE JURÍDICO DE FACOEP</sumario>
+    <urlDoc>228287</urlDoc>
+  </expedienteAvanzado>
+  <expedienteAvanzado>
+    <id_expediente>143008</id_expediente>
+    <nro_de_expediente>3383-J-2026</nro_de_expediente>
+    <fch_inicio>27/10/2026 16:24:44</fch_inicio>
+    <autor_des>JEFE DE GOBIERNO, </autor_des>
+    <coautores_des />
+    <autor_id>30598</autor_id>
+    <coautores_id />
+    <tipo_proyecto_des>LEY</tipo_proyecto_des>
+    <fch_movimiento>3/11/2026 11:20:00</fch_movimiento>
+    <ubicacion_des>PRESUPUESTO, HACIENDA, ADMINISTRACIÓN FINANCIERA Y POLÍTICA TRIBUTARIA</ubicacion_des>
+    <descripcion>EN COMISION</descripcion>
+    <id_proyecto_tipo>1</id_proyecto_tipo>
+    <id_business_party>539</id_business_party>
+    <nro_de_orden_JefeGob>46849032</nro_de_orden_JefeGob>
+    <TieneSancion>0</TieneSancion>
+    <sumario>HOMOLOGACIÓN DE CONDONACIONES DE DEUDAS CONFORME LO DISPUESTO POR EL ART. 188 DEL CÓDIGO FISCAL.-</sumario>
+    <urlDoc>228213</urlDoc>
+  </expedienteAvanzado>
+  <expedienteAvanzado>
+    <id_expediente>143013</id_expediente>
+    <nro_de_expediente>3388-E-2026</nro_de_expediente>
+    <fch_inicio>28/10/2026 12:52:59</fch_inicio>
+    <autor_des>INSTITUTO, REGINA VIRGINUM ADORATRICES</autor_des>
+    <coautores_des />
+    <autor_id>2283</autor_id>
+    <coautores_id />
+    <tipo_proyecto_des>ESCUELAS</tipo_proyecto_des>
+    <fch_movimiento>3/11/2026 09:44:59</fch_movimiento>
+    <ubicacion_des>TRÁNSITO Y TRANSPORTE</ubicacion_des>
+    <descripcion>EN COMISION</descripcion>
+    <id_proyecto_tipo>6</id_proyecto_tipo>
+    <id_business_party>544</id_business_party>
+    <nro_de_orden_JefeGob />
+    <TieneSancion>0</TieneSancion>
+    <sumario>PRUEBA PILOTO PARA LA CIRCULACIÓN SEGURA Y RESPONSABLE DE VEHÍCULOS DE MOVILIDAD PERSONAL. (VMP) - MONOPATINES ELÉCTRICOS</sumario>
+    <urlDoc>228250</urlDoc>
+  </expedienteAvanzado>
+  <expedienteAvanzado>
+    <id_expediente>143035</id_expediente>
+    <nro_de_expediente>3411-D-2026</nro_de_expediente>
+    <fch_inicio>29/10/2026 14:32:58</fch_inicio>
+    <autor_des>TAGLIAFERRI, GUADALUPE</autor_des>
+    <coautores_des>THOURTE, MANUELA</coautores_des>
+    <autor_id>30948</autor_id>
+    <coautores_id>30858</coautores_id>
+    <tipo_proyecto_des>LEY</tipo_proyecto_des>
+    <fch_movimiento>2/11/2026 17:45:21</fch_movimiento>
+    <ubicacion_des>MUJERES, GÉNEROS Y DIVERSIDADES</ubicacion_des>
+    <descripcion>EN COMISION</descripcion>
+    <id_proyecto_tipo>1</id_proyecto_tipo>
+    <id_business_party>535</id_business_party>
+    <nro_de_orden_JefeGob />
+    <TieneSancion>0</TieneSancion>
+    <sumario>ESTÁNDARES MÍNIMOS DE LOS CENTROS INTEGRALES DE LA MUJER</sumario>
+    <urlDoc>228285</urlDoc>
+  </expedienteAvanzado>
+  <expedienteAvanzado>
+    <id_expediente>143030</id_expediente>
+    <nro_de_expediente>3405-D-2026</nro_de_expediente>
+    <fch_inicio>29/10/2026 11:51:23</fch_inicio>
+    <autor_des>BIELLI, MARÍA</autor_des>
+    <coautores_des>BARROETAVEÑA, MATÍAS; CAPORICCIO, FRANCISCO; FERREÑO, CLAUDIO AMÉRICO; FREIRE, VICTORIA; GEMINIANI, NOEMÍ; GONZÁLEZ, ANDREA MARIANA; GRILLO, ALEJANDRO OMAR; IAÑEZ, BERENICE; LA BLUNDA, ANDRÉS; LAMMENS , MATÍAS; MOCHI, FEDERICO; MODARELLI, JUAN PABLO; NEGRI, CLAUDIA; NEIRA, CLAUDIA; PEÑAFORT, GRACIANA; ROSSEN, BÁRBARA; SALVATIERRA, ALEJANDRO; SANTORO, LEANDRO; VELÁZQUEZ, DELFINA</coautores_des>
+    <autor_id>30844</autor_id>
+    <coautores_id>30841, 30943, 30561, 30916, 30940, 30939, 30915, 30896, 30918, 30914, 30938, 30892, 30936, 30716, 30917, 30942, 30941, 30823, 30919</coautores_id>
+    <tipo_proyecto_des>DECLARACION</tipo_proyecto_des>
+    <fch_movimiento>2/11/2026 17:45:12</fch_movimiento>
+    <ubicacion_des>MUJERES, GÉNEROS Y DIVERSIDADES</ubicacion_des>
+    <descripcion>EN COMISION</descripcion>
+    <id_proyecto_tipo>3</id_proyecto_tipo>
+    <id_business_party>535</id_business_party>
+    <nro_de_orden_JefeGob />
+    <TieneSancion>0</TieneSancion>
+    <sumario>PREOCUPACIÓN POR EL FEMICIDIO DE LA MAESTRA RURAL CORRENTINA NANCY ESTELA GODOY</sumario>
+    <urlDoc>228276</urlDoc>
+  </expedienteAvanzado>
+  <expedienteAvanzado>
+    <id_expediente>143036</id_expediente>
+    <nro_de_expediente>3413-D-2026</nro_de_expediente>
+    <fch_inicio>29/10/2026 15:35:42</fch_inicio>
+    <autor_des>REY, SANDRA MÓNICA</autor_des>
+    <coautores_des>ERNST, MARCELO GREGORIO; FERNÁNDEZ, JUAN IGNACIO; FREGUIA, ANDREA; SAIFERT, LEONARDO</coautores_des>
+    <autor_id>30923</autor_id>
+    <coautores_id>30951, 30935, 30933, 30900</coautores_id>
+    <tipo_proyecto_des>RESOLUCION</tipo_proyecto_des>
+    <fch_movimiento>2/11/2026 14:47:06</fch_movimiento>
+    <ubicacion_des>CULTURA</ubicacion_des>
+    <descripcion>EN COMISION</descripcion>
+    <id_proyecto_tipo>2</id_proyecto_tipo>
+    <id_business_party>512</id_business_party>
+    <nro_de_orden_JefeGob />
+    <TieneSancion>0</TieneSancion>
+    <sumario>COLOCACIÓN DE UNA PLACA DE HOMENAJE EN LA CATEDRAL METROPOLITANA DE BUENOS AIRES EN HONOR A SU SANTIDAD EL PAPA FRANCISCO</sumario>
+    <urlDoc>228286</urlDoc>
+  </expedienteAvanzado>
+  <expedienteAvanzado>
+    <id_expediente>143007</id_expediente>
+    <nro_de_expediente>3407-D-2026</nro_de_expediente>
+    <fch_inicio>29/10/2026 12:01:17</fch_inicio>
+    <autor_des>SUÁREZ, GUILLERMO </autor_des>
+    <coautores_des>GRILLO, ALEJANDRO OMAR; LÓPEZ, MATÍAS DAMIÁN; THOURTE, MANUELA</coautores_des>
+    <autor_id>30814</autor_id>
+    <coautores_id>30915, 30853, 30858</coautores_id>
+    <tipo_proyecto_des>DECLARACION</tipo_proyecto_des>
+    <fch_movimiento>2/11/2026 14:47:01</fch_movimiento>
+    <ubicacion_des>CULTURA</ubicacion_des>
+    <descripcion>EN COMISION</descripcion>
+    <id_proyecto_tipo>3</id_proyecto_tipo>
+    <id_business_party>512</id_business_party>
+    <nro_de_orden_JefeGob />
+    <TieneSancion>0</TieneSancion>
+    <sumario>SE DECLARA PERSONALIDAD DESTACADA EN EL ÁMBITO DE LA CULTURA AL ACTOR, DIRECTOR Y DRAMATURGO MAURICIO DAYUB</sumario>
+    <urlDoc>228212</urlDoc>
+  </expedienteAvanzado>
+  <expedienteAvanzado>
+    <id_expediente>143023</id_expediente>
+    <nro_de_expediente>3398-D-2026</nro_de_expediente>
+    <fch_inicio>28/10/2026 16:12:12</fch_inicio>
+    <autor_des>GEMINIANI, NOEMÍ</autor_des>
+    <coautores_des>BARROETAVEÑA, MATÍAS</coautores_des>
+    <autor_id>30940</autor_id>
+    <coautores_id>30841</coautores_id>
+    <tipo_proyecto_des>DECLARACION</tipo_proyecto_des>
+    <fch_movimiento>2/11/2026 14:46:47</fch_movimiento>
+    <ubicacion_des>CULTURA</ubicacion_des>
+    <descripcion>EN COMISION</descripcion>
+    <id_proyecto_tipo>3</id_proyecto_tipo>
+    <id_business_party>512</id_business_party>
+    <nro_de_orden_JefeGob />
+    <TieneSancion>0</TieneSancion>
+    <sumario>SE DECLARA DE INTERÉS CULTURAL LAS ACTIVIDADES DESARROLLADAS POR LA PEÑA FOLKLÓRICA “USA PUKA” DEL CLUB ATLÉTICO ARGENTINOS JUNIORS</sumario>
+    <urlDoc>228262</urlDoc>
+  </expedienteAvanzado>
+  <expedienteAvanzado>
+    <id_expediente>143021</id_expediente>
+    <nro_de_expediente>3396-D-2026</nro_de_expediente>
+    <fch_inicio>28/10/2026 16:07:49</fch_inicio>
+    <autor_des>LA BLUNDA, ANDRÉS</autor_des>
+    <coautores_des />
+    <autor_id>30918</autor_id>
+    <coautores_id />
+    <tipo_proyecto_des>RESOLUCION</tipo_proyecto_des>
+    <fch_movimiento>2/11/2026 14:36:38</fch_movimiento>
+    <ubicacion_des>CULTURA</ubicacion_des>
+    <descripcion>EN COMISION</descripcion>
+    <id_proyecto_tipo>2</id_proyecto_tipo>
+    <id_business_party>512</id_business_party>
+    <nro_de_orden_JefeGob />
+    <TieneSancion>0</TieneSancion>
+    <sumario>INFORMES REFERIDOS AL CUMPLIMIENTO DE LA ORDENANZA 45125 Y A LA IMPLEMENTACIÓN DE LA LEY 6127, QUE CREA EL “PASEO DE LAS INVASIONES INGLESAS”</sumario>
+    <urlDoc>228260</urlDoc>
+  </expedienteAvanzado>
+  <expedienteAvanzado>
+    <id_expediente>143018</id_expediente>
+    <nro_de_expediente>3393-D-2026</nro_de_expediente>
+    <fch_inicio>28/10/2026 14:34:43</fch_inicio>
+    <autor_des>WOLFF, WALDO</autor_des>
+    <coautores_des>ALONSO, LAURA; DEL GAISO, JUAN FACUNDO; DONATI, PABLO ALEJANDRO; GLIZE, PATRICIA INÉS; IMAS, SILVIA ; LOSPENNATO, SILVIA; PARERA, IGNACIO JOSÉ</coautores_des>
+    <autor_id>30952</autor_id>
+    <coautores_id>30946, 30848, 30913, 30906, 30910, 30944, 30909</coautores_id>
+    <tipo_proyecto_des>DECLARACION</tipo_proyecto_des>
+    <fch_movimiento>2/11/2026 14:36:14</fch_movimiento>
+    <ubicacion_des>CULTURA</ubicacion_des>
+    <descripcion>EN COMISION</descripcion>
+    <id_proyecto_tipo>3</id_proyecto_tipo>
+    <id_business_party>512</id_business_party>
+    <nro_de_orden_JefeGob />
+    <TieneSancion>0</TieneSancion>
+    <sumario>BENEPLÁCITO POR LA CELEBRACIÓN DE LA FESTIVIDAD DE JÁNUCA</sumario>
+    <urlDoc>228257</urlDoc>
+  </expedienteAvanzado>
+  <expedienteAvanzado>
+    <id_expediente>143053</id_expediente>
+    <nro_de_expediente>3424-D-2026</nro_de_expediente>
+    <fch_inicio>30/10/2026 16:17:40</fch_inicio>
+    <autor_des>FERREÑO, CLAUDIO AMÉRICO</autor_des>
+    <coautores_des>IAÑEZ, BERENICE</coautores_des>
+    <autor_id>30561</autor_id>
+    <coautores_id>30896</coautores_id>
+    <tipo_proyecto_des>DECLARACION</tipo_proyecto_des>
+    <fch_movimiento>2/11/2026 14:31:00</fch_movimiento>
+    <ubicacion_des>MEP</ubicacion_des>
+    <descripcion>ESPERANDO ENVIO A COMISION (ESPERANDO RECEPCION)</descripcion>
+    <id_proyecto_tipo>3</id_proyecto_tipo>
+    <id_business_party>51</id_business_party>
+    <nro_de_orden_JefeGob />
+    <TieneSancion>0</TieneSancion>
+    <sumario>DECLÁRASE DE INTERÉS SOCIAL Y CULTURAL EL PROYECTO DE DIVULGACIÓN DE LA ENCÍCLICA MAGNIFICA HUMANITAS DEL PAPA LEÓN XIV</sumario>
+    <urlDoc>228308</urlDoc>
+  </expedienteAvanzado>
+  <expedienteAvanzado>
+    <id_expediente>143052</id_expediente>
+    <nro_de_expediente>3423-P-2026</nro_de_expediente>
+    <fch_inicio>30/10/2026 16:12:16</fch_inicio>
+    <autor_des>VITULLO ETCHEVERRY, GISELLE BERENICE</autor_des>
+    <coautores_des />
+    <autor_id>3234</autor_id>
+    <coautores_id />
+    <tipo_proyecto_des>HACE CONSIDERACIONES</tipo_proyecto_des>
+    <fch_movimiento>2/11/2026 14:30:22</fch_movimiento>
+    <ubicacion_des>MEP</ubicacion_des>
+    <descripcion>ESPERANDO ENVIO A COMISION (ESPERANDO RECEPCION)</descripcion>
+    <id_proyecto_tipo>10</id_proyecto_tipo>
+    <id_business_party>51</id_business_party>
+    <nro_de_orden_JefeGob />
+    <TieneSancion>0</TieneSancion>
+    <sumario>SOBRE IMPOSICION DEL NOMBRE "MARÍA ESTER PERALTA" A LA ESCUELA DE EDUCACIÓN MEDIA N° 6 DISTRITO ESCOLAR 5°, SITA EN LA VILLA 21-24 / ZAVALETA</sumario>
+    <urlDoc>228306</urlDoc>
+  </expedienteAvanzado>
+  <expedienteAvanzado>
+    <id_expediente>143046</id_expediente>
+    <nro_de_expediente>3422-D-2026</nro_de_expediente>
+    <fch_inicio>30/10/2026 15:44:10</fch_inicio>
+    <autor_des>TAGLIAFERRI, GUADALUPE</autor_des>
+    <coautores_des />
+    <autor_id>30948</autor_id>
+    <coautores_id />
+    <tipo_proyecto_des>DECLARACION</tipo_proyecto_des>
+    <fch_movimiento>2/11/2026 14:28:50</fch_movimiento>
+    <ubicacion_des>MEP</ubicacion_des>
+    <descripcion>ESPERANDO ENVIO A COMISION (ESPERANDO RECEPCION)</descripcion>
+    <id_proyecto_tipo>3</id_proyecto_tipo>
+    <id_business_party>51</id_business_party>
+    <nro_de_orden_JefeGob />
+    <TieneSancion>0</TieneSancion>
+    <sumario>SE DECLARA DE INTERÉS CULTURAL EL LIBRO “INCONSCIENTE COLECTIVO”</sumario>
+    <urlDoc>228305</urlDoc>
+  </expedienteAvanzado>
+  <expedienteAvanzado>
+    <id_expediente>143045</id_expediente>
+    <nro_de_expediente>3421-D-2026</nro_de_expediente>
+    <fch_inicio>30/10/2026 15:42:20</fch_inicio>
+    <autor_des>LA BLUNDA, ANDRÉS</autor_des>
+    <coautores_des />
+    <autor_id>30918</autor_id>
+    <coautores_id />
+    <tipo_proyecto_des>DECLARACION</tipo_proyecto_des>
+    <fch_movimiento>2/11/2026 14:27:26</fch_movimiento>
+    <ubicacion_des>MEP</ubicacion_des>
+    <descripcion>ESPERANDO ENVIO A COMISION (ESPERANDO RECEPCION)</descripcion>
+    <id_proyecto_tipo>3</id_proyecto_tipo>
+    <id_business_party>51</id_business_party>
+    <nro_de_orden_JefeGob />
+    <TieneSancion>0</TieneSancion>
+    <sumario>SE DECLARA DE INTERÉS PARA LA PROMOCIÓN Y DEFENSA DE LOS DERECHOS HUMANOS AL LIBRO EL OVILLO Y LAS VOCES</sumario>
+    <urlDoc>228301</urlDoc>
+  </expedienteAvanzado>
+  <expedienteAvanzado>
+    <id_expediente>143044</id_expediente>
+    <nro_de_expediente>3420-D-2026</nro_de_expediente>
+    <fch_inicio>30/10/2026 14:19:18</fch_inicio>
+    <autor_des>TAGLIAFERRI, GUADALUPE</autor_des>
+    <coautores_des />
+    <autor_id>30948</autor_id>
+    <coautores_id />
+    <tipo_proyecto_des>RESOLUCION</tipo_proyecto_des>
+    <fch_movimiento>2/11/2026 14:26:07</fch_movimiento>
+    <ubicacion_des>MEP</ubicacion_des>
+    <descripcion>ESPERANDO ENVIO A COMISION (ESPERANDO RECEPCION)</descripcion>
+    <id_proyecto_tipo>2</id_proyecto_tipo>
+    <id_business_party>51</id_business_party>
+    <nro_de_orden_JefeGob />
+    <TieneSancion>0</TieneSancion>
+    <sumario>INFORMES RESPECTO DEL ESTADO ACTUAL DE LA PLAZOLETA VICENTE BELLINI</sumario>
+    <urlDoc>228298</urlDoc>
+  </expedienteAvanzado>
+  <expedienteAvanzado>
+    <id_expediente>143043</id_expediente>
+    <nro_de_expediente>3419-D-2026</nro_de_expediente>
+    <fch_inicio>30/10/2026 14:01:10</fch_inicio>
+    <autor_des>ARENAZA, JUAN PABLO</autor_des>
+    <coautores_des />
+    <autor_id>30680</autor_id>
+    <coautores_id />
+    <tipo_proyecto_des>DECLARACION</tipo_proyecto_des>
+    <fch_movimiento>2/11/2026 14:24:47</fch_movimiento>
+    <ubicacion_des>MEP</ubicacion_des>
+    <descripcion>ESPERANDO ENVIO A COMISION (ESPERANDO RECEPCION)</descripcion>
+    <id_proyecto_tipo>3</id_proyecto_tipo>
+    <id_business_party>51</id_business_party>
+    <nro_de_orden_JefeGob />
+    <TieneSancion>0</TieneSancion>
+    <sumario>SE DECLARA DE INTERÉS CULTURAL EL ENCUENTRO ORGANIZADO POR LOS ROTARY CLUBES DE BUENOS AIRES, ASUNCIÓN Y LA PAZ</sumario>
+    <urlDoc>228297</urlDoc>
+  </expedienteAvanzado>
+  <expedienteAvanzado>
+    <id_expediente>143041</id_expediente>
+    <nro_de_expediente>3417-D-2026</nro_de_expediente>
+    <fch_inicio>30/10/2026 13:36:24</fch_inicio>
+    <autor_des>CRUCITTA, ALDANA BELÉN</autor_des>
+    <coautores_des />
+    <autor_id>30912</autor_id>
+    <coautores_id />
+    <tipo_proyecto_des>DECLARACION</tipo_proyecto_des>
+    <fch_movimiento>2/11/2026 14:22:00</fch_movimiento>
+    <ubicacion_des>MEP</ubicacion_des>
+    <descripcion>ESPERANDO ENVIO A COMISION (ESPERANDO RECEPCION)</descripcion>
+    <id_proyecto_tipo>3</id_proyecto_tipo>
+    <id_business_party>51</id_business_party>
+    <nro_de_orden_JefeGob />
+    <TieneSancion>0</TieneSancion>
+    <sumario>SE DECLARA DE INTERÉS PARA LA COMUNICACIÓN SOCIAL LA PUBLICACIÓN DEL LIBRO “FORO FEDERAL DE CONSEJOS DE LA MAGISTRATURA Y JURADOS DE ENJUICIAMIENTO DE LA REPÚBLICA ARGENTINA: TERCERA EDICIÓN FEDERAL COMPARADA”</sumario>
+    <urlDoc>228294</urlDoc>
+  </expedienteAvanzado>
+  <expedienteAvanzado>
+    <id_expediente>143040</id_expediente>
+    <nro_de_expediente>3416-D-2026</nro_de_expediente>
+    <fch_inicio>30/10/2026 12:14:51</fch_inicio>
+    <autor_des>CAPORICCIO, FRANCISCO</autor_des>
+    <coautores_des />
+    <autor_id>30943</autor_id>
+    <coautores_id />
+    <tipo_proyecto_des>RESOLUCION</tipo_proyecto_des>
+    <fch_movimiento>2/11/2026 14:20:08</fch_movimiento>
+    <ubicacion_des>MEP</ubicacion_des>
+    <descripcion>ESPERANDO ENVIO A COMISION (ESPERANDO RECEPCION)</descripcion>
+    <id_proyecto_tipo>2</id_proyecto_tipo>
+    <id_business_party>51</id_business_party>
+    <nro_de_orden_JefeGob />
+    <TieneSancion>0</TieneSancion>
+    <sumario>INFORMES SOBRE LOS CONTRATOS DE"GESTIÓN, OPERACIÓN Y MANTENIMIENTO INTEGRAL DEL RECURSO FÍSICO, EDIFICIOS E INSTALACIONES, Y LIMPIEZA Y MANEJO INTERNO DE LOS RESIDUOS HOSPITALARIOS" ADJUDICADOS A PARTIR DE LAS LICITACIONES PÚBLICAS 73/SIGAF/14, 82/SIGAF/14 Y 85/SIGAF/14</sumario>
+    <urlDoc>228292</urlDoc>
+  </expedienteAvanzado>
+  <expedienteAvanzado>
+    <id_expediente>143031</id_expediente>
+    <nro_de_expediente>3406-D-2026</nro_de_expediente>
+    <fch_inicio>29/10/2026 11:56:47</fch_inicio>
+    <autor_des>ALONSO, LAURA</autor_des>
+    <coautores_des>CRUCITTA, ALDANA BELÉN; DEL GAISO, JUAN FACUNDO; DONATI, PABLO ALEJANDRO; GLIZE, PATRICIA INÉS; PARERA, IGNACIO JOSÉ; WOLFF, WALDO</coautores_des>
+    <autor_id>30946</autor_id>
+    <coautores_id>30912, 30848, 30913, 30906, 30909, 30952</coautores_id>
+    <tipo_proyecto_des>DECLARACION</tipo_proyecto_des>
+    <fch_movimiento>2/11/2026 14:17:02</fch_movimiento>
+    <ubicacion_des>COMUNICACIÓN SOCIAL, MEDIOS DE COMUNICACIÓN Y TECNOLOGÍAS DE LA COMUNICACIÓN</ubicacion_des>
+    <descripcion>EN COMISION</descripcion>
+    <id_proyecto_tipo>3</id_proyecto_tipo>
+    <id_business_party>511</id_business_party>
+    <nro_de_orden_JefeGob />
+    <TieneSancion>0</TieneSancion>
+    <sumario>SE DECLARA DE INTERÉS PARA LA COMUNICACIÓN SOCIAL Y LA CULTURA AL LIBRO “LA HUELLA DEMOCRÁTICA. POLÍTICA Y ECONOMÍA EN EL PERÍODO 1983- 1989”</sumario>
+    <urlDoc>228278</urlDoc>
+  </expedienteAvanzado>
+  <expedienteAvanzado>
+    <id_expediente>143020</id_expediente>
+    <nro_de_expediente>3395-D-2026</nro_de_expediente>
+    <fch_inicio>28/10/2026 16:05:48</fch_inicio>
+    <autor_des>LA BLUNDA, ANDRÉS</autor_des>
+    <coautores_des />
+    <autor_id>30918</autor_id>
+    <coautores_id />
+    <tipo_proyecto_des>DECLARACION</tipo_proyecto_des>
+    <fch_movimiento>2/11/2026 14:16:53</fch_movimiento>
+    <ubicacion_des>COMUNICACIÓN SOCIAL, MEDIOS DE COMUNICACIÓN Y TECNOLOGÍAS DE LA COMUNICACIÓN</ubicacion_des>
+    <descripcion>EN COMISION</descripcion>
+    <id_proyecto_tipo>3</id_proyecto_tipo>
+    <id_business_party>511</id_business_party>
+    <nro_de_orden_JefeGob />
+    <TieneSancion>0</TieneSancion>
+    <sumario>SE DECLARA DE INTERÉS PARA LA COMUNICACIÓN SOCIAL, EL LIBRO “ARGENTINA SANGRA POR LAS BARRANCAS DEL RÍO PARANÁ”</sumario>
+    <urlDoc>228259</urlDoc>
+  </expedienteAvanzado>
+  <expedienteAvanzado>
+    <id_expediente>143010</id_expediente>
+    <nro_de_expediente>3385-E-2026</nro_de_expediente>
+    <fch_inicio>28/10/2026 12:38:09</fch_inicio>
+    <autor_des>ESCUELA, CRISTIANA EVANGELICA ARGENTINA</autor_des>
+    <coautores_des />
+    <autor_id>2050</autor_id>
+    <coautores_id />
+    <tipo_proyecto_des>ESCUELAS</tipo_proyecto_des>
+    <fch_movimiento>2/11/2026 14:13:28</fch_movimiento>
+    <ubicacion_des>AMBIENTE</ubicacion_des>
+    <descripcion>EN COMISION</descripcion>
+    <id_proyecto_tipo>6</id_proyecto_tipo>
+    <id_business_party>519</id_business_party>
+    <nro_de_orden_JefeGob />
+    <TieneSancion>0</TieneSancion>
+    <sumario>“ROOT BARRIER: RAÍCES BAJO CONTROL”</sumario>
+    <urlDoc>228247</urlDoc>
+  </expedienteAvanzado>
+  <expedienteAvanzado>
+    <id_expediente>143032</id_expediente>
+    <nro_de_expediente>3408-D-2026</nro_de_expediente>
+    <fch_inicio>29/10/2026 12:02:47</fch_inicio>
+    <autor_des>SUÁREZ, GUILLERMO </autor_des>
+    <coautores_des>THOURTE, MANUELA</coautores_des>
+    <autor_id>30814</autor_id>
+    <coautores_id>30858</coautores_id>
+    <tipo_proyecto_des>LEY</tipo_proyecto_des>
+    <fch_movimiento>2/11/2026 14:11:33</fch_movimiento>
+    <ubicacion_des>OBRAS Y SERVICIOS PÚBLICOS</ubicacion_des>
+    <descripcion>EN COMISION</descripcion>
+    <id_proyecto_tipo>1</id_proyecto_tipo>
+    <id_business_party>536</id_business_party>
+    <nro_de_orden_JefeGob />
+    <TieneSancion>0</TieneSancion>
+    <sumario>EXTENSIÓN DE LA TRINCHERA DEL FERROCARRIL SARMIENTO —
+TRAMO CABALLITO-LINIERS</sumario>
+    <urlDoc>228280</urlDoc>
+  </expedienteAvanzado>
+  <expedienteAvanzado>
+    <id_expediente>143016</id_expediente>
+    <nro_de_expediente>3391-E-2026</nro_de_expediente>
+    <fch_inicio>28/10/2026 13:12:20</fch_inicio>
+    <autor_des>INSTITUTO, SAN COSME Y SAN DAMIAN</autor_des>
+    <coautores_des />
+    <autor_id>2032</autor_id>
+    <coautores_id />
+    <tipo_proyecto_des>ESCUELAS</tipo_proyecto_des>
+    <fch_movimiento>2/11/2026 13:56:53</fch_movimiento>
+    <ubicacion_des>PLANEAMIENTO URBANO</ubicacion_des>
+    <descripcion>EN COMISION</descripcion>
+    <id_proyecto_tipo>6</id_proyecto_tipo>
+    <id_business_party>537</id_business_party>
+    <nro_de_orden_JefeGob />
+    <TieneSancion>0</TieneSancion>
+    <sumario>LEY DE CUBIERTAS VEGETALES OBLIGATORIAS</sumario>
+    <urlDoc>228255</urlDoc>
+  </expedienteAvanzado>
+  <expedienteAvanzado>
+    <id_expediente>143006</id_expediente>
+    <nro_de_expediente>3382-P-2026</nro_de_expediente>
+    <fch_inicio>27/10/2026 15:56:08</fch_inicio>
+    <autor_des>INFANTE, MERCEDES</autor_des>
+    <coautores_des />
+    <autor_id>3071</autor_id>
+    <coautores_id />
+    <tipo_proyecto_des>HACE CONSIDERACIONES</tipo_proyecto_des>
+    <fch_movimiento>2/11/2026 13:56:34</fch_movimiento>
+    <ubicacion_des>PLANEAMIENTO URBANO</ubicacion_des>
+    <descripcion>EN COMISION</descripcion>
+    <id_proyecto_tipo>10</id_proyecto_tipo>
+    <id_business_party>537</id_business_party>
+    <nro_de_orden_JefeGob />
+    <TieneSancion>0</TieneSancion>
+    <sumario>SOBRE REVITALIZACIÓN URBANA DE UN SECTOR  DEL BARRIO DE CONSTITUCIÓN</sumario>
+    <urlDoc>228200</urlDoc>
+  </expedienteAvanzado>
+  <expedienteAvanzado>
+    <id_expediente>143017</id_expediente>
+    <nro_de_expediente>3392-D-2026</nro_de_expediente>
+    <fch_inicio>28/10/2026 14:32:59</fch_inicio>
+    <autor_des>WOLFF, WALDO</autor_des>
+    <coautores_des>ALONSO, LAURA; DEL GAISO, JUAN FACUNDO; DONATI, PABLO ALEJANDRO; FIGUEROA, ROCÍO; GLIZE, PATRICIA INÉS; IMAS, SILVIA ; LOSPENNATO, SILVIA; PARERA, IGNACIO JOSÉ</coautores_des>
+    <autor_id>30952</autor_id>
+    <coautores_id>30946, 30848, 30913, 30947, 30906, 30910, 30944, 30909</coautores_id>
+    <tipo_proyecto_des>DECLARACION</tipo_proyecto_des>
+    <fch_movimiento>2/11/2026 11:27:04</fch_movimiento>
+    <ubicacion_des>DERECHOS HUMANOS, GARANTÍAS Y ANTIDISCRIMINACIÓN</ubicacion_des>
+    <descripcion>EN COMISION</descripcion>
+    <id_proyecto_tipo>3</id_proyecto_tipo>
+    <id_business_party>515</id_business_party>
+    <nro_de_orden_JefeGob />
+    <TieneSancion>0</TieneSancion>
+    <sumario>SE ADHIERE AL DÍA INTERNACIONAL DE CONMEMORACIÓN EN MEMORIA DE LAS VÍCTIMAS DEL HOLOCAUSTO</sumario>
+    <urlDoc>228256</urlDoc>
+  </expedienteAvanzado>
+  <expedienteAvanzado>
+    <id_expediente>143024</id_expediente>
+    <nro_de_expediente>3399-F-2026</nro_de_expediente>
+    <fch_inicio>28/10/2026 16:22:00</fch_inicio>
+    <autor_des>DEFENSOR DEL  PUEBLO, </autor_des>
+    <coautores_des />
+    <autor_id>30486</autor_id>
+    <coautores_id />
+    <tipo_proyecto_des>LEY</tipo_proyecto_des>
+    <fch_movimiento>2/11/2026 11:26:01</fch_movimiento>
+    <ubicacion_des>VIVIENDA</ubicacion_des>
+    <descripcion>EN COMISION</descripcion>
+    <id_proyecto_tipo>1</id_proyecto_tipo>
+    <id_business_party>546</id_business_party>
+    <nro_de_orden_JefeGob />
+    <TieneSancion>0</TieneSancion>
+    <sumario>SE MODIFICA LA LEY 52 - HERENCIAS VACANTES-</sumario>
+    <urlDoc>228263</urlDoc>
+  </expedienteAvanzado>
+  <expedienteAvanzado>
+    <id_expediente>143039</id_expediente>
+    <nro_de_expediente>3415-D-2026</nro_de_expediente>
+    <fch_inicio>29/10/2026 16:50:18</fch_inicio>
+    <autor_des>SUÁREZ, GUILLERMO </autor_des>
+    <coautores_des />
+    <autor_id>30814</autor_id>
+    <coautores_id />
+    <tipo_proyecto_des>DECLARACION</tipo_proyecto_des>
+    <fch_movimiento>2/11/2026 11:16:19</fch_movimiento>
+    <ubicacion_des>SALUD</ubicacion_des>
+    <descripcion>EN COMISION</descripcion>
+    <id_proyecto_tipo>3</id_proyecto_tipo>
+    <id_business_party>542</id_business_party>
+    <nro_de_orden_JefeGob />
+    <TieneSancion>0</TieneSancion>
+    <sumario>SE DECLARA PERSONALIDAD DESTACADA EN EL ÁMBITO DE LAS CIENCIAS MÉDICAS Y DE LA SALUD A LA LICENCIADA EN ENFERMERÍA ELENA PERICH.</sumario>
+    <urlDoc>228289</urlDoc>
+  </expedienteAvanzado>
+  <expedienteAvanzado>
+    <id_expediente>143014</id_expediente>
+    <nro_de_expediente>3389-E-2026</nro_de_expediente>
+    <fch_inicio>28/10/2026 13:02:24</fch_inicio>
+    <autor_des>COLEGIO Nº 1 D.E 3 BERNARDINO RIVADAVIA, </autor_des>
+    <coautores_des />
+    <autor_id>391</autor_id>
+    <coautores_id />
+    <tipo_proyecto_des>ESCUELAS</tipo_proyecto_des>
+    <fch_movimiento>2/11/2026 11:16:19</fch_movimiento>
+    <ubicacion_des>SALUD</ubicacion_des>
+    <descripcion>EN COMISION</descripcion>
+    <id_proyecto_tipo>6</id_proyecto_tipo>
+    <id_business_party>542</id_business_party>
+    <nro_de_orden_JefeGob />
+    <TieneSancion>0</TieneSancion>
+    <sumario>INSTALACIÓN DE DESFIBRILADORES EXTERNOS AUTOMÁTICOS (DEA) EN ESCUELAS PÚBLICAS DE LA CIUDAD</sumario>
+    <urlDoc>228252</urlDoc>
+  </expedienteAvanzado>
+  <expedienteAvanzado>
+    <id_expediente>143011</id_expediente>
+    <nro_de_expediente>3386-E-2026</nro_de_expediente>
+    <fch_inicio>28/10/2026 12:44:02</fch_inicio>
+    <autor_des>INSTITUTO, SANTA MARÍA</autor_des>
+    <coautores_des />
+    <autor_id>2075</autor_id>
+    <coautores_id />
+    <tipo_proyecto_des>ESCUELAS</tipo_proyecto_des>
+    <fch_movimiento>2/11/2026 11:16:19</fch_movimiento>
+    <ubicacion_des>SALUD</ubicacion_des>
+    <descripcion>EN COMISION</descripcion>
+    <id_proyecto_tipo>6</id_proyecto_tipo>
+    <id_business_party>542</id_business_party>
+    <nro_de_orden_JefeGob />
+    <TieneSancion>0</TieneSancion>
+    <sumario>SISTEMA DE IDENTIFICACIÓN Y REGISTRO DIGITAL DE ANIMALES DOMÉSTICOS” (SIRDAD)</sumario>
+    <urlDoc>228248</urlDoc>
+  </expedienteAvanzado>
+  <expedienteAvanzado>
+    <id_expediente>143009</id_expediente>
+    <nro_de_expediente>3384-D-2026</nro_de_expediente>
+    <fch_inicio>28/10/2026 11:37:01</fch_inicio>
+    <autor_des>NEGRI, CLAUDIA</autor_des>
+    <coautores_des />
+    <autor_id>30936</autor_id>
+    <coautores_id />
+    <tipo_proyecto_des>DECLARACION</tipo_proyecto_des>
+    <fch_movimiento>2/11/2026 11:16:19</fch_movimiento>
+    <ubicacion_des>SALUD</ubicacion_des>
+    <descripcion>EN COMISION</descripcion>
+    <id_proyecto_tipo>3</id_proyecto_tipo>
+    <id_business_party>542</id_business_party>
+    <nro_de_orden_JefeGob />
+    <TieneSancion>0</TieneSancion>
+    <sumario>SE DECLARA DE INTERES SANITARIO EL 2º CONGRESO DE ENFERMERIA DE LOS HOSPITALES UNIVERSITARIOS DE LA UNIVERSIDAD DE BUENOS AIRES , QUE SE REALIZARA EL 18 DE NOVIEMBRE DE 2026 EN LA FACULTAD DE CIENCIAS MEDICAS DE LA UBA.-</sumario>
+    <urlDoc>228246</urlDoc>
+  </expedienteAvanzado>
+  <expedienteAvanzado>
+    <id_expediente>143034</id_expediente>
+    <nro_de_expediente>3410-O-2026</nro_de_expediente>
+    <fch_inicio>29/10/2026 13:31:58</fch_inicio>
+    <autor_des>AUDITORIA GENERAL DE LA CIUDAD DE BUENOS AIRES, </autor_des>
+    <coautores_des />
+    <autor_id>242</autor_id>
+    <coautores_id />
+    <tipo_proyecto_des>REMITE ACTUACIONES</tipo_proyecto_des>
+    <fch_movimiento>2/11/2026 10:08:30</fch_movimiento>
+    <ubicacion_des>JUNTA DE ÉTICA, ACUERDOS Y ORGANISMOS DE CONTROL</ubicacion_des>
+    <descripcion>EN COMISION (ESPERANDO RECEPCION)</descripcion>
+    <id_proyecto_tipo>9</id_proyecto_tipo>
+    <id_business_party>547</id_business_party>
+    <nro_de_orden_JefeGob />
+    <TieneSancion>0</TieneSancion>
+    <sumario>INFORME FINAL DENOMINADO "PROGRAMA GERONTOLÓGICO DE SALUD (PROGESA)". PROYECTO Nº 3.26.06 RESOLUCIÓN Nº 196</sumario>
+    <urlDoc>228283</urlDoc>
+  </expedienteAvanzado>
+  <expedienteAvanzado>
+    <id_expediente>143033</id_expediente>
+    <nro_de_expediente>3409-O-2026</nro_de_expediente>
+    <fch_inicio>29/10/2026 13:24:49</fch_inicio>
+    <autor_des>AUDITORIA GENERAL DE LA CIUDAD DE BUENOS AIRES, </autor_des>
+    <coautores_des />
+    <autor_id>242</autor_id>
+    <coautores_id />
+    <tipo_proyecto_des>REMITE ACTUACIONES</tipo_proyecto_des>
+    <fch_movimiento>2/11/2026 10:08:11</fch_movimiento>
+    <ubicacion_des>JUNTA DE ÉTICA, ACUERDOS Y ORGANISMOS DE CONTROL</ubicacion_des>
+    <descripcion>EN COMISION (ESPERANDO RECEPCION)</descripcion>
+    <id_proyecto_tipo>9</id_proyecto_tipo>
+    <id_business_party>547</id_business_party>
+    <nro_de_orden_JefeGob />
+    <TieneSancion>0</TieneSancion>
+    <sumario>INFORME FINAL DENOMINADO "DESARROLLO DE LA MICRO, PEQUEÑA Y MEDIANA EMPRESA". PROYECTO Nº 13.26.07 RESOLUCIÓN Nº 195</sumario>
+    <urlDoc>228282</urlDoc>
+  </expedienteAvanzado>
+  <expedienteAvanzado>
+    <id_expediente>143029</id_expediente>
+    <nro_de_expediente>3404-O-2026</nro_de_expediente>
+    <fch_inicio>28/10/2026 17:20:26</fch_inicio>
+    <autor_des>AUDITORIA GENERAL DE LA CIUDAD DE BUENOS AIRES, </autor_des>
+    <coautores_des />
+    <autor_id>242</autor_id>
+    <coautores_id />
+    <tipo_proyecto_des>REMITE ACTUACIONES</tipo_proyecto_des>
+    <fch_movimiento>2/11/2026 10:07:34</fch_movimiento>
+    <ubicacion_des>JUNTA DE ÉTICA, ACUERDOS Y ORGANISMOS DE CONTROL</ubicacion_des>
+    <descripcion>EN COMISION (ESPERANDO RECEPCION)</descripcion>
+    <id_proyecto_tipo>9</id_proyecto_tipo>
+    <id_business_party>547</id_business_party>
+    <nro_de_orden_JefeGob />
+    <TieneSancion>0</TieneSancion>
+    <sumario>INFORME FINAL DENOMINADO " MAPA DE CONFLICTIVIDAD VIAL" PROYECTO Nº 10.26.03 - RESOLUCIÓN 189</sumario>
+    <urlDoc>228269</urlDoc>
+  </expedienteAvanzado>
+  <expedienteAvanzado>
+    <id_expediente>143028</id_expediente>
+    <nro_de_expediente>3403-O-2026</nro_de_expediente>
+    <fch_inicio>28/10/2026 17:13:36</fch_inicio>
+    <autor_des>AUDITORIA GENERAL DE LA CIUDAD DE BUENOS AIRES, </autor_des>
+    <coautores_des />
+    <autor_id>242</autor_id>
+    <coautores_id />
+    <tipo_proyecto_des>REMITE ACTUACIONES</tipo_proyecto_des>
+    <fch_movimiento>2/11/2026 10:07:26</fch_movimiento>
+    <ubicacion_des>JUNTA DE ÉTICA, ACUERDOS Y ORGANISMOS DE CONTROL</ubicacion_des>
+    <descripcion>EN COMISION (ESPERANDO RECEPCION)</descripcion>
+    <id_proyecto_tipo>9</id_proyecto_tipo>
+    <id_business_party>547</id_business_party>
+    <nro_de_orden_JefeGob />
+    <TieneSancion>0</TieneSancion>
+    <sumario>INFORME FINAL DENOMINADO "FUELLE - PREVIAL I - DEMARCACIÓN HORIZONTAL EN CALIENTE" PROYECTO Nº 1.26.08 - RESOLUCIÓN 190</sumario>
+    <urlDoc>228268</urlDoc>
+  </expedienteAvanzado>
+  <expedienteAvanzado>
+    <id_expediente>143027</id_expediente>
+    <nro_de_expediente>3402-O-2026</nro_de_expediente>
+    <fch_inicio>28/10/2026 17:08:59</fch_inicio>
+    <autor_des>AUDITORIA GENERAL DE LA CIUDAD DE BUENOS AIRES, </autor_des>
+    <coautores_des />
+    <autor_id>242</autor_id>
+    <coautores_id />
+    <tipo_proyecto_des>REMITE ACTUACIONES</tipo_proyecto_des>
+    <fch_movimiento>2/11/2026 10:07:17</fch_movimiento>
+    <ubicacion_des>JUNTA DE ÉTICA, ACUERDOS Y ORGANISMOS DE CONTROL</ubicacion_des>
+    <descripcion>EN COMISION (ESPERANDO RECEPCION)</descripcion>
+    <id_proyecto_tipo>9</id_proyecto_tipo>
+    <id_business_party>547</id_business_party>
+    <nro_de_orden_JefeGob />
+    <TieneSancion>0</TieneSancion>
+    <sumario>INFORME FINAL DENOMINADO "PROGRAMA CIUDAD BILINGÜE" PROYECTO Nº 2.26.10 - RESOLUCIÓN 191</sumario>
+    <urlDoc>228267</urlDoc>
+  </expedienteAvanzado>
+  <expedienteAvanzado>
+    <id_expediente>143026</id_expediente>
+    <nro_de_expediente>3401-O-2026</nro_de_expediente>
+    <fch_inicio>28/10/2026 17:03:41</fch_inicio>
+    <autor_des>AUDITORIA GENERAL DE LA CIUDAD DE BUENOS AIRES, </autor_des>
+    <coautores_des />
+    <autor_id>242</autor_id>
+    <coautores_id />
+    <tipo_proyecto_des>REMITE ACTUACIONES</tipo_proyecto_des>
+    <fch_movimiento>2/11/2026 10:07:09</fch_movimiento>
+    <ubicacion_des>JUNTA DE ÉTICA, ACUERDOS Y ORGANISMOS DE CONTROL</ubicacion_des>
+    <descripcion>EN COMISION (ESPERANDO RECEPCION)</descripcion>
+    <id_proyecto_tipo>9</id_proyecto_tipo>
+    <id_business_party>547</id_business_party>
+    <nro_de_orden_JefeGob />
+    <TieneSancion>0</TieneSancion>
+    <sumario>INFORME FINAL DENOMINADO "IVC - OBRAS DE AGUA Y SANEAMIENTO - VILLA 21/24" PROYECTO Nº 1.26.20 - RESOLUCIÓN 193</sumario>
+    <urlDoc>228266</urlDoc>
+  </expedienteAvanzado>
+  <expedienteAvanzado>
+    <id_expediente>143025</id_expediente>
+    <nro_de_expediente>3400-O-2026</nro_de_expediente>
+    <fch_inicio>28/10/2026 16:56:52</fch_inicio>
+    <autor_des>AUDITORIA GENERAL DE LA CIUDAD DE BUENOS AIRES, </autor_des>
+    <coautores_des />
+    <autor_id>242</autor_id>
+    <coautores_id />
+    <tipo_proyecto_des>REMITE ACTUACIONES</tipo_proyecto_des>
+    <fch_movimiento>2/11/2026 10:07:03</fch_movimiento>
+    <ubicacion_des>JUNTA DE ÉTICA, ACUERDOS Y ORGANISMOS DE CONTROL</ubicacion_des>
+    <descripcion>EN COMISION (ESPERANDO RECEPCION)</descripcion>
+    <id_proyecto_tipo>9</id_proyecto_tipo>
+    <id_business_party>547</id_business_party>
+    <nro_de_orden_JefeGob />
+    <TieneSancion>0</TieneSancion>
+    <sumario>INFORME FINAL DENOMINADO "MORGUES HOSPITALARIAS" PROYECTO Nº 3.26.04 - RESOLUCIÓN 194</sumario>
+    <urlDoc>228265</urlDoc>
+  </expedienteAvanzado>
+  <expedienteAvanzado>
+    <id_expediente>143022</id_expediente>
+    <nro_de_expediente>3397-D-2026</nro_de_expediente>
+    <fch_inicio>28/10/2026 16:10:22</fch_inicio>
+    <autor_des>LA BLUNDA, ANDRÉS</autor_des>
+    <coautores_des />
+    <autor_id>30918</autor_id>
+    <coautores_id />
+    <tipo_proyecto_des>RESOLUCION</tipo_proyecto_des>
+    <fch_movimiento>2/11/2026 10:06:41</fch_movimiento>
+    <ubicacion_des>PERSONAS MAYORES</ubicacion_des>
+    <descripcion>EN COMISION (ESPERANDO RECEPCION)</descripcion>
+    <id_proyecto_tipo>2</id_proyecto_tipo>
+    <id_business_party>33876</id_business_party>
+    <nro_de_orden_JefeGob />
+    <TieneSancion>0</TieneSancion>
+    <sumario>INFORMES SOBRE LAS PREVISIONES PRESUPUESTARIAS, METAS FÍSICAS, PRESTACIONES Y CRITERIOS DE ASIGNACIÓN DE RECURSOS CORRESPONDIENTES AL EJERCICIO 2027, EN RELACIÓN CON LAS POLÍTICAS PÚBLICAS DESTINADAS A LAS PERSONAS MAYORES</sumario>
+    <urlDoc>228261</urlDoc>
+  </expedienteAvanzado>
+  <expedienteAvanzado>
+    <id_expediente>143019</id_expediente>
+    <nro_de_expediente>3394-D-2026</nro_de_expediente>
+    <fch_inicio>28/10/2026 15:59:05</fch_inicio>
+    <autor_des>LA BLUNDA, ANDRÉS</autor_des>
+    <coautores_des />
+    <autor_id>30918</autor_id>
+    <coautores_id />
+    <tipo_proyecto_des>RESOLUCION</tipo_proyecto_des>
+    <fch_movimiento>2/11/2026 10:06:20</fch_movimiento>
+    <ubicacion_des>PERSONAS MAYORES</ubicacion_des>
+    <descripcion>EN COMISION (ESPERANDO RECEPCION)</descripcion>
+    <id_proyecto_tipo>2</id_proyecto_tipo>
+    <id_business_party>33876</id_business_party>
+    <nro_de_orden_JefeGob />
+    <TieneSancion>0</TieneSancion>
+    <sumario>INFORMES SOBRE METAS FÍSICAS PREVISTAS PARA EL EJERCICIO PRESUPUESTARIO 2026 EN LOS PROGRAMAS DESTINADOS A LAS PERSONAS MAYORES DE LA CIUDAD</sumario>
+    <urlDoc>228258</urlDoc>
+  </expedienteAvanzado>
+  <expedienteAvanzado>
+    <id_expediente>143015</id_expediente>
+    <nro_de_expediente>3390-E-2026</nro_de_expediente>
+    <fch_inicio>28/10/2026 13:06:48</fch_inicio>
+    <autor_des>ESCUELA DE EDUCACIÓN MEDIA N° 1 - DISTRITO N° 12, JULIO CORTAZAR</autor_des>
+    <coautores_des />
+    <autor_id>3012</autor_id>
+    <coautores_id />
+    <tipo_proyecto_des>ESCUELAS</tipo_proyecto_des>
+    <fch_movimiento>2/11/2026 10:05:52</fch_movimiento>
+    <ubicacion_des>LEGISLACION DEL TRABAJO Y POLÍTICAS DE EMPLEO</ubicacion_des>
+    <descripcion>EN COMISION (ESPERANDO RECEPCION)</descripcion>
+    <id_proyecto_tipo>6</id_proyecto_tipo>
+    <id_business_party>32260</id_business_party>
+    <nro_de_orden_JefeGob />
+    <TieneSancion>0</TieneSancion>
+    <sumario>CENTROS PÚBLICOS DE FACILITACIÓN LABORAL</sumario>
+    <urlDoc>228254</urlDoc>
+  </expedienteAvanzado>
+  <expedienteAvanzado>
+    <id_expediente>142997</id_expediente>
+    <nro_de_expediente>3373-D-2026</nro_de_expediente>
+    <fch_inicio>27/10/2026 14:55:02</fch_inicio>
+    <autor_des>VELÁZQUEZ, DELFINA</autor_des>
+    <coautores_des>BARROETAVEÑA, MATÍAS; LA BLUNDA, ANDRÉS</coautores_des>
+    <autor_id>30919</autor_id>
+    <coautores_id>30841, 30918</coautores_id>
+    <tipo_proyecto_des>LEY</tipo_proyecto_des>
+    <fch_movimiento>30/10/2026 11:17:42</fch_movimiento>
+    <ubicacion_des>DERECHOS HUMANOS, GARANTÍAS Y ANTIDISCRIMINACIÓN</ubicacion_des>
+    <descripcion>EN COMISION</descripcion>
+    <id_proyecto_tipo>1</id_proyecto_tipo>
+    <id_business_party>515</id_business_party>
+    <nro_de_orden_JefeGob />
+    <TieneSancion>0</TieneSancion>
+    <sumario>CREACIÓN DEL CENTRO DE ORIENTACIÓN PARA PERSONAS MIGRANTES Y REFUGIADAS DE LA CIUDAD</sumario>
+    <urlDoc>228180</urlDoc>
+  </expedienteAvanzado>
+  <expedienteAvanzado>
+    <id_expediente>142993</id_expediente>
+    <nro_de_expediente>3369-P-2026</nro_de_expediente>
+    <fch_inicio>27/10/2026 12:18:09</fch_inicio>
+    <autor_des>CORBETTO, ALEJANDRA BEATRIZ</autor_des>
+    <coautores_des />
+    <autor_id>3232</autor_id>
+    <coautores_id />
+    <tipo_proyecto_des>HACE CONSIDERACIONES</tipo_proyecto_des>
+    <fch_movimiento>30/10/2026 11:03:28</fch_movimiento>
+    <ubicacion_des>TURISMO Y DEPORTES</ubicacion_des>
+    <descripcion>EN COMISION</descripcion>
+    <id_proyecto_tipo>10</id_proyecto_tipo>
+    <id_business_party>545</id_business_party>
+    <nro_de_orden_JefeGob />
+    <TieneSancion>0</TieneSancion>
+    <sumario>SOBRE DECLÁRAR DE UTILIDAD PÚBLICA Y SUJETA A EXPROPIACIÓN POR PARTE DE LA CIUDAD AUTÓNOMA DE BUENOS AIRES LA FRACCIÓN DEL INMUEBLE UBICADO EN LA AVENIDA DON PEDRO DE MENDOZA 2301/07 ESQUINA CORONEL SALVADORES  602/16, A OTORGARSE AL CLUB DE REGATAS ALMIRANTE BROWN</sumario>
+    <urlDoc>228175</urlDoc>
+  </expedienteAvanzado>
+  <expedienteAvanzado>
+    <id_expediente>142991</id_expediente>
+    <nro_de_expediente>3368-J-2026</nro_de_expediente>
+    <fch_inicio>27/10/2026 11:33:39</fch_inicio>
+    <autor_des>CONSEJO ASESOR, DEL DEPORTE</autor_des>
+    <coautores_des />
+    <autor_id>2049</autor_id>
+    <coautores_id />
+    <tipo_proyecto_des>REMITE ACTUACIONES</tipo_proyecto_des>
+    <fch_movimiento>30/10/2026 11:03:28</fch_movimiento>
+    <ubicacion_des>TURISMO Y DEPORTES</ubicacion_des>
+    <descripcion>EN COMISION</descripcion>
+    <id_proyecto_tipo>9</id_proyecto_tipo>
+    <id_business_party>545</id_business_party>
+    <nro_de_orden_JefeGob>47021935</nro_de_orden_JefeGob>
+    <TieneSancion>0</TieneSancion>
+    <sumario>ELEVA INFORME CORRESPONDIENTE AL 1º SEMESTRE DE EJERCICIO DEL AÑO 2026, CONFORME EL ART. 18 DE LA LEY Nº 1624.-</sumario>
+    <urlDoc>228173</urlDoc>
+  </expedienteAvanzado>
+  <expedienteAvanzado>
+    <id_expediente>142987</id_expediente>
+    <nro_de_expediente>3365-D-2026</nro_de_expediente>
+    <fch_inicio>27/10/2026 11:18:31</fch_inicio>
+    <autor_des>NAGATA, SEBASTIÁN</autor_des>
+    <coautores_des>ALIFRACO, EDGARDO NESTOR; OCAÑA, MARÍA GRACIELA; RODRÍGUEZ LARRETA, HORACIO; TAGLIAFERRI, GUADALUPE</coautores_des>
+    <autor_id>30907</autor_id>
+    <coautores_id>30922, 30742, 30950, 30948</coautores_id>
+    <tipo_proyecto_des>RESOLUCION</tipo_proyecto_des>
+    <fch_movimiento>30/10/2026 11:03:28</fch_movimiento>
+    <ubicacion_des>TURISMO Y DEPORTES</ubicacion_des>
+    <descripcion>EN COMISION</descripcion>
+    <id_proyecto_tipo>2</id_proyecto_tipo>
+    <id_business_party>545</id_business_party>
+    <nro_de_orden_JefeGob />
+    <TieneSancion>0</TieneSancion>
+    <sumario>SE CONMEMORAN LOS 120 AÑOS DE LA LLEGADA DEL JUDO A LA REPÚBLICA ARGENTINA Y SE DISPONE LA ENTREGA DE UNA BANDEJA PROTOCOLAR A LA FEDERACIÓN METROPOLITANA DE JUDO</sumario>
+    <urlDoc>228169</urlDoc>
+  </expedienteAvanzado>
+  <expedienteAvanzado>
+    <id_expediente>143005</id_expediente>
+    <nro_de_expediente>3381-P-2026</nro_de_expediente>
+    <fch_inicio>27/10/2026 15:45:54</fch_inicio>
+    <autor_des>BARREIRO, LAURA ARIANA</autor_des>
+    <coautores_des />
+    <autor_id>2976</autor_id>
+    <coautores_id />
+    <tipo_proyecto_des>HACE CONSIDERACIONES</tipo_proyecto_des>
+    <fch_movimiento>30/10/2026 10:35:17</fch_movimiento>
+    <ubicacion_des>COMUNICACIÓN SOCIAL, MEDIOS DE COMUNICACIÓN Y TECNOLOGÍAS DE LA COMUNICACIÓN</ubicacion_des>
+    <descripcion>EN COMISION</descripcion>
+    <id_proyecto_tipo>10</id_proyecto_tipo>
+    <id_business_party>511</id_business_party>
+    <nro_de_orden_JefeGob />
+    <TieneSancion>0</TieneSancion>
+    <sumario>SOBRE DECLÁRAR DE INTERÉS CULTURAL A LA EMISORA DIGITAL “1920 LIVE – LOS LOCOS DE LA AZOTEA”</sumario>
+    <urlDoc>228189</urlDoc>
+  </expedienteAvanzado>
+  <expedienteAvanzado>
+    <id_expediente>143002</id_expediente>
+    <nro_de_expediente>3378-P-2026</nro_de_expediente>
+    <fch_inicio>27/10/2026 15:25:11</fch_inicio>
+    <autor_des>SOSA, REINALDO ROGELIO GUSTAVO</autor_des>
+    <coautores_des />
+    <autor_id>3189</autor_id>
+    <coautores_id />
+    <tipo_proyecto_des>HACE CONSIDERACIONES</tipo_proyecto_des>
+    <fch_movimiento>30/10/2026 10:08:11</fch_movimiento>
+    <ubicacion_des>TRÁNSITO Y TRANSPORTE</ubicacion_des>
+    <descripcion>EN COMISION</descripcion>
+    <id_proyecto_tipo>10</id_proyecto_tipo>
+    <id_business_party>544</id_business_party>
+    <nro_de_orden_JefeGob />
+    <TieneSancion>0</TieneSancion>
+    <sumario>SOBRE DERÓGAR LA PROHIBICIÓN DE CIRCULACIÓN DE VEHÍCULOS DEL SERVICIO DE TRANSPORTE PÚBLICO DE PASAJEROS EN AUTOMÓVIL DE ALQUILER CON CONDUCTOR (TAXIS) EN CONDICIÓN DE "LIBRES" O "SIN PASAJERO" EN LOS CARRILES EXCLUSIVOS DE LA AVENIDA CÓRDOBA</sumario>
+    <urlDoc>228185</urlDoc>
+  </expedienteAvanzado>
+  <expedienteAvanzado>
+    <id_expediente>142986</id_expediente>
+    <nro_de_expediente>3364-D-2026</nro_de_expediente>
+    <fch_inicio>27/10/2026 11:16:04</fch_inicio>
+    <autor_des>KIENAST, MARINA</autor_des>
+    <coautores_des>ARENAZA, JUAN PABLO; ERNST, MARCELO GREGORIO; FERNÁNDEZ, JUAN IGNACIO; FREGUIA, ANDREA; IMAS, SILVIA ; PELAYO, SOLANA; RAMÍREZ, MARÍA DEL PILAR; SAIFERT, LEONARDO</coautores_des>
+    <autor_id>30886</autor_id>
+    <coautores_id>30680, 30951, 30935, 30933, 30910, 30931, 30921, 30900</coautores_id>
+    <tipo_proyecto_des>RESOLUCION</tipo_proyecto_des>
+    <fch_movimiento>29/10/2026 18:06:02</fch_movimiento>
+    <ubicacion_des>EDUCACIÓN, CIENCIA Y TECNOLOGÍA</ubicacion_des>
+    <descripcion>EN COMISION</descripcion>
+    <id_proyecto_tipo>2</id_proyecto_tipo>
+    <id_business_party>520</id_business_party>
+    <nro_de_orden_JefeGob />
+    <TieneSancion>0</TieneSancion>
+    <sumario>INFORMES SOBRE LA IMPLEMENTACIÓN, EJECUCIÓN PRESUPUESTARIA, COBERTURA, RECURSOS HUMANOS, ARTICULACIÓN INTERINSTITUCIONAL Y EVALUACIÓN DE LA POLÍTICA DE BIENESTAR SOCIOEMOCIONAL Y SALUD MENTAL DESARROLLADA EN EL MARCO DEL PLAN ESTRATÉGICO BUENOS AIRES APRENDE 2024-2027</sumario>
+    <urlDoc>228168</urlDoc>
+  </expedienteAvanzado>
+  <expedienteAvanzado>
+    <id_expediente>143004</id_expediente>
+    <nro_de_expediente>3380-P-2026</nro_de_expediente>
+    <fch_inicio>27/10/2026 15:35:08</fch_inicio>
+    <autor_des>SALCEDO, ROBERTO</autor_des>
+    <coautores_des />
+    <autor_id>2425</autor_id>
+    <coautores_id />
+    <tipo_proyecto_des>HACE CONSIDERACIONES</tipo_proyecto_des>
+    <fch_movimiento>29/10/2026 17:18:14</fch_movimiento>
+    <ubicacion_des>CULTURA</ubicacion_des>
+    <descripcion>EN COMISION</descripcion>
+    <id_proyecto_tipo>10</id_proyecto_tipo>
+    <id_business_party>512</id_business_party>
+    <nro_de_orden_JefeGob />
+    <TieneSancion>0</TieneSancion>
+    <sumario>SOBRE DECLÁRAR PERSONALIDAD DESTACADA EN EL ÁMBITO DE LA CULTURA A LA SRA.  VIVIANA ESTELA SÁEZ</sumario>
+    <urlDoc>228187</urlDoc>
+  </expedienteAvanzado>
+  <expedienteAvanzado>
+    <id_expediente>143003</id_expediente>
+    <nro_de_expediente>3379-D-2026</nro_de_expediente>
+    <fch_inicio>27/10/2026 15:30:06</fch_inicio>
+    <autor_des>IAÑEZ, BERENICE</autor_des>
+    <coautores_des>CAPORICCIO, FRANCISCO; FERREÑO, CLAUDIO AMÉRICO; GRILLO, ALEJANDRO OMAR; PEÑAFORT, GRACIANA; ROSSEN, BÁRBARA; SANTORO, LEANDRO</coautores_des>
+    <autor_id>30896</autor_id>
+    <coautores_id>30943, 30561, 30915, 30917, 30942, 30823</coautores_id>
+    <tipo_proyecto_des>RESOLUCION</tipo_proyecto_des>
+    <fch_movimiento>29/10/2026 17:17:48</fch_movimiento>
+    <ubicacion_des>CULTURA</ubicacion_des>
+    <descripcion>EN COMISION</descripcion>
+    <id_proyecto_tipo>2</id_proyecto_tipo>
+    <id_business_party>512</id_business_party>
+    <nro_de_orden_JefeGob />
+    <TieneSancion>0</TieneSancion>
+    <sumario>SE DECLARA PERSONALIDAD DESTACADA EN EL ÁMBITO DE LA CULTURA AL SEÑOR GUSTAVO GARZÓN Y SE DISPONE LA ENTREGA DE UN DIPLOMA</sumario>
+    <urlDoc>228186</urlDoc>
+  </expedienteAvanzado>
+  <expedienteAvanzado>
+    <id_expediente>142999</id_expediente>
+    <nro_de_expediente>3374-N-2026</nro_de_expediente>
+    <fch_inicio>27/10/2026 14:59:08</fch_inicio>
+    <autor_des>CONSEJO DE PLANEAMIENTO ESTRATEGICO, </autor_des>
+    <coautores_des />
+    <autor_id>405</autor_id>
+    <coautores_id />
+    <tipo_proyecto_des>LEY</tipo_proyecto_des>
+    <fch_movimiento>29/10/2026 17:17:21</fch_movimiento>
+    <ubicacion_des>CULTURA</ubicacion_des>
+    <descripcion>EN COMISION</descripcion>
+    <id_proyecto_tipo>1</id_proyecto_tipo>
+    <id_business_party>512</id_business_party>
+    <nro_de_orden_JefeGob />
+    <TieneSancion>0</TieneSancion>
+    <sumario>INCORPORACIÓN DE LAS PERSONAS CON DISCAPACIDAD AL PROGRAMA PASE CULTURAL</sumario>
+    <urlDoc>228182</urlDoc>
+  </expedienteAvanzado>
+  <expedienteAvanzado>
+    <id_expediente>142994</id_expediente>
+    <nro_de_expediente>3371-D-2026</nro_de_expediente>
+    <fch_inicio>27/10/2026 14:49:15</fch_inicio>
+    <autor_des>LOUPIAS, FRANCISCO</autor_des>
+    <coautores_des>DONATI, PABLO ALEJANDRO; GLIZE, PATRICIA INÉS</coautores_des>
+    <autor_id>30911</autor_id>
+    <coautores_id>30913, 30906</coautores_id>
+    <tipo_proyecto_des>DECLARACION</tipo_proyecto_des>
+    <fch_movimiento>29/10/2026 17:16:49</fch_movimiento>
+    <ubicacion_des>CULTURA</ubicacion_des>
+    <descripcion>EN COMISION</descripcion>
+    <id_proyecto_tipo>3</id_proyecto_tipo>
+    <id_business_party>512</id_business_party>
+    <nro_de_orden_JefeGob />
+    <TieneSancion>0</TieneSancion>
+    <sumario>SE DECLARA DE INTERÉS CULTURAL LA INICIATIVA “LA NOCHE DE LAS CASAS DE PROVINCIA”</sumario>
+    <urlDoc>228176</urlDoc>
+  </expedienteAvanzado>
+  <expedienteAvanzado>
+    <id_expediente>142992</id_expediente>
+    <nro_de_expediente>3370-D-2026</nro_de_expediente>
+    <fch_inicio>27/10/2026 12:24:21</fch_inicio>
+    <autor_des>REY, SANDRA MÓNICA</autor_des>
+    <coautores_des>RAMÍREZ, MARÍA DEL PILAR</coautores_des>
+    <autor_id>30923</autor_id>
+    <coautores_id>30921</coautores_id>
+    <tipo_proyecto_des>DECLARACION</tipo_proyecto_des>
+    <fch_movimiento>29/10/2026 17:16:16</fch_movimiento>
+    <ubicacion_des>CULTURA</ubicacion_des>
+    <descripcion>EN COMISION</descripcion>
+    <id_proyecto_tipo>3</id_proyecto_tipo>
+    <id_business_party>512</id_business_party>
+    <nro_de_orden_JefeGob />
+    <TieneSancion>0</TieneSancion>
+    <sumario>SE DECLARA DE INTERÉS CULTURAL LAS ACTIVIDADES ARTÍSTICAS REALIZADAS POR “EL TALLER DE MAURO KETLUN”</sumario>
+    <urlDoc>228174</urlDoc>
+  </expedienteAvanzado>
+  <expedienteAvanzado>
+    <id_expediente>142990</id_expediente>
+    <nro_de_expediente>3367-D-2026</nro_de_expediente>
+    <fch_inicio>27/10/2026 11:23:59</fch_inicio>
+    <autor_des>LÓPEZ, MATÍAS DAMIÁN</autor_des>
+    <coautores_des>FERRARIO, EMMANUEL; LOSPENNATO, SILVIA; NEIRA, CLAUDIA; RAMÍREZ, MARÍA DEL PILAR; THOURTE, MANUELA</coautores_des>
+    <autor_id>30853</autor_id>
+    <coautores_id>30880, 30944, 30716, 30921, 30858</coautores_id>
+    <tipo_proyecto_des>RESOLUCION</tipo_proyecto_des>
+    <fch_movimiento>29/10/2026 17:15:39</fch_movimiento>
+    <ubicacion_des>CULTURA</ubicacion_des>
+    <descripcion>EN COMISION</descripcion>
+    <id_proyecto_tipo>2</id_proyecto_tipo>
+    <id_business_party>512</id_business_party>
+    <nro_de_orden_JefeGob />
+    <TieneSancion>0</TieneSancion>
+    <sumario>SE DISPONE LA COLOCACIÓN DE UNA PLACA CONMEMORATIVA EN LA ESTACIÓN "CATEDRAL" DE LA LÍNEA D DE LA RED DE SUBTERRÁNEOS, EN HOMENAJE AL CARDENAL JORGE MARIO BERGOGLIO, PAPA FRANCISCO, EN EL MARCO DE LA VISITA OFICIAL A NUESTRO PAÍS DE SU SANTIDAD LEÓN XIV</sumario>
+    <urlDoc>228172</urlDoc>
+  </expedienteAvanzado>
+  <expedienteAvanzado>
+    <id_expediente>142989</id_expediente>
+    <nro_de_expediente>3366-D-2026</nro_de_expediente>
+    <fch_inicio>27/10/2026 11:20:37</fch_inicio>
+    <autor_des>IMAS, SILVIA </autor_des>
+    <coautores_des>ARENAZA, JUAN PABLO; ERNST, MARCELO GREGORIO; FERNÁNDEZ, JUAN IGNACIO; FLEITAS, REBECA; FREGUIA, ANDREA; KIENAST, MARINA; MONTENEGRO, LUCÍA; PAKGOJZ, NICOLÁS; PELAYO, SOLANA; RAMÍREZ, MARÍA DEL PILAR; REY, SANDRA MÓNICA; SAIFERT, LEONARDO; VARTABEDIAN, DIEGO</coautores_des>
+    <autor_id>30910</autor_id>
+    <coautores_id>30680, 30951, 30935, 30899, 30933, 30886, 30898, 30932, 30931, 30921, 30923, 30900, 30934</coautores_id>
+    <tipo_proyecto_des>RESOLUCION</tipo_proyecto_des>
+    <fch_movimiento>29/10/2026 17:15:08</fch_movimiento>
+    <ubicacion_des>CULTURA</ubicacion_des>
+    <descripcion>EN COMISION</descripcion>
+    <id_proyecto_tipo>2</id_proyecto_tipo>
+    <id_business_party>512</id_business_party>
+    <nro_de_orden_JefeGob />
+    <TieneSancion>0</TieneSancion>
+    <sumario>SE DECLARA SITIO DE INTERÉS CULTURAL AL RESTAURANTE "CRIZIA", Y SE DISPONE LA COLOCACIÓN DE UNA PLACA</sumario>
+    <urlDoc>228171</urlDoc>
+  </expedienteAvanzado>
+  <expedienteAvanzado>
+    <id_expediente>142985</id_expediente>
+    <nro_de_expediente>3363-D-2026</nro_de_expediente>
+    <fch_inicio>27/10/2026 11:13:49</fch_inicio>
+    <autor_des>VARTABEDIAN, DIEGO</autor_des>
+    <coautores_des />
+    <autor_id>30934</autor_id>
+    <coautores_id />
+    <tipo_proyecto_des>DECLARACION</tipo_proyecto_des>
+    <fch_movimiento>29/10/2026 17:14:43</fch_movimiento>
+    <ubicacion_des>CULTURA</ubicacion_des>
+    <descripcion>EN COMISION</descripcion>
+    <id_proyecto_tipo>3</id_proyecto_tipo>
+    <id_business_party>512</id_business_party>
+    <nro_de_orden_JefeGob />
+    <TieneSancion>0</TieneSancion>
+    <sumario>SE DECLARA DE INTERÉS CULTURAL Y SOCIAL LA TRAYECTORIA Y LABOR DESARROLLADA POR EL FONDO NACIONAL ARMENIA DE ARGENTINA</sumario>
+    <urlDoc>228167</urlDoc>
+  </expedienteAvanzado>
+  <expedienteAvanzado>
+    <id_expediente>143001</id_expediente>
+    <nro_de_expediente>3377-D-2026</nro_de_expediente>
+    <fch_inicio>27/10/2026 15:21:25</fch_inicio>
+    <autor_des>IAÑEZ, BERENICE</autor_des>
+    <coautores_des />
+    <autor_id>30896</autor_id>
+    <coautores_id />
+    <tipo_proyecto_des>RESOLUCION</tipo_proyecto_des>
+    <fch_movimiento>29/10/2026 16:39:31</fch_movimiento>
+    <ubicacion_des>SALUD</ubicacion_des>
+    <descripcion>EN COMISION</descripcion>
+    <id_proyecto_tipo>2</id_proyecto_tipo>
+    <id_business_party>542</id_business_party>
+    <nro_de_orden_JefeGob />
+    <TieneSancion>0</TieneSancion>
+    <sumario>INFORMES REFERIDOS A LA PROVISIÓN DE MEDICAMENTOS EN EL CENTRO DE SALUD Y ACCIÓN COMUNITARIA (CESAC) N° 24</sumario>
+    <urlDoc>228184</urlDoc>
+  </expedienteAvanzado>
+  <expedienteAvanzado>
+    <id_expediente>142998</id_expediente>
+    <nro_de_expediente>3375-D-2026</nro_de_expediente>
+    <fch_inicio>27/10/2026 15:05:22</fch_inicio>
+    <autor_des>SUÁREZ, GUILLERMO </autor_des>
+    <coautores_des />
+    <autor_id>30814</autor_id>
+    <coautores_id />
+    <tipo_proyecto_des>LEY</tipo_proyecto_des>
+    <fch_movimiento>29/10/2026 16:39:18</fch_movimiento>
+    <ubicacion_des>SALUD</ubicacion_des>
+    <descripcion>EN COMISION</descripcion>
+    <id_proyecto_tipo>1</id_proyecto_tipo>
+    <id_business_party>542</id_business_party>
+    <nro_de_orden_JefeGob />
+    <TieneSancion>0</TieneSancion>
+    <sumario>SISTEMA DE PREVENCIÓN, DETECCIÓN TEMPRANA Y ATENCIÓN INTEGRAL ANTE LA ANAFILAXIA “ANAFILAXIA CERO”</sumario>
+    <urlDoc>228181</urlDoc>
+  </expedienteAvanzado>
+  <expedienteAvanzado>
+    <id_expediente>142995</id_expediente>
+    <nro_de_expediente>3372-D-2026</nro_de_expediente>
+    <fch_inicio>27/10/2026 14:53:24</fch_inicio>
+    <autor_des>SUÁREZ, GUILLERMO </autor_des>
+    <coautores_des />
+    <autor_id>30814</autor_id>
+    <coautores_id />
+    <tipo_proyecto_des>DECLARACION</tipo_proyecto_des>
+    <fch_movimiento>29/10/2026 16:39:18</fch_movimiento>
+    <ubicacion_des>SALUD</ubicacion_des>
+    <descripcion>EN COMISION</descripcion>
+    <id_proyecto_tipo>3</id_proyecto_tipo>
+    <id_business_party>542</id_business_party>
+    <nro_de_orden_JefeGob />
+    <TieneSancion>0</TieneSancion>
+    <sumario>GESTIONES PARA GARANTIZAR QUE EL MEDICAMENTO EPIPEN Y EPIPEN JR. (EPINEFRINA/ADRENALINA EN AUTOINYECTOR) PUEDA SER ADQUIRIDO EN EL TERRITORIO DE LA REPÚBLICA ARGENTINA A UN COSTO EQUIVALENTE O SIMILAR AL VALOR DE MERCADO AL QUE TIENEN EN PAÍSES VECINOS</sumario>
+    <urlDoc>228178</urlDoc>
+  </expedienteAvanzado>
+  <expedienteAvanzado>
+    <id_expediente>143000</id_expediente>
+    <nro_de_expediente>3376-D-2026</nro_de_expediente>
+    <fch_inicio>27/10/2026 15:08:37</fch_inicio>
+    <autor_des>IAÑEZ, BERENICE</autor_des>
+    <coautores_des>GEMINIANI, NOEMÍ; LA BLUNDA, ANDRÉS; NEIRA, CLAUDIA</coautores_des>
+    <autor_id>30896</autor_id>
+    <coautores_id>30940, 30918, 30716</coautores_id>
+    <tipo_proyecto_des>RESOLUCION</tipo_proyecto_des>
+    <fch_movimiento>29/10/2026 16:25:02</fch_movimiento>
+    <ubicacion_des>PERSONAS MAYORES</ubicacion_des>
+    <descripcion>EN COMISION (ESPERANDO RECEPCION)</descripcion>
+    <id_proyecto_tipo>2</id_proyecto_tipo>
+    <id_business_party>33876</id_business_party>
+    <nro_de_orden_JefeGob />
+    <TieneSancion>0</TieneSancion>
+    <sumario>INFORMES REFERIDOS A LAS RESIDENCIAS DESTINADAS A LA COVIVIENDA DE PERSONAS MAYORES QUE MENCIONÓ EL MINISTRO DE DESARROLLO HUMANO Y HÁBITAT, EN ESTA LEGISLATURA, EL PASADO 16DE OCTUBRE DE 2026, CON MOTIVO DE LA PRESENTACIÓN DEL PRESUPUESTO 2027</sumario>
+    <urlDoc>228183</urlDoc>
+  </expedienteAvanzado>
+  <expedienteAvanzado>
+    <id_expediente>142988</id_expediente>
+    <nro_de_expediente>3362-J-2026</nro_de_expediente>
+    <fch_inicio>27/10/2026 11:08:09</fch_inicio>
+    <autor_des>JEFE DE GOBIERNO, </autor_des>
+    <coautores_des />
+    <autor_id>30598</autor_id>
+    <coautores_id />
+    <tipo_proyecto_des>LEY</tipo_proyecto_des>
+    <fch_movimiento>27/10/2026 11:10:25</fch_movimiento>
+    <ubicacion_des>DGDP</ubicacion_des>
+    <descripcion>ESPERANDO ASIGNACION DE GIRO (ESPERANDO RECEPCION)</descripcion>
+    <id_proyecto_tipo>1</id_proyecto_tipo>
+    <id_business_party>52</id_business_party>
+    <nro_de_orden_JefeGob>48138119</nro_de_orden_JefeGob>
+    <TieneSancion>0</TieneSancion>
+    <sumario>LEY DE IDENTIFICACIÓN, PROTECCIÓN Y BIENESTAR INTEGRAL DE PERROS Y GATOS</sumario>
+    <urlDoc>228170</urlDoc>
+  </expedienteAvanzado>
+</ArrayOfExpedienteAvanzado>

@@ -25,8 +25,8 @@ from typing import Any
 
 from vigia_connectors import (
     BoraAviso, BoraClient, BocbaClient, BocbaNorma,
-    HcdnClient, HcdnProyecto, InfoLegClient, InfoLegNorm,
-    SenadoClient, SenadoProyecto,
+    Expediente, HcdnClient, HcdnProyecto, InfoLegClient, InfoLegNorm,
+    LegislaturaClient, SenadoClient, SenadoProyecto,
 )
 from vigia_connectors.bora import looks_like_dnu
 from vigia_connectors.emisores import detect_emisor
@@ -39,6 +39,7 @@ INFOLEG_SOURCE = catalog_fields("infoleg")
 HCDN_SOURCE = catalog_fields("hcdn_proyectos")
 BORA_SOURCE = catalog_fields("bora_primera")
 BOCBA_SOURCE = catalog_fields("bocba")
+LEGISLATURA_SOURCE = catalog_fields("legislatura")
 
 # Cuántos registros por batch al persistir el corpus completo.
 # Tope: asyncpg admite máx 32767 parámetros bind por statement
@@ -766,3 +767,91 @@ def backfill_emisores() -> dict[str, Any]:
         return {"scanned": scanned, "updated": updated}
 
     return run_async(_run())
+
+
+# ── Legislatura CABA ─────────────────────────────────────────────────────────
+
+LEGISLATURA_ORGANISMO = "Legislatura de la Ciudad de Buenos Aires"
+
+
+def _expediente_to_row(e: Expediente) -> dict[str, Any]:
+    """Mapea un expediente de la Legislatura al shape de `norma` (tipo PROYECTO).
+
+    `bora_seccion = 'Legislatura'` lo separa del Boletín (el feed "Boletín del
+    día" lo excluye) y lo hace filtrable en Reportes; `raw.tipo_nombre` es el
+    "Tipo" del constructor de reportes ("Proyecto de ley", "Escuelas", …).
+    """
+    autores = "; ".join([e.autor, *e.coautores]) if e.autor else None
+    resumen = f"{e.tipo_nombre}." + (f" Autoría: {autores}." if autores else "")
+    estado = (e.estado or "En trámite") + (" · SANCIONADO" if e.sancionado else "")
+    return {
+        "external_id": e.numero,
+        "tipo": "PROYECTO",
+        "numero": e.numero,
+        "titulo": e.sumario,
+        "resumen": resumen,
+        "resumen_ia": None,
+        "fecha_publicacion": e.fecha_inicio.date() if e.fecha_inicio else None,
+        "jurisdiccion": "CABA",
+        "sector": e.detect_sector(),
+        "organismo": LEGISLATURA_ORGANISMO,
+        "emisor": "LEGISLATURA",
+        "estado": estado[:128],
+        "impacto": None,
+        "bora_seccion": "Legislatura",
+        "entidades": [e.autor, *e.coautores] if e.autor else None,
+        "tags": ["legislatura", e.tipo.lower(), *([e.origen.lower()] if e.origen else [])],
+        "url": e.url,
+        "raw": {
+            "tipo_nombre": e.tipo_nombre,
+            "id_expediente": e.id_expediente,
+            "tipo_proyecto": e.tipo,
+            "origen": e.origen,
+            "autor": e.autor,
+            "autor_id": e.autor_id,
+            "coautores": e.coautores,
+            "ubicacion": e.ubicacion,
+            "estado": e.estado,
+            "sancionado": e.sancionado,
+            "fecha_inicio": e.fecha_inicio.isoformat() if e.fecha_inicio else None,
+            "fecha_movimiento": e.fecha_movimiento.isoformat() if e.fecha_movimiento else None,
+            "url_documento": e.url_documento,
+        },
+    }
+
+
+@celery_app.task(name="vigia_workers.tasks.ingest_legislatura")
+def ingest_legislatura(dry_run: bool = False, lookback_days: int = 30) -> dict[str, Any]:
+    """Ingesta los expedientes de la Legislatura porteña iniciados en los últimos N días.
+
+    El web service devuelve el estado actual de cada expediente, así que el
+    lookback también refresca estado y sanción de los recientes. La corrida
+    semanal usa un lookback largo (400 días) para actualizar los más viejos;
+    un backfill es la misma task con lookback mayor. Idempotente (upsert por
+    número de expediente).
+    """
+    from datetime import timedelta
+
+    dry = _is_dry_run(dry_run)
+    hasta = date.today()
+    desde = hasta - timedelta(days=max(1, lookback_days) - 1)
+
+    async def _run() -> dict[str, Any]:
+        async with LegislaturaClient() as client:
+            expedientes = await client.fetch_rango(desde, hasta)
+        rows = [_expediente_to_row(e) for e in expedientes]
+        if dry:
+            return {"rows": len(rows), "sample": [_dry_sample_row(r) for r in rows[:_DRY_SAMPLE]]}
+        totals = _empty_totals()
+        for i in range(0, len(rows), _FULL_BATCH):
+            _acc(totals, await upsert_normas(LEGISLATURA_SOURCE, rows[i : i + _FULL_BATCH]))
+        return totals
+
+    if dry:
+        return {"source": "legislatura", "dry_run": True, "desde": desde.isoformat(), **run_async(_run())}
+
+    async def _wrapped() -> dict[str, Any]:
+        counts = await with_status([LEGISLATURA_SOURCE["code"]], _run)
+        return {"source": "legislatura", "desde": desde.isoformat(), **counts}
+
+    return run_async(_wrapped())

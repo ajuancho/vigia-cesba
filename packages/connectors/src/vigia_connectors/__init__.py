@@ -3,6 +3,7 @@ from vigia_connectors.bocba import BocbaClient, BocbaNorma
 from vigia_connectors.bora import BoraAviso, BoraClient
 from vigia_connectors.hcdn import HcdnClient, HcdnProyecto
 from vigia_connectors.infoleg import InfoLegClient, InfoLegNorm
+from vigia_connectors.legislatura import Expediente, LegislaturaClient
 from vigia_connectors.senado import SenadoClient, SenadoProyecto
 
 __all__ = [
@@ -15,6 +16,8 @@ __all__ = [
     "BcraClient",
     "ComunicacionBcra",
     "BocbaClient",
+    "Expediente",
+    "LegislaturaClient",
     "BocbaNorma",
     "SenadoClient",
     "SenadoProyecto",

@@ -282,6 +282,33 @@ en el PDF de cada aviso); su extracción queda para una fase 2.
 
 ---
 
+## Legislatura porteña
+
+Fuente `legislatura`: expedientes de la Legislatura (proyectos de ley,
+resolución, declaración, etc.) desde el web service del buscador oficial
+(`parlamentaria.legislatura.gob.ar/webservices/Json.asmx/GetExpedienteAvanzada`,
+no documentado). Se guardan en `norma` como `PROYECTO` con
+`bora_seccion = 'Legislatura'`: entran en Buscador, Alertas y Reportes, tienen
+su página `/legislatura` y NO aparecen en "Boletín del día".
+
+Beat: diario 07:30 ART (expedientes iniciados en los últimos 30 días, con su
+estado actual) y domingos 06:30 (refresco de estado de los últimos 400 días).
+
+Primera carga (Railway: consola del servicio **worker**), sin migración:
+
+```bash
+python -c "from vigia_workers.tasks import ingest_legislatura as t; print(t(dry_run=True, lookback_days=7))"
+python -c "from vigia_workers.tasks import ingest_legislatura as t; print(t(lookback_days=400))"
+python -c "from vigia_workers.alerts import match_alertas as t; print(t(notify=False))"
+```
+
+El último comando registra los matches del backfill sin mandar emails (si no,
+las alertas notificarían cientos de expedientes viejos). Si el servicio cambia
+de formato, falla `packages/connectors/tests/test_legislatura.py` contra el
+fixture y la fuente aparece en error en `GET /health/sources`.
+
+---
+
 ## Membresías
 
 No hay período de prueba: todos los workspaces tienen acceso pleno. Para

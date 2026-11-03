@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 from fastapi import APIRouter, HTTPException, Query
-from sqlalchemy import func, select
+from sqlalchemy import func, or_, select
 
 from vigia_api.core.db import get_sessionmaker
 from vigia_api.core.scope import norma_filters
@@ -11,6 +11,9 @@ from vigia_shared.relevancia import PESO_TIPO, es_tramite
 from vigia_shared.schemas import NormaDetail, NormaListItem, NormaPage
 
 router = APIRouter(prefix="/normas", tags=["normas"])
+
+# Sección asignada a los expedientes de la Legislatura (worker ingest_legislatura).
+SECCION_LEGISLATURA = "Legislatura"
 
 # Topes por edición (el cliente muestra lo que llega; el resto queda contado).
 _MAX_DESTACADOS = 30
@@ -30,9 +33,12 @@ async def ediciones(
     Cada edición separa `destacados` (DNU, leyes, decretos de alcance general,
     normativa regulatoria) de `tramite` (edictos, designaciones, beneplácitos),
     que el cliente colapsa en una línea. Orden: peso editorial del tipo.
+    Los expedientes de la Legislatura no son parte del Boletín: tienen su
+    propia vista (`GET /normas?seccion=Legislatura`).
     """
     Session = get_sessionmaker()
     filters = norma_filters()
+    filters.append(or_(Norma.bora_seccion.is_(None), Norma.bora_seccion != SECCION_LEGISLATURA))
     if tipo:
         filters.append(Norma.tipo == tipo)
     if sector:
@@ -104,6 +110,8 @@ async def list_normas(
     impacto: str | None = Query(None, description="alto|medio|bajo"),
     sector: str | None = Query(None),
     emisor: str | None = Query(None, description="organismo canónico: ARCA|CNV|BCRA|…"),
+    seccion: str | None = Query(None, description="sección de origen: 'Licitaciones', 'Legislatura', …"),
+    tipo_nombre: str | None = Query(None, description="tipo tal como lo publica la fuente: 'Proyecto de ley', …"),
     limit: int = Query(20, ge=1, le=100),
     offset: int = Query(0, ge=0, le=100000),
 ) -> NormaPage:
@@ -117,6 +125,10 @@ async def list_normas(
         filters.append(Norma.sector == sector)
     if emisor:
         filters.append(Norma.emisor == emisor)
+    if seccion:
+        filters.append(Norma.bora_seccion == seccion)
+    if tipo_nombre:
+        filters.append(Norma.raw["tipo_nombre"].astext == tipo_nombre)
 
     async with Session() as session:
         total = (
@@ -144,7 +156,11 @@ async def list_normas(
                 items.append(item)
         else:
             rows = (await session.execute(query)).scalars().all()
-            items = [NormaListItem.model_validate(r) for r in rows]
+            items = []
+            for r in rows:
+                item = NormaListItem.model_validate(r)
+                item.tipo_nombre = (r.raw or {}).get("tipo_nombre")
+                items.append(item)
 
     return NormaPage(items=items, total=int(total or 0), limit=limit, offset=offset)
 

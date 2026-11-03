@@ -25,6 +25,9 @@ class NormaBase(BaseModel):
     bora_seccion: str | None = None
     tags: list[str] | None = None
     url: str | None = None
+    # Tipo tal como lo publica la fuente (raw.tipo_nombre): "Proyecto de ley",
+    # "Licitación Obra Pública", … Lo completa el listado de /normas.
+    tipo_nombre: str | None = None
     # Solo poblado para DNU (join a dnu_tracking):
     # sin_tratamiento | pendiente | dictaminado | aprobado | rechazado
     estado_bicameral: str | None = None
