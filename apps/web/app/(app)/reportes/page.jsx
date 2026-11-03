@@ -9,6 +9,19 @@ import {
   FileBarChart, Play, Save, Download, Printer, Sparkles, Trash2, Plus, X, ExternalLink, Lock,
 } from 'lucide-react';
 import { authedFetch, authedFetchBlob, AUTH_ENABLED } from '@/lib/authClient';
+
+// Traduce los errores de la API a algo accionable para quien usa el módulo.
+function mensajeError(e) {
+  const status = e?.status;
+  if (status === 0) return 'No se pudo conectar con la API. Revisá que el servidor esté en línea y actualizado.';
+  if (status === 401 || status === 403) return 'Tu sesión venció o no tiene acceso. Cerrá sesión y volvé a ingresar.';
+  if (status === 404 || status === 405) return 'El servidor de la API todavía no tiene el módulo de reportes: hay que actualizarlo (runbook, sección Reportes).';
+  if (status === 503 && e.detail === 'ia_no_configurada') return 'El análisis con IA no está activado en el servidor (VIGIA_AI_PROVIDER).';
+  if (status === 502 && e.detail === 'ia_fallo') return 'El servicio de IA no respondió. Probá de nuevo en unos minutos.';
+  if (status === 422) return 'Algún filtro tiene un valor inválido. Revisá las fechas y volvé a intentar.';
+  if (status >= 500) return 'Error del servidor al procesar el reporte. Si el módulo es nuevo, puede faltar aplicar la migración 0009_reportes.';
+  return String(e?.message || e);
+}
 import FadeIn from '@/components/FadeIn';
 
 const PAGE = 100;
@@ -175,6 +188,7 @@ export default function ReportesView() {
   const [cargando, setCargando] = useState(false);
   const [analisis, setAnalisis] = useState('');
   const [analizando, setAnalizando] = useState(false);
+  const [analisisErr, setAnalisisErr] = useState('');
   const [orgDraft, setOrgDraft] = useState('');
   const [err, setErr] = useState('');
 
@@ -184,7 +198,7 @@ export default function ReportesView() {
 
   const run = useCallback(async (fn) => {
     setErr('');
-    try { return await fn(); } catch (e) { setErr(String(e.message || e)); return null; }
+    try { return await fn(); } catch (e) { setErr(mensajeError(e)); return null; }
   }, []);
 
   const cargarGuardados = useCallback(async () => {
@@ -228,8 +242,13 @@ export default function ReportesView() {
 
   const pedirAnalisis = async () => {
     setAnalizando(true);
-    const r = await run(() => authedFetch(jwt, '/reportes/analisis', { method: 'POST', body: JSON.stringify(body) }));
-    if (r) setAnalisis(r.texto);
+    setAnalisisErr('');
+    try {
+      const r = await authedFetch(jwt, '/reportes/analisis', { method: 'POST', body: JSON.stringify(body) });
+      setAnalisis(r.texto);
+    } catch (e) {
+      setAnalisisErr(mensajeError(e));
+    }
     setAnalizando(false);
   };
 
@@ -415,10 +434,13 @@ export default function ReportesView() {
                   </button>
                 </div>
               </div>
+              {err && (
+                <p role="alert" className="text-[13px] text-status-red bg-[rgba(180,35,24,0.06)] border border-[rgba(180,35,24,0.25)] rounded px-3 py-2">
+                  {err}
+                </p>
+              )}
             </section>
           </FadeIn>
-
-          {err && <p className="text-[13px] text-status-red mb-4">{err}</p>}
 
           {/* Resultado */}
           {resultado && (
@@ -478,6 +500,8 @@ export default function ReportesView() {
                         {analisis.split(/\n+/).filter(Boolean).map((p, i) => <p key={i}>{p}</p>)}
                         <p className="text-[11px] text-text-tertiary pt-1">Texto generado con IA a partir de las cifras del reporte. Verificá los datos antes de citarlos.</p>
                       </div>
+                    ) : analisisErr ? (
+                      <p role="alert" className="text-[13px] text-status-red">{analisisErr}</p>
                     ) : (
                       <p className="text-[13px] text-text-tertiary">Un resumen escrito de las cifras del reporte: volumen, evolución, organismos y temas recurrentes.</p>
                     )}
