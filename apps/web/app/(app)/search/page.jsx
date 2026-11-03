@@ -51,7 +51,7 @@ function SearchView() {
         <div className="mb-7 pt-2">
           <p className="eyebrow mb-1"><span className="eyebrow-num">BOCBA / SEARCH</span><span className="ml-2">Full-text en español</span></p>
           <h2 className="display-section text-text-primary mb-1">Buscar en <em>todo el corpus</em></h2>
-          <p className="text-[13px] text-text-tertiary font-mono">533 mil normas · ranking + snippets</p>
+          <p className="text-[13px] text-text-tertiary font-mono">boletín oficial de la ciudad · ranking por relevancia y fragmentos en contexto</p>
         </div>
       </FadeIn>
 

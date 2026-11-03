@@ -13,7 +13,7 @@ import CountUp from '@/components/CountUp';
 
 const COLORS = ['#18A6C2', '#0079DC', '#18596C', '#4E83FB', '#153B70', '#9FD6E2', '#00C49A', '#93989E'];
 
-// Orden y color editorial por tipo (paleta Argentina).
+// Orden y color editorial por tipo (paleta CESBA).
 const SERIE_TIPOS = [
   { key: 'RESOLUCION', color: '#18A6C2' },
   { key: 'PROYECTO', color: '#54BBC7' },
@@ -105,7 +105,7 @@ export default function DashboardView() {
             El pulso de la <em>normativa</em>
           </h2>
           <p className="text-[13px] text-text-tertiary font-mono">
-            {dash ? <CountUp value={dash.total_normas} /> : '…'} normas · InfoLEG / BORA / HCDN · actualización diaria
+            {dash ? <CountUp value={dash.total_normas} /> : '…'} normas · Boletín Oficial CABA · actualización diaria
           </p>
         </div>
       </FadeIn>
@@ -278,7 +278,7 @@ export default function DashboardView() {
 
       <FadeIn>
         <p className="text-[10px] text-text-tertiary font-mono pb-10 border-t border-border-light pt-4">
-          Fuentes: InfoLEG (Min. Justicia) · Boletín Oficial · datos.hcdn.gob.ar — datos públicos verificables.
+          Fuente: Boletín Oficial de la Ciudad de Buenos Aires (api-restboletinoficial.buenosaires.gob.ar) — datos públicos verificables.
         </p>
       </FadeIn>
     </div>
