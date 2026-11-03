@@ -302,6 +302,11 @@ python -c "from vigia_workers.tasks import ingest_legislatura as t; print(t(look
 python -c "from vigia_workers.alerts import match_alertas as t; print(t(notify=False))"
 ```
 
+Filtros por fuente (migración `0011_alerta_fuentes`): las alertas pueden
+vigilar Boletín, Legislatura o ambas; el Buscador tiene filtro "Fuente" y en
+Reportes la "Etapa" de un expediente es su estado de trámite (o "Sancionado").
+Aplicar con `alembic -c db/alembic.ini upgrade head` desde la consola del worker.
+
 El último comando registra los matches del backfill sin mandar emails (si no,
 las alertas notificarían cientos de expedientes viejos). Si el servicio cambia
 de formato, falla `packages/connectors/tests/test_legislatura.py` contra el

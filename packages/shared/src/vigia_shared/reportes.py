@@ -21,8 +21,14 @@ from sqlalchemy import text
 
 # Tipo de procedimiento / tipo de norma tal como lo publica el boletín.
 TIPO_EXPR = "COALESCE(raw->>'tipo_nombre', tipo)"
-# Etapa de una licitación, tomada del título: "<tipo> / <etapa>  N° …".
-ETAPA_EXPR = r"NULLIF(btrim(substring(titulo from ' / ([^/]+?)\s+N[°º]')), '')"
+# Etapa: en licitaciones sale del título ("<tipo> / <etapa>  N° …"); en los
+# expedientes de la Legislatura es su estado de trámite (o "Sancionado").
+ETAPA_EXPR = (
+    "CASE WHEN bora_seccion = 'Legislatura' THEN "
+    "CASE WHEN raw->>'sancionado' = 'true' THEN 'Sancionado' "
+    r"ELSE NULLIF(btrim(regexp_replace(raw->>'estado', '\s*\(.*\)$', '')), '') END "
+    r"ELSE NULLIF(btrim(substring(titulo from ' / ([^/]+?)\s+N[°º]')), '') END"
+)
 
 CSV_MAX = 20000        # tope de filas exportables
 TOP_ORGANISMOS = 12

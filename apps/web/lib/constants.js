@@ -19,3 +19,12 @@ export const SECTORES = [
   'Economía', 'Energía', 'Salud', 'Educación', 'Justicia', 'Trabajo', 'Ambiente', 'Tecnología',
   'Comercio', 'Transporte', 'Minería', 'Agro', 'Defensa', 'Seguridad',
 ];
+
+// Fuentes de la instancia (vigia_shared.fuentes). Vacío en un filtro = todas.
+export const FUENTES = {
+  boletin: 'Boletín Oficial',
+  legislatura: 'Legislatura',
+};
+
+// Tipos que aplican a la Ciudad (los nacionales — BCRA, consultas — quedan fuera).
+export const TIPOS_CABA = ['DNU', 'DECRETO', 'LEY', 'RESOLUCION', 'DISPOSICION', 'PROYECTO', 'OTRA'];

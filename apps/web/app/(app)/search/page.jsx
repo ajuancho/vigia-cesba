@@ -3,7 +3,7 @@
 import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { api } from '@/lib/api';
-import { TIPOS_NORMA, SECTORES, JURISDICCIONES } from '@/lib/constants';
+import { TIPOS_NORMA, TIPOS_CABA, SECTORES, FUENTES } from '@/lib/constants';
 import { Search as SearchIcon, SlidersHorizontal, ArrowRight } from 'lucide-react';
 import FadeIn from '@/components/FadeIn';
 
@@ -21,14 +21,14 @@ function SearchView() {
   const [query, setQuery] = useState(params.get('q') || '');
   const [tipo, setTipo] = useState('');
   const [sector, setSector] = useState('');
-  const [jurisdiccion, setJurisdiccion] = useState('');
+  const [fuente, setFuente] = useState('');
   const [showFilters, setShowFilters] = useState(false);
   const [results, setResults] = useState([]);
   const [total, setTotal] = useState(0);
   const [touched, setTouched] = useState(false);
 
   useEffect(() => {
-    const active = query || tipo || sector || jurisdiccion;
+    const active = query || tipo || sector || fuente;
     if (!active) {
       setResults([]);
       setTotal(0);
@@ -38,12 +38,12 @@ function SearchView() {
     setTouched(true);
     const t = setTimeout(() => {
       api
-        .search({ q: query, tipo, sector, jurisdiccion, limit: 50 })
+        .search({ q: query, tipo, sector, fuente, limit: 50 })
         .then((r) => { setResults(r.hits || []); setTotal(r.total || 0); })
         .catch(() => setResults([]));
     }, 250);
     return () => clearTimeout(t);
-  }, [query, tipo, sector, jurisdiccion]);
+  }, [query, tipo, sector, fuente]);
 
   return (
     <div className="max-w-4xl mx-auto">
@@ -51,7 +51,7 @@ function SearchView() {
         <div className="mb-7 pt-2">
           <p className="eyebrow mb-1"><span className="eyebrow-num">BOCBA / SEARCH</span><span className="ml-2">Full-text en español</span></p>
           <h2 className="display-section text-text-primary mb-1">Buscar en <em>todo el corpus</em></h2>
-          <p className="text-[13px] text-text-tertiary font-mono">boletín oficial de la ciudad · ranking por relevancia y fragmentos en contexto</p>
+          <p className="text-[13px] text-text-tertiary font-mono">boletín oficial y legislatura · ranking por relevancia y fragmentos en contexto</p>
         </div>
       </FadeIn>
 
@@ -83,7 +83,7 @@ function SearchView() {
             <label className="eyebrow text-[9px] block mb-1">Tipo</label>
             <select value={tipo} onChange={(e) => setTipo(e.target.value)} className={SELECT_CLS}>
               <option value="">Todos</option>
-              {Object.entries(TIPOS_NORMA).map(([key, val]) => <option key={key} value={key}>{val.label}</option>)}
+              {TIPOS_CABA.map((key) => <option key={key} value={key}>{TIPOS_NORMA[key].label}</option>)}
             </select>
           </div>
           <div>
@@ -94,10 +94,10 @@ function SearchView() {
             </select>
           </div>
           <div>
-            <label className="eyebrow text-[9px] block mb-1">Jurisdicción</label>
-            <select value={jurisdiccion} onChange={(e) => setJurisdiccion(e.target.value)} className={SELECT_CLS}>
+            <label className="eyebrow text-[9px] block mb-1">Fuente</label>
+            <select value={fuente} onChange={(e) => setFuente(e.target.value)} className={SELECT_CLS}>
               <option value="">Todas</option>
-              {JURISDICCIONES.map((j) => <option key={j} value={j}>{j}</option>)}
+              {Object.entries(FUENTES).map(([key, label]) => <option key={key} value={key}>{label}</option>)}
             </select>
           </div>
         </div>

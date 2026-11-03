@@ -13,6 +13,7 @@ from typing import Any
 from sqlalchemy import text
 
 from vigia_shared.db import session_scope
+from vigia_shared.fuentes import fuentes_sql
 from vigia_workers.celery_app import celery_app
 from vigia_workers.notifications import render_digest, send_email
 from vigia_workers.persistence import run_async
@@ -35,7 +36,7 @@ async def _match_all(notify: bool = True) -> dict[str, Any]:
             await session.execute(
                 text(
                     """
-                    SELECT a.id, a.keywords, a.sectores, a.anchor_at, a.workspace_id,
+                    SELECT a.id, a.keywords, a.sectores, a.fuentes, a.anchor_at, a.workspace_id,
                            w.name AS ws_name, u.email AS user_email
                     FROM alerta a
                     JOIN workspace w ON w.id = a.workspace_id
@@ -63,6 +64,10 @@ async def _match_all(notify: bool = True) -> dict[str, Any]:
                 sector_clause = "AND n.sector = ANY(:sectores)"
                 params["sectores"] = a.sectores
 
+            # Fuentes (Boletín / Legislatura); lista vacía = todas.
+            fuente_cond = fuentes_sql(a.fuentes or [], alias="n")
+            fuente_clause = f"AND {fuente_cond}" if fuente_cond else ""
+
             inserted = (
                 await session.execute(
                     text(
@@ -72,6 +77,7 @@ async def _match_all(notify: bool = True) -> dict[str, Any]:
                         FROM norma n
                         WHERE n.search_vector @@ ({ts_expr})
                           {sector_clause}
+                          {fuente_clause}
                           AND n.ingested_at >= :anchor
                           AND NOT EXISTS (
                               SELECT 1 FROM alerta_match m

@@ -55,6 +55,13 @@ const PLANTILLAS = [
     }),
   },
   {
+    nombre: 'Proyectos de ley de la Legislatura · último año',
+    config: () => ({
+      filtros: { secciones: ['Legislatura'], tipos: ['Proyecto de ley'], desde: haceDias(365) },
+      formato: 'analisis', orden: 'fecha_desc',
+    }),
+  },
+  {
     nombre: 'Contrataciones directas · último año',
     config: () => ({
       filtros: { secciones: ['Licitaciones'], tipos: ['Contratación Directa'], desde: haceDias(365) },
@@ -427,7 +434,7 @@ export default function ReportesView() {
                 <Chips opciones={opciones?.tipos || []} seleccion={f.tipos} onToggle={toggle('tipos')} />
               </Campo>
               {(opciones?.etapas?.length ?? 0) > 0 && (
-                <Campo label="Etapa" ayuda="llamado, preadjudicación, adjudicación…">
+                <Campo label="Etapa" ayuda="licitaciones: llamado, adjudicación… · legislatura: estado del expediente o sancionado">
                   <Chips opciones={opciones.etapas} seleccion={f.etapas} onToggle={toggle('etapas')} />
                 </Campo>
               )}

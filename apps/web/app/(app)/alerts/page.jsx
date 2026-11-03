@@ -2,19 +2,20 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useSession } from 'next-auth/react';
-import { SECTORES } from '@/lib/constants';
+import { SECTORES, FUENTES } from '@/lib/constants';
 import { authedFetch, AUTH_ENABLED } from '@/lib/authClient';
-import { Bell, Plus, Trash2, Power, PowerOff, Tag, Hash, Calendar, Info, Pencil, X } from 'lucide-react';
+import { Bell, Plus, Trash2, Power, PowerOff, Tag, Hash, Calendar, Info, Pencil, X, Landmark } from 'lucide-react';
 import FadeIn from '@/components/FadeIn';
 import CountUp from '@/components/CountUp';
 
 const INPUT_CLS = 'w-full bg-transparent border-b border-border-light px-1 py-2 text-[13px] text-text-primary placeholder-text-tertiary focus:outline-none focus:border-celeste transition-colors';
 
 // Form reutilizable: alta y edición comparten markup. `initial` pre-carga
-// keywords/sectores; `onSubmit` recibe el payload limpio { keywords, sectores }.
+// keywords/sectores/fuentes; `onSubmit` recibe el payload limpio { keywords, sectores, fuentes }.
 function AlertaForm({ initial, onSubmit, onCancel, submitLabel }) {
   const [keywords, setKeywords] = useState(initial?.keywords || []);
   const [sectores, setSectores] = useState(initial?.sectores || []);
+  const [fuentes, setFuentes] = useState(initial?.fuentes || []);
   const [draft, setDraft] = useState('');
 
   const addKeyword = (raw) => {
@@ -33,7 +34,7 @@ function AlertaForm({ initial, onSubmit, onCancel, submitLabel }) {
     // Volcar lo que quede tipeado sin confirmar.
     const kws = draft.trim() && !keywords.includes(draft.trim()) ? [...keywords, draft.trim()] : keywords;
     if (!kws.length) return;
-    onSubmit({ keywords: kws, sectores });
+    onSubmit({ keywords: kws, sectores, fuentes });
   };
 
   return (
@@ -55,6 +56,22 @@ function AlertaForm({ initial, onSubmit, onCancel, submitLabel }) {
           />
         </div>
         <div className="border-b border-border-light mt-1" />
+      </div>
+
+      <div className="mb-4">
+        <label className="eyebrow text-[9px] block mb-2">Fuentes <span className="text-text-tertiary normal-case font-normal">— qué vigilar (vacío = todas)</span></label>
+        <div className="flex flex-wrap gap-1.5">
+          {Object.entries(FUENTES).map(([key, label]) => {
+            const on = fuentes.includes(key);
+            return (
+              <button key={key} type="button" aria-pressed={on}
+                onClick={() => setFuentes((p) => (p.includes(key) ? p.filter((x) => x !== key) : [...p, key]))}
+                className={`text-[11px] px-2.5 py-1 rounded-full border transition-colors ${on ? 'tint-blue' : 'text-text-tertiary border-border-light hover:text-text-secondary hover:border-text-tertiary'}`}>
+                {label}
+              </button>
+            );
+          })}
+        </div>
       </div>
 
       <div className="mb-4">
@@ -99,29 +116,29 @@ export default function AlertsView() {
 
   useEffect(() => { load(); }, [load]);
 
-  const addAlerta = async ({ keywords, sectores }) => {
+  const addAlerta = async ({ keywords, sectores, fuentes }) => {
     if (connected) {
       try {
-        await authedFetch(jwt, '/alerts', { method: 'POST', body: JSON.stringify({ keywords, sectores }) });
+        await authedFetch(jwt, '/alerts', { method: 'POST', body: JSON.stringify({ keywords, sectores, fuentes }) });
         await load();
       } catch (e) { setErr(String(e.message || e)); }
     } else {
       setAlertas((prev) => [
-        { id: `local-${Date.now()}`, keywords, sectores, activa: true, matches: 0, last_match_at: null },
+        { id: `local-${Date.now()}`, keywords, sectores, fuentes, activa: true, matches: 0, last_match_at: null },
         ...prev,
       ]);
     }
     setShowForm(false);
   };
 
-  const saveEdit = async (a, { keywords, sectores }) => {
+  const saveEdit = async (a, { keywords, sectores, fuentes }) => {
     if (connected) {
       try {
-        await authedFetch(jwt, `/alerts/${a.id}`, { method: 'PATCH', body: JSON.stringify({ keywords, sectores }) });
+        await authedFetch(jwt, `/alerts/${a.id}`, { method: 'PATCH', body: JSON.stringify({ keywords, sectores, fuentes }) });
         await load();
       } catch (e) { setErr(String(e.message || e)); }
     } else {
-      setAlertas((prev) => prev.map((x) => (x.id === a.id ? { ...x, keywords, sectores } : x)));
+      setAlertas((prev) => prev.map((x) => (x.id === a.id ? { ...x, keywords, sectores, fuentes } : x)));
     }
     setEditingId(null);
   };
@@ -160,7 +177,7 @@ export default function AlertsView() {
           <div>
             <p className="eyebrow mb-1"><span className="eyebrow-num">BOCBA / ALERTAS</span><span className="ml-2">Monitoreo automático</span></p>
             <h2 className="display-section text-text-primary mb-1">Que la norma <em>te encuentre</em></h2>
-            <p className="text-[13px] text-text-tertiary font-mono">keywords + sectores · matching horario · digest por email</p>
+            <p className="text-[13px] text-text-tertiary font-mono">palabras clave + fuentes + sectores · matching horario · digest por email</p>
           </div>
           <button onClick={() => { setShowForm((v) => !v); setEditingId(null); }} className="flex items-center gap-1.5 px-4 py-2 btn-celeste rounded-full text-[11px] font-bold shrink-0">
             <Plus size={13} /> Nueva
@@ -197,7 +214,7 @@ export default function AlertsView() {
       {showForm && (
         <div className="mb-10">
           <p className="eyebrow mb-4"><span className="eyebrow-num">+</span><span className="ml-2">Nueva alerta</span></p>
-          <AlertaForm initial={{ keywords: [], sectores: [] }} onSubmit={addAlerta} onCancel={() => setShowForm(false)} submitLabel="Crear" />
+          <AlertaForm initial={{ keywords: [], sectores: [], fuentes: [] }} onSubmit={addAlerta} onCancel={() => setShowForm(false)} submitLabel="Crear" />
         </div>
       )}
 
@@ -209,7 +226,7 @@ export default function AlertsView() {
               <div className="border-b border-border-light py-5">
                 <p className="eyebrow mb-4"><span className="eyebrow-num">✎</span><span className="ml-2">Editar alerta</span></p>
                 <AlertaForm
-                  initial={{ keywords: alerta.keywords || [], sectores: alerta.sectores || [] }}
+                  initial={{ keywords: alerta.keywords || [], sectores: alerta.sectores || [], fuentes: alerta.fuentes || [] }}
                   onSubmit={(payload) => saveEdit(alerta, payload)}
                   onCancel={() => setEditingId(null)}
                   submitLabel="Guardar"
@@ -228,6 +245,7 @@ export default function AlertsView() {
                       {alerta.activa && <span className="text-[9px] font-medium tint-green border px-1.5 py-0.5 rounded-full shrink-0">activa</span>}
                     </div>
                     <div className="flex items-center gap-3 text-[10px] text-text-tertiary font-mono">
+                      <span className="flex items-center gap-1"><Landmark size={9} /> {(alerta.fuentes || []).length ? alerta.fuentes.map((f) => FUENTES[f] || f).join(' · ') : 'todas las fuentes'}</span>
                       <span className="flex items-center gap-1"><Tag size={9} /> {(alerta.sectores || []).length ? alerta.sectores.join(' · ') : 'todos'}</span>
                       <span className="flex items-center gap-1"><Hash size={9} /> {(alerta.matches || 0).toLocaleString('es-AR')} matches</span>
                       {alerta.last_match_at && <span className="flex items-center gap-1"><Calendar size={9} /> {alerta.last_match_at.slice(0, 10)}</span>}

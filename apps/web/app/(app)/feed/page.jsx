@@ -4,7 +4,7 @@ import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { BarChart, Bar, XAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import { api } from '@/lib/api';
-import { TIPOS_NORMA } from '@/lib/constants';
+import { TIPOS_NORMA, TIPOS_CABA } from '@/lib/constants';
 import {
   Clock, ArrowRight, Building2, Tag,
   Landmark, Receipt, Antenna, Umbrella, Zap, Pill, Flame, Sprout, CandlestickChart, ShieldAlert, Scale,
@@ -278,7 +278,7 @@ function FeedView() {
       <FadeIn delay={140}>
         <div className="mb-2 pb-4 border-b border-border-light">
           <div className="flex flex-wrap items-center gap-2">
-            {['TODOS', ...Object.keys(TIPOS_NORMA)].map((tipo) => (
+            {['TODOS', ...TIPOS_CABA.filter((t) => t !== 'PROYECTO')].map((tipo) => (
               <button
                 key={tipo}
                 onClick={() => changeFilter(setFilterTipo)(tipo)}

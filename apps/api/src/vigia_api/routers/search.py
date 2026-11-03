@@ -9,6 +9,7 @@ from sqlalchemy import text
 
 from vigia_api.core.db import get_sessionmaker
 from vigia_api.core.scope import scope_where
+from vigia_shared.fuentes import FUENTES, fuente_sql
 
 router = APIRouter(prefix="/search", tags=["search"])
 
@@ -41,6 +42,7 @@ async def search(
     sector: str | None = Query(None),
     emisor: str | None = Query(None, description="organismo canónico: ARCA|CNV|BCRA|…"),
     jurisdiccion: str | None = Query(None),
+    fuente: str | None = Query(None, description="boletin | legislatura (vacío = todas)"),
     limit: int = Query(40, ge=1, le=200),
     offset: int = Query(0, ge=0, le=10000),
 ) -> SearchResponse:
@@ -64,6 +66,8 @@ async def search(
     if jurisdiccion:
         where.append("jurisdiccion = :jur")
         params["jur"] = jurisdiccion
+    if fuente in FUENTES:
+        where.append(fuente_sql(fuente))
 
     # Scope de instancia: si VIGIA_JURISDICCION_SCOPE está definido, se acota
     # automáticamente (tiene precedencia sobre el parámetro `jurisdiccion`).

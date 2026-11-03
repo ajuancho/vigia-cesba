@@ -7,13 +7,11 @@ from sqlalchemy import func, or_, select
 from vigia_api.core.db import get_sessionmaker
 from vigia_api.core.scope import norma_filters
 from vigia_shared.models import DnuTracking, Norma, SourceCatalog
+from vigia_shared.fuentes import SECCION_LEGISLATURA
 from vigia_shared.relevancia import PESO_TIPO, es_tramite
 from vigia_shared.schemas import NormaDetail, NormaListItem, NormaPage
 
 router = APIRouter(prefix="/normas", tags=["normas"])
-
-# Sección asignada a los expedientes de la Legislatura (worker ingest_legislatura).
-SECCION_LEGISLATURA = "Legislatura"
 
 # Topes por edición (el cliente muestra lo que llega; el resto queda contado).
 _MAX_DESTACADOS = 30

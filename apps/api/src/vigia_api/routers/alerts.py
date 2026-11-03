@@ -16,6 +16,7 @@ from sqlalchemy import delete, func, select, update
 from vigia_api.core.db import get_sessionmaker
 from vigia_api.core.security import WorkspaceContext, require_active_plan
 from vigia_shared.constants import SECTORES
+from vigia_shared.fuentes import FUENTES
 from vigia_shared.models import Alerta, AlertaMatch, Norma
 
 router = APIRouter(prefix="/alerts", tags=["alerts"])
@@ -52,14 +53,27 @@ def _clean_sectores(sectores: list[str]) -> list[str]:
     return seen
 
 
+def _clean_fuentes(fuentes: list[str]) -> list[str]:
+    """Valida contra el catálogo de fuentes; todas o ninguna = lista vacía (= todas)."""
+    out: list[str] = []
+    for f in fuentes:
+        if f not in FUENTES:
+            raise HTTPException(422, f"fuente_invalida: {f}")
+        if f not in out:
+            out.append(f)
+    return [] if set(out) == set(FUENTES) else out
+
+
 class AlertaIn(BaseModel):
     keywords: list[str]
     sectores: list[str] = []
+    fuentes: list[str] = []
 
 
 class AlertaPatch(BaseModel):
     keywords: list[str] | None = None
     sectores: list[str] | None = None
+    fuentes: list[str] | None = None
     activa: bool | None = None
 
 
@@ -67,6 +81,7 @@ class AlertaOut(BaseModel):
     id: int
     keywords: list[str]
     sectores: list[str]
+    fuentes: list[str] = []
     activa: bool
     matches: int
     last_match_at: datetime | None
@@ -129,8 +144,8 @@ async def list_alertas(ctx: Annotated[WorkspaceContext, Depends(require_active_p
         ).all()
     return [
         AlertaOut(
-            id=a.id, keywords=a.keywords, sectores=a.sectores, activa=a.activa,
-            matches=int(c or 0), last_match_at=a.last_match_at,
+            id=a.id, keywords=a.keywords, sectores=a.sectores, fuentes=a.fuentes or [],
+            activa=a.activa, matches=int(c or 0), last_match_at=a.last_match_at,
         )
         for a, c in rows
     ]
@@ -144,6 +159,7 @@ async def create_alerta(
     _require_real_workspace(ctx)
     keywords = _clean_keywords(body.keywords)
     sectores = _clean_sectores(body.sectores)
+    fuentes = _clean_fuentes(body.fuentes)
     Session = get_sessionmaker()
     async with Session() as session:
         a = Alerta(
@@ -151,13 +167,14 @@ async def create_alerta(
             user_id=ctx.user_id or None,
             keywords=keywords,
             sectores=sectores,
+            fuentes=fuentes,
             activa=True,
         )
         session.add(a)
         await session.commit()
         await session.refresh(a)
     return AlertaOut(
-        id=a.id, keywords=a.keywords, sectores=a.sectores, activa=a.activa,
+        id=a.id, keywords=a.keywords, sectores=a.sectores, fuentes=a.fuentes, activa=a.activa,
         matches=0, last_match_at=None,
     )
 
@@ -191,6 +208,9 @@ async def update_alerta(
         if body.sectores is not None:
             a.sectores = _clean_sectores(body.sectores)
             criterio_cambio = True
+        if body.fuentes is not None:
+            a.fuentes = _clean_fuentes(body.fuentes)
+            criterio_cambio = True
         if body.activa is not None:
             a.activa = body.activa
 
@@ -206,8 +226,8 @@ async def update_alerta(
             select(func.count()).select_from(AlertaMatch).where(AlertaMatch.alerta_id == a.id)
         )
     return AlertaOut(
-        id=a.id, keywords=a.keywords, sectores=a.sectores, activa=a.activa,
-        matches=int(count or 0), last_match_at=a.last_match_at,
+        id=a.id, keywords=a.keywords, sectores=a.sectores, fuentes=a.fuentes or [],
+        activa=a.activa, matches=int(count or 0), last_match_at=a.last_match_at,
     )
 
 
