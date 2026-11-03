@@ -380,6 +380,144 @@ async def analisis(
     return AnalisisOut(texto=texto)
 
 
+# ── Pedido en lenguaje natural → configuración del constructor ──────────────
+
+
+class PedidoIn(BaseModel):
+    pedido: str = Field(min_length=3, max_length=1000)
+
+
+class InterpretacionOut(BaseModel):
+    config: ReporteConfig
+    explicacion: str
+    descartados: list[str] = []  # valores que propuso la IA y no existen en la base
+
+
+_SYSTEM_INTERPRETAR = (
+    "Convertís pedidos de reportes sobre el Boletín Oficial de la Ciudad de Buenos Aires "
+    "en filtros para un constructor de reportes. Respondés SOLO un objeto JSON, sin texto "
+    "alrededor, con esta forma:\n"
+    '{"filtros": {"secciones": [], "tipos": [], "etapas": [], "organismos": [], '
+    '"desde": null, "hasta": null, "texto": null}, "formato": "analisis", '
+    '"orden": "fecha_desc", "explicacion": ""}\n'
+    "Reglas:\n"
+    "- secciones, tipos, etapas y organismos: usá SOLO valores copiados textualmente de las "
+    "listas disponibles que te paso. Lista vacía = sin restricción.\n"
+    "- Licitaciones, compras y contrataciones están en la sección 'Licitaciones'; su tipo de "
+    "procedimiento va en 'tipos' (p.ej. 'Licitación Obra Pública') y la etapa (llamado, "
+    "preadjudicación, adjudicación…) en 'etapas'.\n"
+    "- desde/hasta: fechas ISO (AAAA-MM-DD) calculadas a partir de la fecha de hoy que te paso. "
+    "'el último año' = hoy menos 365 días. Sin período en el pedido = null.\n"
+    "- texto: solo palabras del tema que no cubran los otros filtros (p.ej. 'hospital', "
+    "'residuos'). Sintaxis: palabras sueltas (todas deben aparecer), \"frase exacta\", "
+    "'or' entre alternativas, '-palabra' para excluir. Sin tema = null.\n"
+    "- formato: 'analisis' si pide análisis, cantidades, promedios, rankings o comparaciones; "
+    "'listado' si pide listar, compilar o enumerar.\n"
+    "- orden: fecha_desc | fecha_asc | organismo | tipo.\n"
+    "- explicacion: una frase en español rioplatense que diga qué vas a mostrar. Si el pedido "
+    "incluye algo que los datos no tienen (montos, adjudicatarios, presupuestos), aclaralo ahí."
+)
+
+
+def _parse_json(texto: str) -> dict[str, Any] | None:
+    """Primer objeto JSON del texto (tolera ```json …``` u otro envoltorio)."""
+    ini, fin = texto.find("{"), texto.rfind("}")
+    if ini < 0 or fin <= ini:
+        return None
+    try:
+        data = json.loads(texto[ini : fin + 1])
+    except json.JSONDecodeError:
+        return None
+    return data if isinstance(data, dict) else None
+
+
+def _canon(valores: Any, disponibles: list[str], descartados: list[str]) -> list[str]:
+    """Mapea los valores propuestos a los disponibles (sin distinguir mayúsculas)."""
+    por_clave = {d.casefold(): d for d in disponibles}
+    out: list[str] = []
+    for v in valores if isinstance(valores, list) else []:
+        c = por_clave.get(str(v).strip().casefold())
+        if c is None:
+            descartados.append(str(v))
+        elif c not in out:
+            out.append(c)
+    return out
+
+
+def _fecha(v: Any) -> Date | None:
+    try:
+        return Date.fromisoformat(str(v)[:10]) if v else None
+    except ValueError:
+        return None
+
+
+@router.post("/interpretar", response_model=InterpretacionOut)
+async def interpretar(
+    body: PedidoIn,
+    ctx: Annotated[WorkspaceContext, Depends(require_active_plan)],
+) -> InterpretacionOut:
+    """Traduce un pedido en lenguaje natural a la configuración del constructor."""
+    _require_real_workspace(ctx)
+    if not ai.enabled():
+        raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail="ia_no_configurada")
+
+    where_all, params_all = _where(Filtros())
+    Session = get_sessionmaker()
+    async with Session() as session:
+        async def valores(expr: str, limit: int) -> list[str]:
+            rows = (
+                await session.execute(
+                    text(
+                        f"SELECT v FROM (SELECT {expr} AS v, COUNT(*) c FROM norma {where_all} "
+                        f"GROUP BY 1) t WHERE v IS NOT NULL ORDER BY c DESC LIMIT {limit}"
+                    ),
+                    params_all,
+                )
+            ).all()
+            return [str(r[0]) for r in rows]
+
+        secciones = await valores("bora_seccion", 50)
+        tipos = await valores(TIPO_EXPR, 80)
+        etapas = await valores(ETAPA_EXPR, 20)
+        organismos = await valores("organismo", 300)
+
+    contexto = {
+        "hoy": Date.today().isoformat(),
+        "secciones": secciones,
+        "tipos": tipos,
+        "etapas": etapas,
+        "organismos": organismos,
+    }
+    prompt = (
+        "Valores disponibles (JSON):\n" + json.dumps(contexto, ensure_ascii=False)
+        + f'\n\nPedido del usuario:\n"""\n{body.pedido.strip()}\n"""'
+    )
+    respuesta = await ai.completar(system=_SYSTEM_INTERPRETAR, prompt=prompt, max_tokens=800)
+    data = _parse_json(respuesta or "")
+    if data is None:
+        raise HTTPException(status_code=status.HTTP_502_BAD_GATEWAY, detail="ia_fallo")
+
+    f = data.get("filtros") if isinstance(data.get("filtros"), dict) else {}
+    descartados: list[str] = []
+    texto = f.get("texto")
+    filtros = Filtros(
+        secciones=_canon(f.get("secciones"), secciones, descartados),
+        tipos=_canon(f.get("tipos"), tipos, descartados),
+        etapas=_canon(f.get("etapas"), etapas, descartados),
+        organismos=_canon(f.get("organismos"), organismos, descartados),
+        desde=_fecha(f.get("desde")),
+        hasta=_fecha(f.get("hasta")),
+        texto=str(texto).strip()[:200] if texto else None,
+    )
+    formato = data.get("formato") if data.get("formato") in ("listado", "analisis") else "analisis"
+    orden = data.get("orden") if data.get("orden") in _ORDEN_SQL else "fecha_desc"
+    return InterpretacionOut(
+        config=ReporteConfig(filtros=filtros, formato=formato, orden=orden),
+        explicacion=str(data.get("explicacion") or "").strip()[:500],
+        descartados=descartados,
+    )
+
+
 # ── Reportes guardados ──────────────────────────────────────────────────────
 
 

@@ -6,7 +6,7 @@ import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid,
 } from 'recharts';
 import {
-  FileBarChart, Play, Save, Download, Printer, Sparkles, Trash2, Plus, X, ExternalLink, Lock,
+  FileBarChart, Play, Save, Download, Printer, Sparkles, Trash2, Plus, X, ExternalLink, Lock, Wand2,
 } from 'lucide-react';
 import { authedFetch, authedFetchBlob, AUTH_ENABLED } from '@/lib/authClient';
 
@@ -190,6 +190,10 @@ export default function ReportesView() {
   const [analizando, setAnalizando] = useState(false);
   const [analisisErr, setAnalisisErr] = useState('');
   const [orgDraft, setOrgDraft] = useState('');
+  const [pedido, setPedido] = useState('');
+  const [interpretando, setInterpretando] = useState(false);
+  const [interpretacion, setInterpretacion] = useState(null); // {explicacion, descartados}
+  const [pedidoErr, setPedidoErr] = useState('');
   const [err, setErr] = useState('');
 
   const f = config.filtros;
@@ -273,6 +277,21 @@ export default function ReportesView() {
     if (r) { setActual({ id: r.id, nombre: r.nombre }); cargarGuardados(); }
   };
 
+  const interpretar = async () => {
+    if (pedido.trim().length < 3) return;
+    setInterpretando(true);
+    setPedidoErr('');
+    try {
+      const r = await authedFetch(jwt, '/reportes/interpretar', { method: 'POST', body: JSON.stringify({ pedido: pedido.trim() }) });
+      setInterpretacion({ explicacion: r.explicacion, descartados: r.descartados || [] });
+      abrir(r.config);
+    } catch (e) {
+      setInterpretacion(null);
+      setPedidoErr(mensajeError(e));
+    }
+    setInterpretando(false);
+  };
+
   const abrir = (cfg, meta = null) => {
     const c = normalizar(cfg);
     setConfig(c);
@@ -311,6 +330,48 @@ export default function ReportesView() {
 
       {status === 'loading' ? null : !connected ? <SinSesion /> : (
         <>
+          {/* Pedido en lenguaje natural */}
+          <FadeIn delay={40}>
+            <section className="grad-institucional relative overflow-hidden rounded-lg text-white p-5 md:p-6 mb-6 print:hidden" aria-label="Pedir un reporte en lenguaje natural">
+              <div className="trama" />
+              <div className="relative flex flex-col gap-3">
+                <label htmlFor="pedido-reporte" className="flex items-center gap-2 text-[13px] font-bold tracking-[0.06em] uppercase">
+                  <Wand2 size={18} strokeWidth={1.75} /> Pedí el reporte con tus palabras
+                </label>
+                <textarea
+                  id="pedido-reporte"
+                  value={pedido}
+                  onChange={(e) => setPedido(e.target.value)}
+                  onKeyDown={(e) => { if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) interpretar(); }}
+                  rows={2}
+                  maxLength={1000}
+                  placeholder="p. ej. licitaciones de obra pública del último año del Ministerio de Salud, ordenadas por organismo"
+                  className="w-full rounded px-3 py-2.5 text-[14px] text-text-secondary bg-white placeholder-text-tertiary focus:outline-none focus:ring-2 focus:ring-verde-vital resize-y"
+                />
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <p className="text-[12px] text-white/85 max-w-xl">
+                    La IA lo traduce a los filtros de abajo y genera el reporte. Podés revisar y ajustar los filtros después.
+                  </p>
+                  <button type="button" onClick={interpretar} disabled={interpretando || pedido.trim().length < 3}
+                    className="inline-flex items-center gap-2 min-h-11 px-5 rounded bg-white text-petroleo text-[12px] font-bold uppercase tracking-[0.06em] hover:bg-humo disabled:opacity-60">
+                    <Sparkles size={15} /> {interpretando ? 'Interpretando…' : 'Armar reporte'}
+                  </button>
+                </div>
+                {pedidoErr && (
+                  <p role="alert" className="text-[13px] bg-white text-status-red rounded px-3 py-2">{pedidoErr}</p>
+                )}
+                {interpretacion && !pedidoErr && (
+                  <div className="text-[13px] bg-white/15 border border-white/30 rounded px-3 py-2 flex flex-col gap-1" role="status">
+                    {interpretacion.explicacion && <p><span className="font-semibold">Entendí:</span> {interpretacion.explicacion}</p>}
+                    {interpretacion.descartados.length > 0 && (
+                      <p className="text-white/85">No encontré en la base: {interpretacion.descartados.join(', ')}. Revisá los filtros.</p>
+                    )}
+                  </div>
+                )}
+              </div>
+            </section>
+          </FadeIn>
+
           {/* Plantillas y guardados */}
           <FadeIn delay={60}>
             <div className="flex flex-col gap-3 mb-6 print:hidden">
@@ -396,11 +457,20 @@ export default function ReportesView() {
                     </label>
                   </div>
                 </Campo>
-                <Campo label="Texto" ayuda="palabras en el título u objeto">
+                <Campo label="Palabras clave" ayuda="filtra por palabras; no es un pedido a la IA">
                   <input value={f.texto} onChange={(e) => setFiltro('texto', e.target.value)}
                     onKeyDown={(e) => { if (e.key === 'Enter') generar(); }}
-                    placeholder='p. ej. "hospital" o pavimentación -bacheo'
+                    placeholder='p. ej. hospital, "residuos peligrosos" o pavimentación -bacheo'
+                    aria-describedby="ayuda-palabras"
                     className="h-10 px-3 rounded border border-border-medium bg-white text-[13px] focus:outline-none focus:border-cian" />
+                  <p id="ayuda-palabras" className="text-[12px] leading-relaxed text-text-tertiary">
+                    Busca en el título, el objeto y el organismo. Varias palabras: tienen que aparecer todas
+                    (<code className="text-petroleo">limpieza hospital</code>). Frase exacta entre comillas
+                    (<code className="text-petroleo">"residuos peligrosos"</code>). Alternativas con <code className="text-petroleo">or</code>
+                    (<code className="text-petroleo">ascensores or escaleras</code>). Excluir con un guion
+                    (<code className="text-petroleo">-bacheo</code>). Incluye plurales y variantes. Para pedir el reporte con tus
+                    palabras usá la caja de arriba.
+                  </p>
                 </Campo>
               </div>
               <div className="flex flex-wrap items-end justify-between gap-4 pt-4 border-t border-border-light">
