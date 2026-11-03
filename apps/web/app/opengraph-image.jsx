@@ -1,9 +1,10 @@
 import { ImageResponse } from 'next/og';
 
-/* Imagen OpenGraph (1200×630) — editorial OpenArg: dark cinematic, franja
-   bandera, headline monumental con em sol, metadata mono. */
+/* Imagen OpenGraph (1200×630) — identidad CESBA: gradiente institucional,
+   título en mayúsculas bold con bajada en minúsculas, barra de acento vital
+   y la línea de pie institucional. */
 
-export const alt = 'Vigía — La normativa argentina, vigilada. Inteligencia legislativa y regulatoria por OpenArg.';
+export const alt = 'Monitor BOCBA — La normativa porteña, al día. Herramienta del CESBA.';
 export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
 
@@ -16,10 +17,10 @@ async function loadFont(path) {
 }
 
 export default async function OpengraphImage() {
-  const [displayBold, displayItalic, mono] = await Promise.all([
-    loadFont('familjen-grotesk@latest/latin-700-normal.ttf'),
-    loadFont('familjen-grotesk@latest/latin-700-italic.ttf'),
-    loadFont('jetbrains-mono@latest/latin-500-normal.ttf'),
+  const [bold, light, medium] = await Promise.all([
+    loadFont('montserrat@latest/latin-700-normal.ttf'),
+    loadFont('montserrat@latest/latin-300-normal.ttf'),
+    loadFont('montserrat@latest/latin-500-normal.ttf'),
   ]);
 
   return new ImageResponse(
@@ -30,109 +31,51 @@ export default async function OpengraphImage() {
           height: '100%',
           display: 'flex',
           flexDirection: 'column',
-          backgroundColor: '#06090F',
-          backgroundImage:
-            'radial-gradient(ellipse 900px 600px at 10% -10%, rgba(116,172,223,0.16), transparent 60%), radial-gradient(ellipse 700px 500px at 100% 110%, rgba(246,180,14,0.10), transparent 55%)',
-          position: 'relative',
+          backgroundImage: 'linear-gradient(180deg, #1B9FC7 0%, #153B70 100%)',
+          color: '#FFFFFF',
+          fontFamily: 'Montserrat',
         }}
       >
-        {/* Franja bandera */}
-        <div style={{ display: 'flex', height: 10, width: '100%' }}>
-          <div style={{ flex: 1, backgroundColor: '#74ACDF' }} />
-          <div style={{ flex: 1, backgroundColor: '#FFFFFF' }} />
-          <div style={{ flex: 1, backgroundColor: '#74ACDF' }} />
-        </div>
-
         {/* Cuerpo */}
-        <div
-          style={{
-            flex: 1,
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'center',
-            padding: '0 88px',
-          }}
-        >
-          <div
-            style={{
-              fontFamily: 'JetBrains Mono',
-              fontSize: 20,
-              letterSpacing: 4,
-              color: '#74ACDF',
-              marginBottom: 28,
-              display: 'flex',
-            }}
-          >
-            N.º 01 / MMXXVI · INTELIGENCIA LEGISLATIVA · ARGENTINA
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '0 88px' }}>
+          <div style={{ display: 'flex', fontWeight: 500, fontSize: 20, letterSpacing: 3, color: 'rgba(255,255,255,0.86)', marginBottom: 36 }}>
+            CONSEJO ECONÓMICO Y SOCIAL DE LA CIUDAD DE BUENOS AIRES
           </div>
-
-          <div
-            style={{
-              fontFamily: 'Familjen Grotesk',
-              fontWeight: 700,
-              fontSize: 96,
-              lineHeight: 1.02,
-              letterSpacing: -4,
-              color: '#E8ECF4',
-              display: 'flex',
-              flexDirection: 'column',
-            }}
-          >
-            <span>La normativa argentina,</span>
-            <span style={{ fontStyle: 'italic', color: '#F6B40E' }}>vigilada.</span>
+          <div style={{ display: 'flex', alignItems: 'stretch' }}>
+            <div style={{ width: 10, backgroundColor: '#00FAB9', marginRight: 32 }} />
+            <div style={{ display: 'flex', flexDirection: 'column' }}>
+              <span style={{ fontWeight: 700, fontSize: 84, lineHeight: 1.02, letterSpacing: 2 }}>LA NORMATIVA PORTEÑA,</span>
+              <span style={{ fontWeight: 700, fontSize: 84, lineHeight: 1.02, letterSpacing: 2 }}>AL DÍA</span>
+              <span style={{ fontWeight: 300, fontSize: 34, marginTop: 22 }}>monitor del boletín oficial de la ciudad de buenos aires</span>
+            </div>
           </div>
         </div>
 
-        {/* Pie */}
+        {/* Pie institucional */}
         <div
           style={{
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            padding: '0 88px 52px',
+            padding: '0 88px',
+            height: 72,
+            borderTop: '1px solid rgba(255,255,255,0.28)',
+            fontWeight: 500,
+            fontSize: 20,
+            letterSpacing: 2,
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: 18 }}>
-            {/* Marca: ojo */}
-            <div
-              style={{
-                width: 54,
-                height: 54,
-                borderRadius: 14,
-                border: '2px solid rgba(116,172,223,0.45)',
-                backgroundColor: 'rgba(116,172,223,0.12)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-            >
-              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#74ACDF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z" />
-                <circle cx="12" cy="12" r="3" />
-              </svg>
-            </div>
-            <div style={{ display: 'flex', flexDirection: 'column' }}>
-              <span style={{ fontFamily: 'Familjen Grotesk', fontWeight: 700, fontSize: 30, color: '#E8ECF4', letterSpacing: 1 }}>
-                VIGÍA
-              </span>
-              <span style={{ fontFamily: 'JetBrains Mono', fontSize: 15, letterSpacing: 4, color: '#636E85' }}>
-                POR OPENARG
-              </span>
-            </div>
-          </div>
-
-          <div style={{ fontFamily: 'JetBrains Mono', fontSize: 18, color: '#8892A8', display: 'flex' }}>
-            533.000+ normas · InfoLEG · BORA · HCDN
-          </div>
+          <span>www.cesba.gob.ar</span>
+          <span style={{ fontWeight: 700 }}>MONITOR BOCBA · CESBA</span>
         </div>
       </div>
     ),
     {
       ...size,
       fonts: [
-        { name: 'Familjen Grotesk', data: displayBold, weight: 700, style: 'normal' },
-        { name: 'Familjen Grotesk', data: displayItalic, weight: 700, style: 'italic' },
-        { name: 'JetBrains Mono', data: mono, weight: 500, style: 'normal' },
+        { name: 'Montserrat', data: bold, weight: 700, style: 'normal' },
+        { name: 'Montserrat', data: light, weight: 300, style: 'normal' },
+        { name: 'Montserrat', data: medium, weight: 500, style: 'normal' },
       ],
     }
   );

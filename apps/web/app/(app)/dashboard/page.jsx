@@ -11,19 +11,19 @@ import { TrendingUp, TrendingDown, Minus } from 'lucide-react';
 import FadeIn from '@/components/FadeIn';
 import CountUp from '@/components/CountUp';
 
-const COLORS = ['#74ACDF', '#F6B40E', '#34D399', '#A78BFA', '#F87171', '#93C5F8', '#FFD04A', '#8892A8'];
+const COLORS = ['#18A6C2', '#0079DC', '#18596C', '#4E83FB', '#153B70', '#9FD6E2', '#00C49A', '#93989E'];
 
 // Orden y color editorial por tipo (paleta Argentina).
 const SERIE_TIPOS = [
-  { key: 'RESOLUCION', color: '#74ACDF' },
-  { key: 'PROYECTO', color: '#22D3EE' },
-  { key: 'DISPOSICION', color: '#A78BFA' },
-  { key: 'DECRETO', color: '#F6B40E' },
-  { key: 'LEY', color: '#34D399' },
-  { key: 'DNU', color: '#F87171' },
-  { key: 'COMUNICACION', color: '#F472B6' },
-  { key: 'CONSULTA', color: '#FB923C' },
-  { key: 'OTRA', color: '#8892A8' },
+  { key: 'RESOLUCION', color: '#18A6C2' },
+  { key: 'PROYECTO', color: '#54BBC7' },
+  { key: 'DISPOSICION', color: '#4E83FB' },
+  { key: 'DECRETO', color: '#0079DC' },
+  { key: 'LEY', color: '#18596C' },
+  { key: 'DNU', color: '#153B70' },
+  { key: 'COMUNICACION', color: '#00B2D1' },
+  { key: 'CONSULTA', color: '#7FB8C9' },
+  { key: 'OTRA', color: '#93989E' },
 ];
 
 function Delta({ actual, anterior }) {
@@ -100,9 +100,9 @@ export default function DashboardView() {
       {/* Header editorial */}
       <FadeIn>
         <div className="mb-10 pt-2">
-          <Eyebrow num="VIGÍA / DATA">Inteligencia regulatoria</Eyebrow>
+          <Eyebrow num="BOCBA / DATA">Inteligencia regulatoria</Eyebrow>
           <h2 className="display-section text-text-primary mb-1">
-            El pulso de la <em>normativa.</em>
+            El pulso de la <em>normativa</em>
           </h2>
           <p className="text-[13px] text-text-tertiary font-mono">
             {dash ? <CountUp value={dash.total_normas} /> : '…'} normas · InfoLEG / BORA / HCDN · actualización diaria
@@ -136,7 +136,7 @@ export default function DashboardView() {
         <FadeIn>
           <Eyebrow num="II.">Pulso regulatorio · 24 meses</Eyebrow>
           <h3 className="text-[17px] font-bold text-text-primary mb-6" style={{ fontFamily: 'var(--font-display)' }}>
-            Producción total, <em className="text-sol italic">y cada tipo en su propia escala.</em>
+            Producción total, <em>y cada tipo en su propia escala</em>
           </h3>
         </FadeIn>
 
@@ -145,15 +145,15 @@ export default function DashboardView() {
             <AreaChart data={totalSerie} margin={{ left: -10, right: 4 }}>
               <defs>
                 <linearGradient id="fillTotal" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#74ACDF" stopOpacity={0.35} />
-                  <stop offset="100%" stopColor="#74ACDF" stopOpacity={0.02} />
+                  <stop offset="0%" stopColor="#18A6C2" stopOpacity={0.35} />
+                  <stop offset="100%" stopColor="#18A6C2" stopOpacity={0.02} />
                 </linearGradient>
               </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(116, 172, 223, 0.08)" vertical={false} />
-              <XAxis dataKey="mes" tick={{ fill: '#636E85', fontSize: 10 }} axisLine={false} tickLine={false} interval="preserveStartEnd" />
-              <YAxis tick={{ fill: '#636E85', fontSize: 10 }} axisLine={false} tickLine={false} />
+              <CartesianGrid strokeDasharray="3 3" stroke="rgba(24, 166, 194, 0.08)" vertical={false} />
+              <XAxis dataKey="mes" tick={{ fill: '#5B6267', fontSize: 10 }} axisLine={false} tickLine={false} interval="preserveStartEnd" />
+              <YAxis tick={{ fill: '#5B6267', fontSize: 10 }} axisLine={false} tickLine={false} />
               <Tooltip content={<ChartTooltip />} />
-              <Area type="monotone" dataKey="total" name="Total" stroke="#74ACDF" strokeWidth={2} fill="url(#fillTotal)" animationDuration={1200} />
+              <Area type="monotone" dataKey="total" name="Total" stroke="#18A6C2" strokeWidth={2} fill="url(#fillTotal)" animationDuration={1200} />
             </AreaChart>
           </ResponsiveContainer>
         </FadeIn>
@@ -194,7 +194,7 @@ export default function DashboardView() {
         <FadeIn>
           <Eyebrow num="III.">Quién regula · últimos 90 días</Eyebrow>
           <h3 className="text-[17px] font-bold text-text-primary mb-6" style={{ fontFamily: 'var(--font-display)' }}>
-            Los organismos que <em className="text-sol italic">más publican.</em>
+            Los organismos que <em>más publican</em>
           </h3>
         </FadeIn>
         <div className="border-t border-border-light">
@@ -227,17 +227,17 @@ export default function DashboardView() {
           <FadeIn>
             <Eyebrow num="IV.">DNU desde 1994</Eyebrow>
             <h3 className="text-[17px] font-bold text-text-primary mb-6" style={{ fontFamily: 'var(--font-display)' }}>
-              Cada gestión, <em className="text-sol italic">a simple vista.</em>
+              Cada gestión, <em>a simple vista</em>
             </h3>
           </FadeIn>
           <FadeIn delay={120}>
             <ResponsiveContainer width="100%" height={240}>
               <BarChart data={dnuHist} margin={{ left: -14, right: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="rgba(116, 172, 223, 0.08)" vertical={false} />
-                <XAxis dataKey="anio" tick={{ fill: '#636E85', fontSize: 9 }} axisLine={false} tickLine={false} interval={3} />
-                <YAxis tick={{ fill: '#636E85', fontSize: 10 }} axisLine={false} tickLine={false} />
-                <Tooltip content={<ChartTooltip />} cursor={{ fill: 'rgba(116,172,223,0.06)' }} />
-                <Bar dataKey="cantidad" name="DNU" fill="#F87171" radius={[3, 3, 0, 0]} animationDuration={1100} />
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(24, 166, 194, 0.08)" vertical={false} />
+                <XAxis dataKey="anio" tick={{ fill: '#5B6267', fontSize: 9 }} axisLine={false} tickLine={false} interval={3} />
+                <YAxis tick={{ fill: '#5B6267', fontSize: 10 }} axisLine={false} tickLine={false} />
+                <Tooltip content={<ChartTooltip />} cursor={{ fill: 'rgba(24, 166, 194, 0.06)' }} />
+                <Bar dataKey="cantidad" name="DNU" fill="#153B70" radius={[3, 3, 0, 0]} animationDuration={1100} />
               </BarChart>
             </ResponsiveContainer>
           </FadeIn>
@@ -247,7 +247,7 @@ export default function DashboardView() {
           <FadeIn>
             <Eyebrow num="V.">Sectores</Eyebrow>
             <h3 className="text-[17px] font-bold text-text-primary mb-6" style={{ fontFamily: 'var(--font-display)' }}>
-              Dónde golpea <em className="text-sol italic">la regulación.</em>
+              Dónde golpea <em>la regulación</em>
             </h3>
           </FadeIn>
           <FadeIn delay={120}>

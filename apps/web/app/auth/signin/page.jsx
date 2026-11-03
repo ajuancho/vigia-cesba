@@ -4,7 +4,7 @@ import { Suspense, useState } from 'react';
 import Link from 'next/link';
 import { signIn } from 'next-auth/react';
 import { useSearchParams } from 'next/navigation';
-import { ScrollText, Bell, Users, History, ArrowLeft } from 'lucide-react';
+import { Bell, Users, History, ArrowLeft } from 'lucide-react';
 import { AUTH_ENABLED } from '@/lib/authClient';
 import FadeIn from '@/components/FadeIn';
 
@@ -31,77 +31,82 @@ function SignInInner() {
   const [accepted, setAccepted] = useState(false);
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-4">
-      <div className="flag-stripe fixed top-0 inset-x-0 z-[60]" />
+    <div className="min-h-screen flex flex-wrap bg-white">
+      {/* Marca: gradiente institucional + trama */}
+      <section className="grad-institucional relative overflow-hidden text-white flex-[1_1_480px] min-h-[380px] p-8 md:p-12 flex flex-col justify-between gap-12">
+        <div className="trama" />
+        <div className="blob w-[460px] h-[460px] -left-36 -bottom-44 bg-[rgba(0,250,185,0.26)]" />
+        <Link href="/" className="relative w-fit">
+          <img src="/brand/cesba-logo-blanco.png" alt="CESBA — Consejo Económico y Social de la Ciudad de Buenos Aires" width={96} height={96} className="w-20 h-20 md:w-24 md:h-24" />
+        </Link>
+        <div className="relative title-rule-vital flex flex-col gap-3">
+          <p className="display-hero !text-[clamp(2rem,4vw,3.25rem)]">Monitor BOCBA</p>
+          <p className="text-[17px] md:text-[19px] font-light text-white/85">la normativa porteña, al día</p>
+        </div>
+        <p className="relative text-[11px] md:text-[12px] tracking-[0.06em] text-white/85">
+          CONSEJO ECONÓMICO Y SOCIAL DE LA CIUDAD DE BUENOS AIRES
+        </p>
+      </section>
 
-      <FadeIn className="w-full max-w-sm">
-        <div className="card p-8 relative overflow-hidden">
-          <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(ellipse 80% 60% at 50% -10%, rgba(116,172,223,0.10), transparent 60%)' }} />
-
-          <div className="relative">
-            <div className="flex items-center gap-2.5 mb-7">
-              <div className="w-10 h-10 rounded-lg bg-celeste/10 border border-celeste/30 flex items-center justify-center">
-                <ScrollText size={20} className="text-celeste" />
-              </div>
-              <div>
-                <p className="text-[14px] font-bold text-text-primary leading-none" style={{ fontFamily: 'var(--font-display)' }}>BOCBA</p>
-                <p className="text-[8px] text-text-tertiary uppercase tracking-[0.18em] font-mono mt-0.5">Monitor Normativo · CESBA</p>
-              </div>
+      {/* Acceso */}
+      <section className="flex-[1_1_480px] px-6 py-12 md:py-16 flex items-center justify-center">
+        <FadeIn className="w-full max-w-sm">
+          <div className="flex flex-col gap-7">
+            <div className="flex flex-col gap-2">
+              <p className="eyebrow"><span className="eyebrow-num">ACCESO</span></p>
+              <h1 className="display-section text-petroleo">Entrá al monitor</h1>
+              <p className="text-[15px] text-text-tertiary">usá tu correo institucional para ingresar</p>
             </div>
 
-            <p className="eyebrow mb-2"><span className="eyebrow-num">ACCESO</span></p>
-            <h1 className="display-section text-text-primary mb-6">Entrá al <em>monitor.</em></h1>
-
-            <ul className="space-y-3 mb-7">
+            <ul className="space-y-3">
               {BENEFITS.map(({ icon: Icon, text }) => (
-                <li key={text} className="flex items-start gap-2.5 text-[12px] text-text-secondary leading-relaxed">
-                  <Icon size={13} className="text-celeste shrink-0 mt-0.5" />
+                <li key={text} className="flex items-start gap-3 text-[14px] text-text-secondary leading-relaxed">
+                  <Icon size={18} strokeWidth={1.75} className="text-petroleo shrink-0 mt-0.5" />
                   {text}
                 </li>
               ))}
             </ul>
 
             {AUTH_ENABLED ? (
-              <>
-                <label className="flex items-start gap-2.5 mb-4 cursor-pointer select-none">
+              <div className="flex flex-col gap-4">
+                <label className="flex items-start gap-2.5 cursor-pointer select-none">
                   <input
                     type="checkbox"
                     checked={accepted}
                     onChange={(e) => setAccepted(e.target.checked)}
-                    className="mt-0.5 w-4 h-4 shrink-0 accent-celeste cursor-pointer"
+                    className="mt-0.5 w-4 h-4 shrink-0 accent-cian cursor-pointer"
                   />
-                  <span className="text-[11px] text-text-tertiary leading-relaxed">
+                  <span className="text-[12px] text-text-tertiary leading-relaxed">
                     Leí y acepto los{' '}
-                    <Link href="/legal" className="text-celeste hover:text-celeste-bright transition-colors">términos y la política de privacidad</Link>, y presto mi consentimiento al tratamiento de mis datos personales conforme a la Ley N° 25.326.
+                    <Link href="/legal" className="text-celeste font-semibold hover:text-petroleo transition-colors">términos y la política de privacidad</Link>, y presto mi consentimiento al tratamiento de mis datos personales conforme a la Ley N° 25.326.
                   </span>
                 </label>
                 <button
                   onClick={() => signIn('google', { callbackUrl })}
                   disabled={!accepted}
-                  className="w-full flex items-center justify-center gap-2.5 px-4 py-2.5 bg-text-primary text-navy-950 rounded-full text-[13px] font-bold hover:bg-white transition-colors disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-text-primary"
+                  className="btn-celeste w-full flex items-center justify-center gap-3 min-h-12 px-4 text-[13px] font-bold disabled:opacity-40 disabled:cursor-not-allowed"
                 >
-                  <GoogleMark /> Continuar con Google
+                  <span className="w-6 h-6 rounded-sm bg-white flex items-center justify-center"><GoogleMark /></span>
+                  Continuar con Google
                 </button>
-              </>
+              </div>
             ) : (
-              <div className="text-[12px] text-text-secondary bg-bg-secondary border border-border-light rounded-lg p-3 leading-relaxed">
+              <div className="text-[13px] text-text-secondary bg-humo border border-border-light rounded p-3 leading-relaxed">
                 <span className="tint-amber border rounded-full px-2 py-0.5 text-[10px] font-semibold mr-1.5">demo</span>
                 El login se activa configurando Google OAuth
-                (<code className="font-mono text-[11px]">AUTH_GOOGLE_ID/SECRET</code> + <code className="font-mono text-[11px]">AUTH_SECRET</code>).
+                (<code className="text-[12px]">AUTH_GOOGLE_ID/SECRET</code> + <code className="text-[12px]">AUTH_SECRET</code>).
               </div>
             )}
 
-            <div className="flex items-center justify-between mt-6 pt-5 border-t border-border-light">
-              <Link href="/" className="flex items-center gap-1 text-[11px] text-text-tertiary hover:text-text-primary transition-colors">
-                <ArrowLeft size={11} /> Volver al inicio
+            <div className="flex flex-wrap items-center justify-between gap-2 pt-5 border-t border-border-light text-[12px]">
+              <a href="https://www.cesba.gob.ar" target="_blank" rel="noopener noreferrer" className="font-semibold tracking-[0.06em] text-petroleo hover:underline">www.cesba.gob.ar</a>
+              <Link href="/" className="flex items-center gap-1 text-text-tertiary hover:text-petroleo transition-colors">
+                <ArrowLeft size={12} /> Volver al inicio
               </Link>
-              <span className="text-[11px] text-text-tertiary">Cuenta gratuita</span>
             </div>
           </div>
-        </div>
-      </FadeIn>
-
-      <p className="text-[10px] text-text-tertiary font-mono mt-6">Datos públicos · Boletín Oficial CABA · CESBA</p>
+        </FadeIn>
+      </section>
     </div>
   );
 }

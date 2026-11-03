@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { ScrollText, Newspaper, Search, Bell, ArrowRight, BarChart3 } from 'lucide-react';
+import { Newspaper, Search, Bell, ArrowRight, BarChart3 } from 'lucide-react';
 import FadeIn from '@/components/FadeIn';
 
 export const revalidate = 300;
@@ -18,28 +18,28 @@ async function getStats() {
 
 const MODULES = [
   {
-    num: '01', icon: Newspaper, title: 'Boletín del día', href: '/feed',
+    icon: Newspaper, title: 'Boletín del día', href: '/feed',
     desc: 'El Boletín Oficial CABA como un diario: lo importante arriba, el trámite colapsado, filtrable por organismo y cada norma con su resumen IA.',
   },
   {
-    num: '02', icon: Search, title: 'Buscador', href: '/search',
-    desc: 'Full-text search en español sobre toda la normativa porteña. Lenguaje natural, ranking por relevancia y snippets en contexto.',
+    icon: Search, title: 'Buscador', href: '/search',
+    desc: 'Búsqueda de texto completo en español sobre toda la normativa porteña, con ranking por relevancia y fragmentos en contexto.',
   },
   {
-    num: '03', icon: Bell, title: 'Alertas', href: '/alerts',
-    desc: 'Suscribite por keyword y sector. Cuando una norma matchea, recibís un digest por email con el resumen y el vínculo al texto oficial.',
+    icon: Bell, title: 'Alertas', href: '/alerts',
+    desc: 'Suscribite por palabra clave y sector. Cuando una norma coincide, recibís un resumen por correo con el vínculo al texto oficial.',
   },
   {
-    num: '04', icon: BarChart3, title: 'Estadísticas', href: '/dashboard',
+    icon: BarChart3, title: 'Estadísticas', href: '/dashboard',
     desc: 'El pulso normativo porteño en números: actividad por tipo y sector, organismos más activos, tendencias históricas.',
   },
 ];
 
 const PIPELINE = [
-  { num: '01', label: 'Ingesta', desc: 'API REST oficial del BOCBA — scraping diario con workers automáticos cada mañana', color: 'text-celeste' },
-  { num: '02', label: 'Normalización', desc: 'Tipo, sector y organismo emisor detectados automáticamente sobre cada norma publicada', color: 'text-sol' },
-  { num: '03', label: 'Síntesis IA', desc: 'Cada norma nueva resumida en lenguaje claro: qué resuelve y a quién afecta', color: 'text-sol-bright' },
-  { num: '04', label: 'Alertas', desc: 'Índice full-text en español + matching por keyword y digest por email', color: 'text-text-primary' },
+  { num: '01', label: 'Ingesta', desc: 'API REST oficial del BOCBA: lectura diaria con procesos automáticos cada mañana.' },
+  { num: '02', label: 'Normalización', desc: 'Tipo, sector y organismo emisor detectados automáticamente sobre cada norma publicada.' },
+  { num: '03', label: 'Síntesis IA', desc: 'Cada norma nueva resumida en lenguaje claro: qué resuelve y a quién afecta.' },
+  { num: '04', label: 'Alertas', desc: 'Índice de texto completo en español, coincidencias por palabra clave y resumen por correo.' },
 ];
 
 export default async function Landing() {
@@ -48,200 +48,184 @@ export default async function Landing() {
   const sectores = stats?.por_sector?.length ?? 9;
   const fmt = (n) => n.toLocaleString('es-AR');
 
-  return (
-    <div className="min-h-screen">
-      <div className="flag-stripe fixed top-0 inset-x-0 z-[60]" />
+  const CIFRAS = [
+    { num: total > 0 ? fmt(total) : '—', label: 'Normas indexadas', detail: 'decretos, resoluciones, disposiciones, edictos y avisos' },
+    { num: '1', label: 'Fuente oficial', detail: 'api del boletín oficial de la ciudad, sin intermediarios' },
+    { num: String(sectores), label: 'Sectores detectados', detail: 'salud, educación, ambiente, transporte y más' },
+    { num: '24/7', label: 'Monitoreo continuo', detail: 'ingesta diaria a las 9:00 hs con reintento a las 13:00 hs' },
+  ];
 
-      {/* ── Topbar ── */}
-      <header className="sticky top-0 z-50 bg-bg-secondary/80 backdrop-blur border-b border-border-light">
-        <div className="max-w-5xl mx-auto px-5 md:px-10 h-14 flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-            <div className="w-7 h-7 rounded-lg bg-celeste/10 border border-celeste/30 flex items-center justify-center">
-              <ScrollText size={14} className="text-celeste" />
-            </div>
-            <div>
-              <p className="text-[13px] font-bold text-text-primary leading-none" style={{ fontFamily: 'var(--font-display)' }}>BOCBA</p>
-              <p className="text-[8px] text-text-tertiary uppercase tracking-[0.18em] font-mono mt-0.5">Monitor Normativo · CESBA</p>
-            </div>
-          </div>
+  return (
+    <div className="min-h-screen flex flex-col bg-white">
+      {/* ── Hero: gradiente institucional + trama ── */}
+      <header className="grad-institucional relative overflow-hidden text-white">
+        <div className="trama" />
+        <div className="blob w-[520px] h-[520px] -right-32 -top-40 bg-[rgba(0,250,185,0.28)]" />
+        <div className="blob w-[420px] h-[420px] right-64 -bottom-56 bg-[rgba(78,131,251,0.35)]" />
+
+        <nav className="relative max-w-6xl mx-auto px-5 md:px-10 pt-6 flex items-center justify-between gap-3">
+          <Link href="/" className="flex items-center gap-3.5 text-white">
+            <img src="/brand/cesba-logo-blanco.png" alt="CESBA — Consejo Económico y Social de la Ciudad de Buenos Aires" width={64} height={64} className="w-14 h-14 md:w-16 md:h-16" />
+            <span className="flex flex-col gap-0.5 border-l border-white/30 pl-3.5">
+              <span className="text-[14px] md:text-[15px] font-bold tracking-[0.06em]">MONITOR BOCBA</span>
+              <span className="hidden sm:block text-[12px] text-white/85">boletín oficial de la ciudad</span>
+            </span>
+          </Link>
           <div className="flex items-center gap-2">
-            <Link href="/auth/signin" className="hidden sm:block text-[12px] text-text-secondary hover:text-text-primary px-3 py-1.5 transition-colors">
+            <Link href="/auth/signin" className="btn-ghost-invert hidden sm:inline-flex items-center min-h-11 px-4 text-[12px] font-semibold">
               Iniciar sesión
             </Link>
-            <Link href="/feed" className="btn-celeste rounded-full px-4 py-1.5 text-[12px] font-bold">
-              Entrar →
+            <Link href="/feed" className="btn-celeste inline-flex items-center gap-2 min-h-11 px-5 text-[12px] font-bold">
+              Entrar <ArrowRight size={16} />
             </Link>
           </div>
-        </div>
-      </header>
+        </nav>
 
-      <main className="max-w-5xl mx-auto px-5 md:px-10">
-        {/* ── Hero ── */}
-        <section className="pt-16 pb-14 md:pt-24 md:pb-20 text-center">
+        <div className="relative max-w-6xl mx-auto px-5 md:px-10 pt-20 pb-24 md:pt-28 md:pb-28 flex flex-col gap-7">
           <FadeIn>
-            <p className="eyebrow mb-5">
-              <span className="eyebrow-num">CESBA</span>
-              <span className="mx-2 text-text-tertiary">·</span>
-              Consejo Económico y Social de la Ciudad de Buenos Aires
+            <p className="text-[11px] md:text-[12px] font-medium tracking-[0.14em] text-white/85">
+              CONSEJO ECONÓMICO Y SOCIAL DE LA CIUDAD DE BUENOS AIRES
             </p>
           </FadeIn>
           <FadeIn delay={80}>
-            <h1 className="display-hero text-text-primary mb-6">
-              La normativa porteña,
-              <br />
-              <em>al día.</em>
-            </h1>
+            <div className="title-rule-vital flex flex-col gap-4">
+              <h1 className="display-hero max-w-4xl">La normativa porteña, al día</h1>
+              <p className="text-[19px] md:text-[23px] font-light leading-snug">
+                monitor interno del boletín oficial de la ciudad de buenos aires
+              </p>
+            </div>
           </FadeIn>
           <FadeIn delay={160}>
-            <p className="text-[15px] md:text-base text-text-secondary max-w-xl mx-auto leading-relaxed mb-9">
-              Monitor interno del <strong className="text-text-primary font-semibold">Boletín Oficial de la Ciudad de Buenos Aires</strong>.
-              Cada norma indexada, resumida con IA en lenguaje claro,
-              y con alertas por email cuando algo que te importa se publica.
-              Datos oficiales, frescos cada mañana.
+            <p className="max-w-xl text-[16px] md:text-[17px] leading-relaxed text-white/85">
+              Cada norma indexada, resumida con IA en lenguaje claro y con alertas por correo
+              cuando se publica algo que te importa. Datos oficiales, actualizados cada mañana.
             </p>
           </FadeIn>
           <FadeIn delay={240}>
-            <div className="flex items-center justify-center gap-6 mt-9 text-[13px] font-medium">
-              <Link href="/feed" className="textlink">
-                Ver el boletín de hoy <span className="arrow">→</span>
+            <div className="flex flex-wrap gap-3">
+              <Link href="/feed" className="btn-celeste inline-flex items-center gap-2.5 min-h-12 px-6 text-[13px] font-bold">
+                Ver el boletín de hoy <ArrowRight size={18} />
               </Link>
-              <Link href="/auth/signin" className="textlink">
-                Iniciar sesión <span className="arrow">→</span>
+              <Link href="#como-funciona" className="btn-ghost-invert inline-flex items-center min-h-12 px-6 text-[13px] font-semibold">
+                Cómo funciona
               </Link>
             </div>
           </FadeIn>
-        </section>
+        </div>
+      </header>
 
-        {/* ── Escala ── */}
-        <section className="border-t border-border-light py-12 md:py-16">
-          <FadeIn>
-            <p className="eyebrow mb-8"><span className="eyebrow-num">I.</span> <span className="ml-2">El corpus</span></p>
-          </FadeIn>
-          {[
-            { num: total > 0 ? `${fmt(total)}+` : '—', color: 'text-celeste', label: 'Normas indexadas', detail: 'Decretos, resoluciones, disposiciones, edictos y avisos del Boletín Oficial de la Ciudad de Buenos Aires.' },
-            { num: '1', color: 'text-sol', label: 'Fuente oficial', detail: 'API REST del Boletín Oficial CABA (boletinoficial.buenosaires.gob.ar) — datos directos, sin intermediarios.' },
-            { num: String(sectores), color: 'text-sol-bright', label: 'Sectores detectados', detail: 'Salud, educación, ambiente, tecnología, transporte y más, etiquetados automáticamente por keywords.' },
-            { num: '24/7', color: 'text-text-primary', label: 'Monitoreo continuo', detail: 'Ingesta diaria a las 09:00 con retry a las 13:00. SLO de frescura: si el boletín se atrasa, lo sabemos.' },
-          ].map((row, i) => (
-            <FadeIn key={row.label} delay={i * 80}>
-              <div className="grid grid-cols-1 md:grid-cols-[200px_220px_1fr] gap-2 md:gap-6 items-baseline py-6 border-b border-border-light">
-                <span className={`font-mono font-bold text-4xl md:text-5xl tracking-tight ${row.color}`}>{row.num}</span>
-                <span className="text-[15px] font-bold text-text-primary" style={{ fontFamily: 'var(--font-display)' }}>{row.label}</span>
-                <span className="text-[13px] text-text-secondary leading-relaxed">{row.detail}</span>
+      {/* ── Cifras ── */}
+      <section className="bg-humo border-b border-nube">
+        <div className="max-w-6xl mx-auto px-5 md:px-10 py-12 md:py-14 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+          {CIFRAS.map((c, i) => (
+            <FadeIn key={c.label} delay={i * 70}>
+              <div className="flex flex-col gap-2">
+                <span className="text-[44px] md:text-[52px] font-bold leading-none text-petroleo tabular-nums">{c.num}</span>
+                <span className="text-[12px] font-semibold tracking-[0.14em] uppercase text-petroleo">{c.label}</span>
+                <span className="text-[14px] leading-snug text-text-tertiary">{c.detail}</span>
               </div>
             </FadeIn>
           ))}
-        </section>
+        </div>
+      </section>
 
-        {/* ── Módulos ── */}
-        <section id="plataforma" className="border-t border-border-light py-12 md:py-16 scroll-mt-16">
+      {/* ── Módulos ── */}
+      <section id="plataforma" className="relative overflow-hidden scroll-mt-16">
+        <div className="trama-clara" />
+        <div className="relative max-w-6xl mx-auto px-5 md:px-10 py-16 md:py-24 flex flex-col gap-10 md:gap-12">
           <FadeIn>
-            <p className="eyebrow mb-3"><span className="eyebrow-num">II.</span> <span className="ml-2">La plataforma</span></p>
-            <h2 className="display-section text-text-primary mb-10">Cuatro módulos, <em>un solo radar.</em></h2>
+            <div className="title-rule flex flex-col gap-2">
+              <h2 className="display-section text-petroleo">La plataforma</h2>
+              <p className="text-[17px] md:text-[19px] text-text-tertiary">cuatro módulos, un solo radar normativo</p>
+            </div>
           </FadeIn>
-          <div className="grid grid-cols-1 sm:grid-cols-2 border-t-2 border-text-primary/80">
-            {MODULES.map(({ num, icon: Icon, title, desc, href }, i) => (
-              <FadeIn key={num} delay={i * 70} className="h-full">
-                <Link href={href} className="group flex flex-col gap-3 p-5 min-h-[190px] border-b sm:border-r border-border-light hover:bg-bg-primary transition-colors h-full">
-                  <div className="flex items-center justify-between">
-                    <span className="font-mono text-[11px] text-celeste">{num}</span>
-                    <Icon size={15} className="text-text-tertiary group-hover:text-celeste transition-colors" />
-                  </div>
-                  <h3 className="text-[16px] font-bold text-text-primary" style={{ fontFamily: 'var(--font-display)' }}>{title}.</h3>
-                  <p className="text-[12px] text-text-secondary leading-relaxed flex-1">{desc}</p>
-                  <span className="text-[11px] font-semibold text-celeste opacity-0 group-hover:opacity-100 transition-opacity">
-                    Abrir →
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {MODULES.map(({ icon: Icon, title, desc, href }, i) => (
+              <FadeIn key={title} delay={i * 70} className="h-full">
+                <Link href={href} className="card card-accent group h-full flex flex-col gap-3.5 px-6 py-7 shadow-[0_4px_14px_rgba(21,59,112,0.10)] hover:shadow-[0_18px_48px_rgba(21,59,112,0.16)] transition-shadow">
+                  <Icon size={28} strokeWidth={1.75} className="text-petroleo" />
+                  <h3 className="text-[16px] font-bold tracking-[0.06em] uppercase text-petroleo">{title}</h3>
+                  <p className="text-[14px] leading-relaxed text-text-secondary flex-1">{desc}</p>
+                  <span className="text-[12px] font-semibold tracking-[0.06em] uppercase text-celeste inline-flex items-center gap-1.5">
+                    Abrir <ArrowRight size={14} className="group-hover:translate-x-0.5 transition-transform" />
                   </span>
                 </Link>
               </FadeIn>
             ))}
           </div>
-        </section>
+        </div>
+      </section>
 
-        {/* ── Pipeline ── */}
-        <section id="como-funciona" className="border-t border-border-light py-12 md:py-16 scroll-mt-16">
+      {/* ── Cómo funciona ── */}
+      <section id="como-funciona" className="bg-petroleo text-white scroll-mt-16">
+        <div className="max-w-6xl mx-auto px-5 md:px-10 py-16 md:py-22 flex flex-col gap-10 md:gap-12">
           <FadeIn>
-            <p className="eyebrow mb-3"><span className="eyebrow-num">III.</span> <span className="ml-2">Cómo funciona</span></p>
-            <h2 className="display-section text-text-primary mb-10">Del Boletín a tu inbox, <em>en cuatro pasos.</em></h2>
+            <div className="border-l-4 border-verde-vital pl-5 flex flex-col gap-2">
+              <h2 className="display-section">Cómo funciona</h2>
+              <p className="text-[17px] md:text-[19px] font-light text-white/85">del boletín a tu correo, en cuatro pasos</p>
+            </div>
           </FadeIn>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 border-t-2 border-text-primary/80">
-            {PIPELINE.map(({ num, label, desc, color }, i) => (
-              <FadeIn key={num} delay={i * 70} className="h-full">
-                <div className="relative p-5 min-h-[140px] border-b sm:border-r border-border-light h-full">
-                  {i < PIPELINE.length - 1 && (
-                    <span className="hidden lg:block absolute top-5 right-3 text-sol text-lg">→</span>
-                  )}
-                  <p className={`font-mono font-bold text-3xl mb-2 ${color}`}>{num}</p>
-                  <p className="text-[14px] font-bold text-text-primary mb-1" style={{ fontFamily: 'var(--font-display)' }}>{label}</p>
-                  <p className="text-[12px] text-text-secondary leading-relaxed">{desc}</p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 border-t border-white/30">
+            {PIPELINE.map(({ num, label, desc }, i) => (
+              <FadeIn key={num} delay={i * 70}>
+                <div className="pt-7 pb-2 pr-6 flex flex-col gap-2.5">
+                  <span className="text-[29px] font-light text-verde-vital tabular-nums">{num}</span>
+                  <span className="text-[14px] font-bold tracking-[0.06em] uppercase">{label}</span>
+                  <span className="text-[14px] leading-relaxed text-white/85">{desc}</span>
                 </div>
               </FadeIn>
             ))}
           </div>
-        </section>
+        </div>
+      </section>
 
-        {/* ── CTA final ── */}
-        <section className="border-t border-border-light py-14 md:py-20">
+      {/* ── Acceso ── */}
+      <section className="bg-white">
+        <div className="max-w-6xl mx-auto px-5 md:px-10 py-16 md:py-22 flex flex-wrap gap-8 items-center justify-between">
           <FadeIn>
-            <div className="card max-w-2xl mx-auto p-8 md:p-10 text-center relative overflow-hidden">
-              <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(ellipse 70% 90% at 50% -20%, rgba(0,102,179,0.10), transparent 60%)' }} />
-              <p className="eyebrow mb-4"><span className="eyebrow-num">IV.</span> <span className="ml-2">Acceso</span></p>
-              <h2 className="display-section text-text-primary mb-4">
-                La Ciudad publica. <em>Vos te enterás.</em>
+            <div className="flex flex-col gap-2 max-w-2xl">
+              <h2 className="text-[24px] md:text-[29px] font-bold tracking-[0.04em] uppercase text-petroleo leading-tight">
+                La Ciudad publica. Vos te enterás.
               </h2>
-              <p className="text-[13px] text-text-secondary max-w-md mx-auto mb-7 leading-relaxed">
-                Herramienta interna del CESBA para el monitoreo de la normativa porteña.
-                Acceso con cuenta institucional.
-              </p>
-              <div className="flex items-center justify-center gap-4 flex-wrap">
-                <Link href="/feed" className="btn-celeste rounded-full px-6 py-2.5 text-[13px] font-bold inline-flex items-center gap-2">
-                  Ver el boletín de hoy <ArrowRight size={14} />
-                </Link>
-                <Link href="/auth/signin" className="textlink text-[13px] font-medium">
-                  Iniciar sesión <span className="arrow">→</span>
-                </Link>
-              </div>
+              <p className="text-[16px] md:text-[17px] text-text-tertiary">herramienta interna del cesba · acceso con cuenta institucional</p>
             </div>
           </FadeIn>
-        </section>
-      </main>
+          <Link href="/auth/signin" className="btn-celeste inline-flex items-center min-h-12 px-6 text-[13px] font-bold">
+            Iniciar sesión
+          </Link>
+        </div>
+      </section>
 
-      {/* ── Footer ── */}
-      <footer className="border-t border-border-light">
-        <div className="max-w-5xl mx-auto px-5 md:px-10 py-10">
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-8 mb-8">
-            <div>
-              <p className="text-[13px] font-bold text-text-primary mb-1" style={{ fontFamily: 'var(--font-display)' }}>BOCBA</p>
-              <p className="text-[10px] text-text-tertiary font-mono uppercase tracking-[0.15em] mb-2">Monitor Normativo · CESBA</p>
-              <p className="text-[11px] text-text-secondary leading-relaxed">Monitoreo del Boletín Oficial de la Ciudad de Buenos Aires.</p>
+      {/* ── Footer institucional ── */}
+      <footer className="bg-azul-profundo text-white mt-auto">
+        <div className="max-w-6xl mx-auto px-5 md:px-10 pt-10 flex flex-wrap gap-8 justify-between items-start">
+          <img src="/brand/cesba-logo-blanco.png" alt="CESBA" width={72} height={72} className="w-[72px] h-[72px]" />
+          <div className="flex flex-wrap gap-12 text-[13px] leading-[1.9]">
+            <div className="flex flex-col">
+              <span className="text-[12px] font-semibold tracking-[0.14em] text-white/70 mb-1">PLATAFORMA</span>
+              <Link href="/feed" className="hover:underline">Boletín del día</Link>
+              <Link href="/search" className="hover:underline">Buscador</Link>
+              <Link href="/alerts" className="hover:underline">Alertas</Link>
+              <Link href="/dashboard" className="hover:underline">Estadísticas</Link>
             </div>
-            <div>
-              <p className="eyebrow mb-3">Plataforma</p>
-              <ul className="space-y-1.5 text-[12px] text-text-secondary">
-                <li><Link href="/feed" className="hover:text-celeste transition-colors">Boletín del día</Link></li>
-                <li><Link href="/search" className="hover:text-celeste transition-colors">Buscador</Link></li>
-                <li><Link href="/alerts" className="hover:text-celeste transition-colors">Alertas</Link></li>
-                <li><Link href="/dashboard" className="hover:text-celeste transition-colors">Estadísticas</Link></li>
-              </ul>
-            </div>
-            <div>
-              <p className="eyebrow mb-3">Fuente</p>
-              <ul className="space-y-1.5 text-[12px] text-text-secondary">
-                <li>Boletín Oficial CABA</li>
-                <li>api-restboletinoficial.buenosaires.gob.ar</li>
-                <li>Actualización diaria automática</li>
-              </ul>
+            <div className="flex flex-col">
+              <span className="text-[12px] font-semibold tracking-[0.14em] text-white/70 mb-1">FUENTE</span>
+              <span>Boletín Oficial CABA</span>
+              <span>api-restboletinoficial.buenosaires.gob.ar</span>
+              <span>Actualización diaria automática</span>
             </div>
           </div>
-          <div className="pt-5 border-t border-border-light flex flex-wrap items-center justify-between gap-2">
-            <p className="text-[10px] text-text-tertiary font-mono">CESBA · Consejo Económico y Social de la Ciudad de Buenos Aires</p>
-            <p className="text-[10px] text-text-tertiary font-mono">Datos públicos — boletinoficial.buenosaires.gob.ar</p>
+        </div>
+        <p className="max-w-6xl mx-auto px-5 md:px-10 pt-8 text-[11px] text-white/70">
+          Basado en{' '}
+          <a href="https://github.com/colossus-lab/vigia" target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-white">Vigía</a>
+          , de Colossus Lab · Licencia MIT
+        </p>
+        <div className="mt-5 border-t border-white/30">
+          <div className="max-w-6xl mx-auto px-5 md:px-10 min-h-11 py-2 flex flex-wrap gap-2 items-center justify-between text-[12px] tracking-[0.06em]">
+            <a href="https://www.cesba.gob.ar" target="_blank" rel="noopener noreferrer" className="font-semibold hover:underline">www.cesba.gob.ar</a>
+            <span className="text-white/85">CONSEJO ECONÓMICO Y SOCIAL DE LA CIUDAD DE BUENOS AIRES</span>
           </div>
-          <p className="text-[10px] text-text-tertiary font-mono mt-3">
-            Basado en{' '}
-            <a href="https://github.com/colossus-lab/vigia" target="_blank" rel="noopener noreferrer" className="hover:text-celeste transition-colors underline underline-offset-2">Vigía</a>
-            , de Colossus Lab · Licencia MIT
-          </p>
         </div>
       </footer>
     </div>

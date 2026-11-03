@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Newspaper, BarChart3, Search, Bell, X, ScrollText, Landmark } from 'lucide-react';
+import { Newspaper, BarChart3, Search, Bell, X } from 'lucide-react';
 
 const NAV_ITEMS = [
   { to: '/feed', label: 'Boletín del día', icon: Newspaper },
@@ -15,33 +15,33 @@ export default function Sidebar({ open, onClose }) {
   const pathname = usePathname();
   return (
     <>
-      {open && <div className="fixed inset-0 bg-black/20 z-40 lg:hidden" onClick={onClose} />}
+      {open && <div className="fixed inset-0 bg-navy-950/30 z-40 lg:hidden" onClick={onClose} />}
 
       <aside
-        className={`fixed top-0 left-0 h-full w-60 bg-bg-primary border-r border-border-light z-50 flex flex-col transition-transform duration-200 lg:translate-x-0 ${
+        className={`grad-institucional fixed top-0 left-0 h-full w-60 text-white z-50 flex flex-col overflow-hidden transition-transform duration-200 lg:translate-x-0 ${
           open ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
+        <div className="trama" />
+
         {/* Logo */}
-        <div className="px-5 py-5 border-b border-border-light">
+        <div className="relative px-5 py-5 border-b border-white/25">
           <div className="flex items-center justify-between">
-            <Link href="/" className="flex items-center gap-2.5 group">
-              <div className="w-8 h-8 rounded-lg bg-celeste/10 border border-celeste/30 flex items-center justify-center group-hover:bg-celeste/20 transition-colors">
-                <ScrollText size={16} className="text-celeste" />
-              </div>
+            <Link href="/" className="flex items-center gap-3">
+              <img src="/brand/cesba-logo-blanco.png" alt="CESBA" width={48} height={48} className="w-12 h-12 shrink-0" />
               <div>
-                <h1 className="text-sm font-bold text-text-primary tracking-wide">BOCBA</h1>
-                <p className="text-[9px] text-text-tertiary uppercase tracking-[0.15em] font-mono">CESBA · CABA</p>
+                <p className="text-[13px] font-bold tracking-[0.06em] leading-tight">MONITOR BOCBA</p>
+                <p className="text-[11px] text-white/85 leading-tight mt-0.5">normativa porteña</p>
               </div>
             </Link>
-            <button onClick={onClose} className="lg:hidden text-text-tertiary hover:text-text-primary">
+            <button onClick={onClose} aria-label="Cerrar menú" className="lg:hidden p-1 text-white/85 hover:text-white">
               <X size={18} />
             </button>
           </div>
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 py-4 px-3 space-y-0.5 overflow-y-auto">
+        <nav className="relative flex-1 py-4 px-3 space-y-1 overflow-y-auto">
           {NAV_ITEMS.map(({ to, label, icon: Icon }) => {
             const isActive = pathname === to || pathname.startsWith(to + '/');
             return (
@@ -49,13 +49,14 @@ export default function Sidebar({ open, onClose }) {
                 key={to}
                 href={to}
                 onClick={onClose}
-                className={`flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-[13px] font-medium transition-colors ${
+                aria-current={isActive ? 'page' : undefined}
+                className={`flex items-center gap-3 px-3.5 min-h-11 rounded text-[12px] uppercase tracking-[0.06em] transition-colors ${
                   isActive
-                    ? 'bg-celeste/10 text-celeste-bright border border-celeste/25'
-                    : 'text-text-secondary hover:bg-bg-tertiary hover:text-text-primary border border-transparent'
+                    ? 'bg-white text-petroleo font-bold'
+                    : 'text-white font-medium hover:bg-white/15'
                 }`}
               >
-                <Icon size={16} className="shrink-0" />
+                <Icon size={18} strokeWidth={1.75} className="shrink-0" />
                 <span>{label}</span>
               </Link>
             );
@@ -63,14 +64,13 @@ export default function Sidebar({ open, onClose }) {
         </nav>
 
         {/* Footer */}
-        <div className="px-4 py-4 border-t border-border-light space-y-2">
-          <div className="flex items-center gap-2">
-            <Landmark size={12} className="text-text-tertiary" />
-            <p className="text-[10px] text-text-tertiary font-mono">CESBA · Ciudad de Buenos Aires</p>
-          </div>
-          <p className="text-[9px] text-text-tertiary/70 font-mono leading-relaxed">
+        <div className="relative px-5 py-4 border-t border-white/25 space-y-1">
+          <a href="https://www.cesba.gob.ar" target="_blank" rel="noopener noreferrer" className="block text-[11px] font-semibold tracking-[0.06em] text-white hover:underline">
+            www.cesba.gob.ar
+          </a>
+          <p className="text-[10px] text-white/85 leading-relaxed">
             Basado en{' '}
-            <a href="https://github.com/colossus-lab/vigia" target="_blank" rel="noopener noreferrer" className="hover:text-celeste transition-colors">Vigía</a>
+            <a href="https://github.com/colossus-lab/vigia" target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-white">Vigía</a>
             , de Colossus Lab · MIT
           </p>
         </div>

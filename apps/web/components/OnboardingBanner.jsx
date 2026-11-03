@@ -46,7 +46,7 @@ export default function OnboardingBanner() {
     <div className="mb-5 card border-l-4 border-l-celeste p-4 flex items-start gap-3">
       <Sparkles size={16} className="text-celeste shrink-0 mt-0.5" />
       <div className="flex-1 min-w-0">
-        <p className="text-[13px] font-semibold text-text-primary">Personalizá tu Vigía</p>
+        <p className="text-[13px] font-semibold text-text-primary">Personalizá tu monitor</p>
         <p className="text-[12px] text-text-secondary leading-relaxed">
           Elegí tus sectores de interés para afinar el feed y las alertas. Toma 30 segundos.
         </p>

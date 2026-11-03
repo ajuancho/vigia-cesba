@@ -52,8 +52,8 @@ export default function DNUTrackerView() {
     <div className="max-w-5xl mx-auto">
       <FadeIn>
         <div className="mb-7 pt-2">
-          <p className="eyebrow mb-1"><span className="eyebrow-num">VIGÍA / DNU</span><span className="ml-2">Decretos de Necesidad y Urgencia</span></p>
-          <h2 className="display-section text-text-primary mb-1">El Ejecutivo, <em>legislando.</em></h2>
+          <p className="eyebrow mb-1"><span className="eyebrow-num">BOCBA / DNU</span><span className="ml-2">Decretos de Necesidad y Urgencia</span></p>
+          <h2 className="display-section text-text-primary mb-1">El Ejecutivo, <em>legislando</em></h2>
           <p className="text-[13px] text-text-tertiary font-mono">seguimiento bicameral · Art. 99 inc. 3 CN</p>
         </div>
       </FadeIn>
@@ -90,17 +90,17 @@ export default function DNUTrackerView() {
         <FadeIn>
           <p className="eyebrow mb-1"><span className="eyebrow-num">I.</span><span className="ml-2">Histórico 1994 → {anioActual}</span></p>
           <h3 className="text-[17px] font-bold text-text-primary mb-6" style={{ fontFamily: 'var(--font-display)' }}>
-            Cada gestión deja <em className="text-sol italic">su huella.</em>
+            Cada gestión deja <em>su huella</em>
           </h3>
         </FadeIn>
         <FadeIn delay={120}>
           <ResponsiveContainer width="100%" height={260}>
             <BarChart data={hist} margin={{ left: -14, right: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(116, 172, 223, 0.08)" vertical={false} />
-              <XAxis dataKey="anio" tick={{ fill: '#636E85', fontSize: 9 }} axisLine={false} tickLine={false} interval={2} />
-              <YAxis tick={{ fill: '#636E85', fontSize: 10 }} axisLine={false} tickLine={false} />
-              <Tooltip content={<ChartTooltip />} cursor={{ fill: 'rgba(116,172,223,0.06)' }} />
-              <Bar dataKey="cantidad" name="DNU" fill="#F87171" radius={[3, 3, 0, 0]} animationDuration={1100} />
+              <CartesianGrid strokeDasharray="3 3" stroke="rgba(24, 166, 194, 0.08)" vertical={false} />
+              <XAxis dataKey="anio" tick={{ fill: '#5B6267', fontSize: 9 }} axisLine={false} tickLine={false} interval={2} />
+              <YAxis tick={{ fill: '#5B6267', fontSize: 10 }} axisLine={false} tickLine={false} />
+              <Tooltip content={<ChartTooltip />} cursor={{ fill: 'rgba(24, 166, 194, 0.06)' }} />
+              <Bar dataKey="cantidad" name="DNU" fill="#153B70" radius={[3, 3, 0, 0]} animationDuration={1100} />
             </BarChart>
           </ResponsiveContainer>
         </FadeIn>
@@ -111,7 +111,7 @@ export default function DNUTrackerView() {
         <FadeIn>
           <p className="eyebrow mb-1"><span className="eyebrow-num">II.</span><span className="ml-2">Los últimos</span></p>
           <h3 className="text-[17px] font-bold text-text-primary mb-4" style={{ fontFamily: 'var(--font-display)' }}>
-            DNU <em className="text-sol italic">recientes.</em>
+            DNU <em>recientes</em>
           </h3>
         </FadeIn>
         <div className="border-t border-border-light">

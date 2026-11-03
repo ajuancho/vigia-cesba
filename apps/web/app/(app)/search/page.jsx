@@ -8,9 +8,9 @@ import { Search as SearchIcon, SlidersHorizontal, ArrowRight } from 'lucide-reac
 import FadeIn from '@/components/FadeIn';
 
 const TIPO_DOT_COLORS = {
-  DNU: '#F87171', DECRETO: '#F6B40E', LEY: '#34D399',
-  RESOLUCION: '#74ACDF', DISPOSICION: '#A78BFA', PROYECTO: '#22D3EE',
-  COMUNICACION: '#F472B6', CONSULTA: '#FB923C', OTRA: '#8892A8',
+  DNU: '#153B70', DECRETO: '#0079DC', LEY: '#18596C',
+  RESOLUCION: '#18A6C2', DISPOSICION: '#4E83FB', PROYECTO: '#54BBC7',
+  COMUNICACION: '#00B2D1', CONSULTA: '#7FB8C9', OTRA: '#93989E',
 };
 
 const SELECT_CLS = 'w-full bg-transparent border-b border-border-light px-1 py-2 text-[12px] text-text-secondary focus:outline-none focus:border-celeste transition-colors';
@@ -49,8 +49,8 @@ function SearchView() {
     <div className="max-w-4xl mx-auto">
       <FadeIn>
         <div className="mb-7 pt-2">
-          <p className="eyebrow mb-1"><span className="eyebrow-num">VIGÍA / SEARCH</span><span className="ml-2">Full-text en español</span></p>
-          <h2 className="display-section text-text-primary mb-1">Buscar en <em>todo el corpus.</em></h2>
+          <p className="eyebrow mb-1"><span className="eyebrow-num">BOCBA / SEARCH</span><span className="ml-2">Full-text en español</span></p>
+          <h2 className="display-section text-text-primary mb-1">Buscar en <em>todo el corpus</em></h2>
           <p className="text-[13px] text-text-tertiary font-mono">533 mil normas · ranking + snippets</p>
         </div>
       </FadeIn>

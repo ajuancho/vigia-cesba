@@ -13,7 +13,7 @@ import CountUp from '@/components/CountUp';
 const SELECT_CLS =
   'w-full bg-transparent border-b border-border-light px-1 py-2 text-[12px] text-text-secondary focus:outline-none focus:border-celeste transition-colors';
 
-const RUBRO_COLORS = ['#74ACDF', '#F6B40E', '#34D399', '#A78BFA', '#F87171', '#93C5F8', '#FFD04A', '#8892A8'];
+const RUBRO_COLORS = ['#18A6C2', '#0079DC', '#18596C', '#4E83FB', '#153B70', '#9FD6E2', '#00C49A', '#93989E'];
 
 // Rubros vienen en MAYÚSCULAS del BORA; los mostramos en Sentence case.
 const sentence = (s) => (s ? s.charAt(0).toUpperCase() + s.slice(1).toLowerCase() : s);
@@ -107,15 +107,15 @@ function SocietarioStats() {
               <AreaChart data={serie} margin={{ left: -16, right: 4, top: 4 }}>
                 <defs>
                   <linearGradient id="fillAvisos" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#74ACDF" stopOpacity={0.35} />
-                    <stop offset="100%" stopColor="#74ACDF" stopOpacity={0.02} />
+                    <stop offset="0%" stopColor="#18A6C2" stopOpacity={0.35} />
+                    <stop offset="100%" stopColor="#18A6C2" stopOpacity={0.02} />
                   </linearGradient>
                 </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="rgba(116, 172, 223, 0.08)" vertical={false} />
-                <XAxis dataKey="dia" tick={{ fill: '#636E85', fontSize: 9 }} axisLine={false} tickLine={false} />
-                <YAxis tick={{ fill: '#636E85', fontSize: 10 }} axisLine={false} tickLine={false} allowDecimals={false} />
-                <Tooltip content={<DiaTooltip />} cursor={{ stroke: 'rgba(116,172,223,0.2)' }} />
-                <Area type="monotone" dataKey="total" stroke="#74ACDF" strokeWidth={2} fill="url(#fillAvisos)" animationDuration={1100} />
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(24, 166, 194, 0.08)" vertical={false} />
+                <XAxis dataKey="dia" tick={{ fill: '#5B6267', fontSize: 9 }} axisLine={false} tickLine={false} />
+                <YAxis tick={{ fill: '#5B6267', fontSize: 10 }} axisLine={false} tickLine={false} allowDecimals={false} />
+                <Tooltip content={<DiaTooltip />} cursor={{ stroke: 'rgba(24, 166, 194, 0.2)' }} />
+                <Area type="monotone" dataKey="total" stroke="#18A6C2" strokeWidth={2} fill="url(#fillAvisos)" animationDuration={1100} />
               </AreaChart>
             </ResponsiveContainer>
           </div>
@@ -183,11 +183,11 @@ export default function AvisosView() {
       <FadeIn>
         <div className="mb-7 pt-2">
           <p className="eyebrow mb-1">
-            <span className="eyebrow-num">VIGÍA / SOCIETARIO</span>
+            <span className="eyebrow-num">BOCBA / SOCIETARIO</span>
             <span className="ml-2">Boletín Oficial · Segunda Sección</span>
           </p>
           <h2 className="display-section text-text-primary mb-1">
-            Las empresas, <em>en movimiento.</em>
+            Las empresas, <em>en movimiento</em>
           </h2>
           <p className="text-[13px] text-text-tertiary font-mono">
             constituciones · asambleas · edictos — actualización diaria

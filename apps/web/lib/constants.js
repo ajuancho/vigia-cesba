@@ -1,14 +1,14 @@
 // Vocabulario de dominio (espejo de packages/shared/constants.py).
 export const TIPOS_NORMA = {
-  DNU: { label: 'DNU', color: '#ef4444', description: 'Decreto de Necesidad y Urgencia' },
-  DECRETO: { label: 'Decreto', color: '#f59e0b', description: 'Decreto del Poder Ejecutivo' },
-  LEY: { label: 'Ley', color: '#10b981', description: 'Ley sancionada por el Congreso' },
-  RESOLUCION: { label: 'Resolución', color: '#3b82f6', description: 'Resolución ministerial' },
-  DISPOSICION: { label: 'Disposición', color: '#8b5cf6', description: 'Disposición administrativa' },
-  PROYECTO: { label: 'Proyecto', color: '#06b6d4', description: 'Proyecto de ley en trámite' },
-  COMUNICACION: { label: 'Comunicación', color: '#f472b6', description: 'Comunicación del BCRA (serie A)' },
-  CONSULTA: { label: 'Consulta', color: '#fb923c', description: 'Consulta pública / anteproyecto en consulta' },
-  OTRA: { label: 'Otra', color: '#64748b', description: 'Otra norma' },
+  DNU: { label: 'DNU', color: '#153B70', description: 'Decreto de Necesidad y Urgencia' },
+  DECRETO: { label: 'Decreto', color: '#0079DC', description: 'Decreto del Poder Ejecutivo' },
+  LEY: { label: 'Ley', color: '#18596C', description: 'Ley sancionada por el Congreso' },
+  RESOLUCION: { label: 'Resolución', color: '#18A6C2', description: 'Resolución ministerial' },
+  DISPOSICION: { label: 'Disposición', color: '#4E83FB', description: 'Disposición administrativa' },
+  PROYECTO: { label: 'Proyecto', color: '#54BBC7', description: 'Proyecto de ley en trámite' },
+  COMUNICACION: { label: 'Comunicación', color: '#00B2D1', description: 'Comunicación del BCRA (serie A)' },
+  CONSULTA: { label: 'Consulta', color: '#7FB8C9', description: 'Consulta pública / anteproyecto en consulta' },
+  OTRA: { label: 'Otra', color: '#93989E', description: 'Otra norma' },
 };
 
 export const JURISDICCIONES = [

@@ -42,7 +42,7 @@ export default function OnboardingPage() {
           </div>
           <div>
             <h1 className="text-base font-bold text-text-primary">Configurá tu workspace</h1>
-            <p className="text-[12px] text-text-tertiary">Personalizá Vigía para tu organización</p>
+            <p className="text-[12px] text-text-tertiary">Personalizá el monitor para tu organización</p>
           </div>
         </div>
 

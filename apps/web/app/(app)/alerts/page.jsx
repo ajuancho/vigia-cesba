@@ -158,8 +158,8 @@ export default function AlertsView() {
       <FadeIn>
         <div className="flex items-end justify-between gap-4 mb-7 pt-2">
           <div>
-            <p className="eyebrow mb-1"><span className="eyebrow-num">VIGÍA / ALERTAS</span><span className="ml-2">Monitoreo automático</span></p>
-            <h2 className="display-section text-text-primary mb-1">Que la norma <em>te encuentre.</em></h2>
+            <p className="eyebrow mb-1"><span className="eyebrow-num">BOCBA / ALERTAS</span><span className="ml-2">Monitoreo automático</span></p>
+            <h2 className="display-section text-text-primary mb-1">Que la norma <em>te encuentre</em></h2>
             <p className="text-[13px] text-text-tertiary font-mono">keywords + sectores · matching horario · digest por email</p>
           </div>
           <button onClick={() => { setShowForm((v) => !v); setEditingId(null); }} className="flex items-center gap-1.5 px-4 py-2 btn-celeste rounded-full text-[11px] font-bold shrink-0">

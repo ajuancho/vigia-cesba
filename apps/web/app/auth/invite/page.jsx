@@ -31,7 +31,7 @@ function InviteInner() {
       <div className="flag-stripe fixed top-0 inset-x-0 z-[60]" />
       <div className="card p-8 max-w-sm w-full text-center">
         <div className="w-12 h-12 rounded-lg bg-celeste/10 border border-celeste/30 flex items-center justify-center mx-auto mb-4"><Eye size={24} className="text-celeste" /></div>
-        <h1 className="text-lg font-bold text-text-primary mb-3">Invitación a Vigía</h1>
+        <h1 className="text-lg font-bold text-text-primary mb-3">Invitación al Monitor BOCBA</h1>
         {!token && <p className="text-[13px] text-status-red">Falta el token de invitación.</p>}
         {token && !AUTH_ENABLED && <p className="text-[13px] text-text-secondary">Auth deshabilitada en este entorno.</p>}
         {token && AUTH_ENABLED && status === 'unauthenticated' && (
