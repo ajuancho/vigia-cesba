@@ -160,7 +160,7 @@ export default function NormDetailView() {
 
       <FadeIn delay={210}>
         <p className="text-[10px] text-text-tertiary font-mono border-t border-border-light pt-4 pb-10">
-          Fuente: {norma.tipo === 'PROYECTO' ? 'Legislatura de la Ciudad de Buenos Aires' : 'Boletín Oficial CABA'} · dato público verificable
+          Fuente: {norma.tipo === 'PROYECTO' ? 'Legislatura de la Ciudad de Buenos Aires' : norma.tipo === 'SENTENCIA' ? 'Tribunal Superior de Justicia de la CABA' : 'Boletín Oficial CABA'} · dato público verificable
         </p>
       </FadeIn>
     </div>

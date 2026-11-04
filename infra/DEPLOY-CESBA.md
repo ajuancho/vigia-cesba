@@ -314,6 +314,33 @@ fixture y la fuente aparece en error en `GET /health/sources`.
 
 ---
 
+## Tribunal Superior de Justicia
+
+Fuente `tsj`: sentencias y resoluciones del TSJ desde el buscador oficial de
+jurisprudencia (`jurisprudencia.tsjbaires.gob.ar`, ASP clásico, sin API): por
+rango de fecha, 100 por página. Cada resolución trae expediente, carátula,
+secretaría (materia), fecha, términos del tesauro y link al PDF oficial. Se
+guarda en `norma` como `SENTENCIA` con `bora_seccion = 'Tribunal Superior'`:
+entra en Buscador, Alertas (fuente "Tribunal Superior") y Reportes (Tipo =
+secretaría, Etapa = tema principal), tiene su página `/tribunal` y no aparece
+en "Boletín del día".
+
+Beat: diario 07:45 ART, sentencias con fecha en los últimos 45 días (el
+buscador publica con días o semanas de atraso). Sin migración.
+
+Primera carga (Railway: consola del servicio **worker**):
+
+```bash
+python -c "from vigia_workers.tasks import ingest_tsj as t; print(t(dry_run=True, lookback_days=10))"
+python -c "from vigia_workers.tasks import ingest_tsj as t; print(t(lookback_days=400))"
+python -c "from vigia_workers.alerts import match_alertas as t; print(t(notify=False))"
+```
+
+Respaldo histórico (no automatizado): los datos abiertos del TSJ
+(`datos.tsjbaires.gob.ar`, CSV de sentencias desde 2016, sin carátula ni texto).
+
+---
+
 ## Membresías
 
 No hay período de prueba: todos los workspaces tienen acceso pleno. Para

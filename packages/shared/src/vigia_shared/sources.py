@@ -114,6 +114,15 @@ SOURCES: dict[str, dict] = {
         # Entran expedientes casi todos los días hábiles; receso de verano aparte.
         "freshness_slo_days": 7,
     },
+    "tsj": {
+        "code": "tsj",
+        "name": "Tribunal Superior de Justicia CABA — sentencias (jurisprudencia.tsjbaires.gob.ar)",
+        "kind": "scrape",
+        "base_url": "http://jurisprudencia.tsjbaires.gob.ar",
+        "cadence_hours": 24,
+        # Publica con días de atraso y en tandas; feria judicial de enero aparte.
+        "freshness_slo_days": 21,
+    },
 }
 
 # Campos que van a la tabla source_catalog (los upserta cada task de ingesta).

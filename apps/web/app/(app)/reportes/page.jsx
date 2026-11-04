@@ -62,6 +62,13 @@ const PLANTILLAS = [
     }),
   },
   {
+    nombre: 'Sentencias del Tribunal Superior · últimos 6 meses',
+    config: () => ({
+      filtros: { secciones: ['Tribunal Superior'], desde: haceDias(182) },
+      formato: 'analisis', orden: 'fecha_desc',
+    }),
+  },
+  {
     nombre: 'Contrataciones directas · último año',
     config: () => ({
       filtros: { secciones: ['Licitaciones'], tipos: ['Contratación Directa'], desde: haceDias(365) },
@@ -434,7 +441,7 @@ export default function ReportesView() {
                 <Chips opciones={opciones?.tipos || []} seleccion={f.tipos} onToggle={toggle('tipos')} />
               </Campo>
               {(opciones?.etapas?.length ?? 0) > 0 && (
-                <Campo label="Etapa" ayuda="licitaciones: llamado, adjudicación… · legislatura: estado del expediente o sancionado">
+                <Campo label="Etapa" ayuda="licitaciones: llamado, adjudicación… · legislatura: estado o sancionado · tribunal: tema principal">
                   <Chips opciones={opciones.etapas} seleccion={f.etapas} onToggle={toggle('etapas')} />
                 </Campo>
               )}

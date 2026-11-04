@@ -26,7 +26,7 @@ from typing import Any
 from vigia_connectors import (
     BoraAviso, BoraClient, BocbaClient, BocbaNorma,
     Expediente, HcdnClient, HcdnProyecto, InfoLegClient, InfoLegNorm,
-    LegislaturaClient, SenadoClient, SenadoProyecto,
+    LegislaturaClient, SenadoClient, SenadoProyecto, Sentencia, TsjClient,
 )
 from vigia_connectors.bora import looks_like_dnu
 from vigia_connectors.emisores import detect_emisor
@@ -40,6 +40,7 @@ HCDN_SOURCE = catalog_fields("hcdn_proyectos")
 BORA_SOURCE = catalog_fields("bora_primera")
 BOCBA_SOURCE = catalog_fields("bocba")
 LEGISLATURA_SOURCE = catalog_fields("legislatura")
+TSJ_SOURCE = catalog_fields("tsj")
 
 # Cuántos registros por batch al persistir el corpus completo.
 # Tope: asyncpg admite máx 32767 parámetros bind por statement
@@ -853,5 +854,86 @@ def ingest_legislatura(dry_run: bool = False, lookback_days: int = 30) -> dict[s
     async def _wrapped() -> dict[str, Any]:
         counts = await with_status([LEGISLATURA_SOURCE["code"]], _run)
         return {"source": "legislatura", "desde": desde.isoformat(), **counts}
+
+    return run_async(_wrapped())
+
+
+# ── Tribunal Superior de Justicia CABA ───────────────────────────────────────
+
+TSJ_ORGANISMO = "Tribunal Superior de Justicia de la Ciudad de Buenos Aires"
+
+
+def _sentencia_to_row(s: Sentencia) -> dict[str, Any]:
+    """Mapea una resolución del TSJ al shape de `norma` (tipo SENTENCIA).
+
+    `bora_seccion = 'Tribunal Superior'` la separa del Boletín; `raw.tipo_nombre`
+    es la secretaría (materia) y `raw.tema_principal` el primer término del
+    tesauro, que Reportes usa como "Etapa" (tipo de recurso o cuestión).
+    """
+    temas = "; ".join(s.tesauro)
+    resumen = f"Secretaría de {s.secretaria_nombre}." + (f" Temas: {temas}." if temas else "")
+    return {
+        "external_id": s.external_id,
+        "tipo": "SENTENCIA",
+        "numero": s.expediente,
+        "titulo": s.caratula,
+        "resumen": resumen,
+        "resumen_ia": None,
+        "fecha_publicacion": s.fecha,
+        "jurisdiccion": "CABA",
+        "sector": s.detect_sector(),
+        "organismo": TSJ_ORGANISMO,
+        "emisor": "TSJ",
+        "estado": None,
+        "impacto": None,
+        "bora_seccion": "Tribunal Superior",
+        "entidades": s.tesauro or None,
+        "tags": ["tsj", s.secretaria.lower()],
+        "url": s.url_pdf,
+        "raw": {
+            "tipo_nombre": s.secretaria_nombre,
+            "secretaria": s.secretaria,
+            "tema_principal": s.tesauro[0].capitalize() if s.tesauro else None,
+            "tesauro": s.tesauro,
+            "expediente": s.expediente,
+            "incidente": s.incidente,
+            "movimiento": s.movimiento,
+            "anio": s.anio,
+            "origen": s.origen,
+        },
+    }
+
+
+@celery_app.task(name="vigia_workers.tasks.ingest_tsj")
+def ingest_tsj(dry_run: bool = False, lookback_days: int = 45) -> dict[str, Any]:
+    """Ingesta sentencias y resoluciones del TSJ con fecha en los últimos N días.
+
+    El buscador publica con días o semanas de atraso, por eso el lookback es
+    amplio. Idempotente (upsert por expediente-incidente-movimiento); un
+    backfill es la misma task con lookback mayor (p.ej. 400).
+    """
+    from datetime import timedelta
+
+    dry = _is_dry_run(dry_run)
+    hasta = date.today()
+    desde = hasta - timedelta(days=max(1, lookback_days) - 1)
+
+    async def _run() -> dict[str, Any]:
+        async with TsjClient() as client:
+            sentencias = await client.fetch_rango(desde, hasta)
+        rows = [_sentencia_to_row(s) for s in sentencias]
+        if dry:
+            return {"rows": len(rows), "sample": [_dry_sample_row(r) for r in rows[:_DRY_SAMPLE]]}
+        totals = _empty_totals()
+        for i in range(0, len(rows), _FULL_BATCH):
+            _acc(totals, await upsert_normas(TSJ_SOURCE, rows[i : i + _FULL_BATCH]))
+        return totals
+
+    if dry:
+        return {"source": "tsj", "dry_run": True, "desde": desde.isoformat(), **run_async(_run())}
+
+    async def _wrapped() -> dict[str, Any]:
+        counts = await with_status([TSJ_SOURCE["code"]], _run)
+        return {"source": "tsj", "desde": desde.isoformat(), **counts}
 
     return run_async(_wrapped())

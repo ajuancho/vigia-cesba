@@ -22,9 +22,11 @@ from sqlalchemy import text
 # Tipo de procedimiento / tipo de norma tal como lo publica el boletín.
 TIPO_EXPR = "COALESCE(raw->>'tipo_nombre', tipo)"
 # Etapa: en licitaciones sale del título ("<tipo> / <etapa>  N° …"); en los
-# expedientes de la Legislatura es su estado de trámite (o "Sancionado").
+# expedientes de la Legislatura es su estado de trámite (o "Sancionado"); en
+# las sentencias del TSJ, el tema principal del tesauro (tipo de recurso).
 ETAPA_EXPR = (
-    "CASE WHEN bora_seccion = 'Legislatura' THEN "
+    "CASE WHEN bora_seccion = 'Tribunal Superior' THEN NULLIF(raw->>'tema_principal', '') "
+    "WHEN bora_seccion = 'Legislatura' THEN "
     "CASE WHEN raw->>'sancionado' = 'true' THEN 'Sancionado' "
     r"ELSE NULLIF(btrim(regexp_replace(raw->>'estado', '\s*\(.*\)$', '')), '') END "
     r"ELSE NULLIF(btrim(substring(titulo from ' / ([^/]+?)\s+N[°º]')), '') END"

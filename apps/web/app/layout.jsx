@@ -3,7 +3,7 @@ import Providers from '@/components/Providers';
 
 const TITLE = 'Monitor Normativo CABA — CESBA';
 const DESCRIPTION =
-  'La normativa de la Ciudad de Buenos Aires, al día. Monitoreo del Boletín Oficial CABA y de los proyectos de la Legislatura porteña: búsqueda, alertas por email y reportes. Herramienta interna del CESBA.';
+  'La normativa de la Ciudad de Buenos Aires, al día. Monitoreo del Boletín Oficial CABA, los proyectos de la Legislatura porteña y las sentencias del Tribunal Superior de Justicia: búsqueda, alertas por email y reportes. Herramienta interna del CESBA.';
 
 export const metadata = {
   metadataBase: new URL('https://normativa.cesba.gob.ar'),

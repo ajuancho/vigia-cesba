@@ -6,6 +6,7 @@ export const TIPOS_NORMA = {
   RESOLUCION: { label: 'Resolución', color: '#18A6C2', description: 'Resolución ministerial' },
   DISPOSICION: { label: 'Disposición', color: '#4E83FB', description: 'Disposición administrativa' },
   PROYECTO: { label: 'Proyecto', color: '#54BBC7', description: 'Expediente de la Legislatura porteña' },
+  SENTENCIA: { label: 'Sentencia', color: '#2F5FC4', description: 'Resolución del Tribunal Superior de Justicia' },
   COMUNICACION: { label: 'Comunicación', color: '#00B2D1', description: 'Comunicación del BCRA (serie A)' },
   CONSULTA: { label: 'Consulta', color: '#7FB8C9', description: 'Consulta pública / anteproyecto en consulta' },
   OTRA: { label: 'Otra', color: '#93989E', description: 'Otra norma' },
@@ -24,7 +25,8 @@ export const SECTORES = [
 export const FUENTES = {
   boletin: 'Boletín Oficial',
   legislatura: 'Legislatura',
+  tsj: 'Tribunal Superior',
 };
 
 // Tipos que aplican a la Ciudad (los nacionales — BCRA, consultas — quedan fuera).
-export const TIPOS_CABA = ['DNU', 'DECRETO', 'LEY', 'RESOLUCION', 'DISPOSICION', 'PROYECTO', 'OTRA'];
+export const TIPOS_CABA = ['DNU', 'DECRETO', 'LEY', 'RESOLUCION', 'DISPOSICION', 'PROYECTO', 'SENTENCIA', 'OTRA'];

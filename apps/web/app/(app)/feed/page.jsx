@@ -278,7 +278,7 @@ function FeedView() {
       <FadeIn delay={140}>
         <div className="mb-2 pb-4 border-b border-border-light">
           <div className="flex flex-wrap items-center gap-2">
-            {['TODOS', ...TIPOS_CABA.filter((t) => t !== 'PROYECTO')].map((tipo) => (
+            {['TODOS', ...TIPOS_CABA.filter((t) => t !== 'PROYECTO' && t !== 'SENTENCIA')].map((tipo) => (
               <button
                 key={tipo}
                 onClick={() => changeFilter(setFilterTipo)(tipo)}

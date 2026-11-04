@@ -78,6 +78,12 @@ celery_app.conf.update(
             "schedule": crontab(day_of_week=0, hour=6, minute=30),
             "kwargs": {"lookback_days": 400},
         },
+        # Tribunal Superior de Justicia — sentencias con fecha en los últimos 45
+        # días (el buscador publica con atraso). Antes del matching de las 8:15.
+        "ingest-tsj": {
+            "task": "vigia_workers.tasks.ingest_tsj",
+            "schedule": crontab(hour=7, minute=45),
+        },
         # Matching de alertas + notificaciones — cada hora.
         "match-alertas": {
             "task": "vigia_workers.alerts.match_alertas",

@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Newspaper, Search, Bell, ArrowRight, BarChart3, FileBarChart, Landmark } from 'lucide-react';
+import { Newspaper, Search, Bell, ArrowRight, BarChart3, FileBarChart, Landmark, Scale } from 'lucide-react';
 import FadeIn from '@/components/FadeIn';
 
 export const revalidate = 300;
@@ -26,12 +26,16 @@ const MODULES = [
     desc: 'Los proyectos y expedientes que ingresan a la Legislatura porteña, con su autoría y estado de trámite, desde que se presentan hasta su sanción.',
   },
   {
+    icon: Scale, title: 'Tribunal Superior', href: '/tribunal',
+    desc: 'Las sentencias y resoluciones del Tribunal Superior de Justicia porteño, con su materia, los temas del tesauro y el PDF oficial de cada fallo.',
+  },
+  {
     icon: Search, title: 'Buscador', href: '/search',
-    desc: 'Búsqueda de texto completo en español sobre el Boletín Oficial y los expedientes de la Legislatura, con ranking por relevancia y fragmentos en contexto.',
+    desc: 'Búsqueda de texto completo en español sobre el Boletín Oficial, la Legislatura y el Tribunal Superior, con ranking por relevancia y fragmentos en contexto.',
   },
   {
     icon: Bell, title: 'Alertas', href: '/alerts',
-    desc: 'Suscribite por palabra clave y sector. Cuando una norma o un proyecto coincide, recibís un resumen por correo con el vínculo al texto oficial.',
+    desc: 'Suscribite por palabra clave, fuente y sector. Cuando una norma, un proyecto o una sentencia coincide, recibís un resumen por correo con el vínculo al texto oficial.',
   },
   {
     icon: BarChart3, title: 'Estadísticas', href: '/dashboard',
@@ -50,10 +54,10 @@ export default async function Landing() {
   const fmt = (n) => n.toLocaleString('es-AR');
 
   const CIFRAS = [
-    { num: total > 0 ? fmt(total) : '—', label: 'Normas y expedientes', detail: 'normas del boletín oficial y proyectos de la legislatura porteña' },
-    { num: '2', label: 'Fuentes oficiales', detail: 'boletín oficial y legislatura de la ciudad, sin intermediarios' },
+    { num: total > 0 ? fmt(total) : '—', label: 'Documentos indexados', detail: 'normas del boletín, proyectos de la legislatura y sentencias del tribunal superior' },
+    { num: '3', label: 'Fuentes oficiales', detail: 'boletín oficial, legislatura y tribunal superior de justicia de la ciudad' },
     { num: String(sectores), label: 'Sectores detectados', detail: 'salud, educación, ambiente, transporte y más' },
-    { num: '24/7', label: 'Monitoreo continuo', detail: 'legislatura a las 7:30 hs · boletín a las 9:00 hs, con reintento a las 13:00 hs' },
+    { num: '24/7', label: 'Monitoreo continuo', detail: 'legislatura 7:30 hs · tribunal superior 7:45 hs · boletín 9:00 hs, con reintento a las 13:00 hs' },
   ];
 
   return (
@@ -92,15 +96,15 @@ export default async function Landing() {
             <div className="title-rule-vital flex flex-col gap-4">
               <h1 className="display-hero max-w-4xl">La normativa porteña, al día</h1>
               <p className="text-[19px] md:text-[23px] font-light leading-snug">
-                monitor interno del boletín oficial y la legislatura de la ciudad de buenos aires
+                monitor interno del boletín oficial, la legislatura y el tribunal superior de la ciudad
               </p>
             </div>
           </FadeIn>
           <FadeIn delay={160}>
             <p className="max-w-xl text-[16px] md:text-[17px] leading-relaxed text-white/85">
-              Cada norma del Boletín Oficial y cada proyecto de la Legislatura, indexados y con
-              alertas por correo cuando se publica o se presenta algo que te importa. Datos
-              oficiales, actualizados cada mañana.
+              Cada norma del Boletín Oficial, cada proyecto de la Legislatura y cada sentencia
+              del Tribunal Superior, indexados y con alertas por correo cuando aparece algo que
+              te importa. Datos oficiales, actualizados cada mañana.
             </p>
           </FadeIn>
           <FadeIn delay={240}>
@@ -138,10 +142,10 @@ export default async function Landing() {
           <FadeIn>
             <div className="title-rule flex flex-col gap-2">
               <h2 className="display-section text-petroleo">La plataforma</h2>
-              <p className="text-[17px] md:text-[19px] text-text-tertiary">seis módulos, un solo radar normativo</p>
+              <p className="text-[17px] md:text-[19px] text-text-tertiary">siete módulos, un solo radar normativo</p>
             </div>
           </FadeIn>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {MODULES.map(({ icon: Icon, title, desc, href }, i) => (
               <FadeIn key={title} delay={i * 70} className="h-full">
                 <Link href={href} className="card card-accent group h-full flex flex-col gap-3.5 px-6 py-7 shadow-[0_4px_14px_rgba(21,59,112,0.10)] hover:shadow-[0_18px_48px_rgba(21,59,112,0.16)] transition-shadow">
@@ -184,6 +188,7 @@ export default async function Landing() {
               <span className="text-[12px] font-semibold tracking-[0.14em] text-white/70 mb-1">PLATAFORMA</span>
               <Link href="/feed" className="hover:underline">Boletín del día</Link>
               <Link href="/legislatura" className="hover:underline">Legislatura</Link>
+              <Link href="/tribunal" className="hover:underline">Tribunal Superior</Link>
               <Link href="/search" className="hover:underline">Buscador</Link>
               <Link href="/alerts" className="hover:underline">Alertas</Link>
               <Link href="/dashboard" className="hover:underline">Estadísticas</Link>
@@ -193,6 +198,7 @@ export default async function Landing() {
               <span className="text-[12px] font-semibold tracking-[0.14em] text-white/70 mb-1">FUENTES</span>
               <span>Boletín Oficial CABA</span>
               <span>Legislatura de la Ciudad de Buenos Aires</span>
+              <span>Tribunal Superior de Justicia CABA</span>
               <span>Actualización diaria automática</span>
             </div>
           </div>

@@ -5,6 +5,7 @@ from vigia_connectors.hcdn import HcdnClient, HcdnProyecto
 from vigia_connectors.infoleg import InfoLegClient, InfoLegNorm
 from vigia_connectors.legislatura import Expediente, LegislaturaClient
 from vigia_connectors.senado import SenadoClient, SenadoProyecto
+from vigia_connectors.tsj import Sentencia, TsjClient
 
 __all__ = [
     "InfoLegClient",
@@ -18,6 +19,8 @@ __all__ = [
     "BocbaClient",
     "Expediente",
     "LegislaturaClient",
+    "Sentencia",
+    "TsjClient",
     "BocbaNorma",
     "SenadoClient",
     "SenadoProyecto",

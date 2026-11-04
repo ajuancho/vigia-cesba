@@ -7,7 +7,7 @@ from sqlalchemy import func, or_, select
 from vigia_api.core.db import get_sessionmaker
 from vigia_api.core.scope import norma_filters
 from vigia_shared.models import DnuTracking, Norma, SourceCatalog
-from vigia_shared.fuentes import SECCION_LEGISLATURA
+from vigia_shared.fuentes import SECCIONES_EXTERNAS
 from vigia_shared.relevancia import PESO_TIPO, es_tramite
 from vigia_shared.schemas import NormaDetail, NormaListItem, NormaPage
 
@@ -31,12 +31,12 @@ async def ediciones(
     Cada edición separa `destacados` (DNU, leyes, decretos de alcance general,
     normativa regulatoria) de `tramite` (edictos, designaciones, beneplácitos),
     que el cliente colapsa en una línea. Orden: peso editorial del tipo.
-    Los expedientes de la Legislatura no son parte del Boletín: tienen su
-    propia vista (`GET /normas?seccion=Legislatura`).
+    Los expedientes de la Legislatura y las sentencias del TSJ no son parte del
+    Boletín: tienen su propia vista (`GET /normas?seccion=…`).
     """
     Session = get_sessionmaker()
     filters = norma_filters()
-    filters.append(or_(Norma.bora_seccion.is_(None), Norma.bora_seccion != SECCION_LEGISLATURA))
+    filters.append(or_(Norma.bora_seccion.is_(None), Norma.bora_seccion.notin_(list(SECCIONES_EXTERNAS.values()))))
     if tipo:
         filters.append(Norma.tipo == tipo)
     if sector:

@@ -69,6 +69,7 @@ El web se redeploya solo con cada push (Vercel Git integration). Runbook complet
 - **Fuentes nuevas**: runbook en `infra/DEPLOY.md` (dry-run → backfill → `match_alertas(notify=False)` → beat). Registry con SLOs en `vigia_shared/sources.py`; estado operativo sin ssh en `GET /health/sources`.
 - **BORA 2ª NO entra a `norma`**: va a `aviso_societario` (tabla y FTS propios, router `/avisos`, página "Radar societario") para no contaminar feed/stats/alertas.
 - **Legislatura CABA**: web service ASMX no documentado del buscador oficial (`GetExpedienteAvanzada`, filtra por fecha de INICIO y devuelve estado actual). Se guarda como `PROYECTO` con `bora_seccion='Legislatura'`; el feed `/normas/ediciones` lo excluye. Backfill → `match_alertas(notify=False)` (runbook en DEPLOY-CESBA.md).
+- **TSJ CABA**: buscador de jurisprudencia ASP (`resultadoBusqueda.asp`, por fecha de sentencia, 100/página); declara ISO-8859-1 pero el HTML es UTF-8. Se guarda como `SENTENCIA` con `bora_seccion='Tribunal Superior'`. Fuentes y su SQL en `vigia_shared/fuentes.py` (boletin | legislatura | tsj).
 - **Sin free trial**: el período de prueba (402 `trial_expired` + cartel `TrialGate`) fue eliminado; `require_active_plan` quedó como pass-through, punto único para reintroducir gating por plan.
 
 ## Diseño / UX
