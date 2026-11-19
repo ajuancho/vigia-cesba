@@ -91,8 +91,8 @@ export default function DashboardView() {
   const KPIS = [
     { label: 'Normas esta semana', value: rec?.semana, sub: 'vs. semana anterior', color: 'text-celeste', delta: rec && <Delta actual={rec.semana} anterior={rec.semana_anterior} /> },
     { label: 'Últimos 30 días', value: rec?.mes, sub: 'vs. 30 días previos', color: 'text-sol', delta: rec && <Delta actual={rec.mes} anterior={rec.mes_anterior} /> },
-    { label: 'Proyectos presentados', value: rec?.proyectos_30d, sub: 'últimos 30 días · Congreso', color: 'text-sol-bright', delta: null },
-    { label: `DNU en ${new Date().getFullYear()}`, value: rec?.dnu_anio, sub: `${(dnu?.total ?? 0).toLocaleString('es-AR')} históricos`, color: 'text-status-red', delta: null },
+    { label: 'Proyectos presentados', value: rec?.proyectos_30d, sub: 'últimos 30 días · Legislatura', color: 'text-sol-bright', delta: null },
+    { label: 'Sentencias del Tribunal Superior', value: rec?.sentencias_30d, sub: 'últimos 30 días', color: 'text-status-red', delta: null },
   ];
 
   return (
@@ -105,7 +105,7 @@ export default function DashboardView() {
             El pulso de la <em>normativa</em>
           </h2>
           <p className="text-[13px] text-text-tertiary font-mono">
-            {dash ? <CountUp value={dash.total_normas} /> : '…'} normas · Boletín Oficial CABA · actualización diaria
+            {dash ? <CountUp value={dash.total_normas} /> : '…'} documentos · Boletín Oficial, Legislatura y Tribunal Superior · actualización diaria
           </p>
         </div>
       </FadeIn>
@@ -247,7 +247,7 @@ export default function DashboardView() {
           <FadeIn>
             <Eyebrow num="V.">Sectores</Eyebrow>
             <h3 className="text-[17px] font-bold text-text-primary mb-6" style={{ fontFamily: 'var(--font-display)' }}>
-              Dónde golpea <em>la regulación</em>
+              Distribución <em>por sector</em>
             </h3>
           </FadeIn>
           <FadeIn delay={120}>

@@ -1,7 +1,7 @@
 """Consultas de reportes compartidas entre la API (constructor) y los workers
 (reportes programados).
 
-Un reporte filtra `norma` por sección del boletín, tipo de procedimiento,
+Un reporte filtra `norma` por fuente (boletín, legislatura, tribunal), sección del boletín, tipo de procedimiento,
 etapa, organismo, período y texto. Las licitaciones del BOCBA llegan con
 `bora_seccion = 'Licitaciones'`: el tipo de procedimiento está en
 `raw->>'tipo_nombre'` ("Licitación Obra Pública", "Contratación Menor", …) y la
@@ -18,6 +18,8 @@ from typing import Any
 from zoneinfo import ZoneInfo
 
 from sqlalchemy import text
+
+from vigia_shared.fuentes import SECCIONES_EXTERNAS, fuentes_sql
 
 # Tipo de procedimiento / tipo de norma tal como lo publica el boletín.
 TIPO_EXPR = "COALESCE(raw->>'tipo_nombre', tipo)"
@@ -59,8 +61,19 @@ def build_where(
     """
     conds: list[str] = []
     params: dict[str, Any] = {}
+    fuentes = list(filtros.get("fuentes") or [])
+    cond_fuentes = fuentes_sql(fuentes)
+    if cond_fuentes:
+        conds.append(cond_fuentes)
+    if filtros.get("secciones"):
+        # Las secciones son del Boletín: no recortan las otras fuentes elegidas.
+        otras = [f for f in fuentes if f in SECCIONES_EXTERNAS]
+        cond = "bora_seccion = ANY(:secciones)"
+        if otras:
+            cond = f"({cond} OR {fuentes_sql(otras)})"
+        conds.append(cond)
+        params["secciones"] = list(filtros["secciones"])
     for key, expr in (
-        ("secciones", "bora_seccion"),
         ("tipos", TIPO_EXPR),
         ("etapas", ETAPA_EXPR),
         ("organismos", "organismo"),

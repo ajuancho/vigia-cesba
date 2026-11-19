@@ -73,6 +73,7 @@ class RecentStats(BaseModel):
     mes: int
     mes_anterior: int
     proyectos_30d: int
+    sentencias_30d: int = 0
     dnu_anio: int
 
 

@@ -61,6 +61,8 @@ async def dashboard() -> DashboardStats:
                                          AND fecha_publicacion <  current_date - 30) AS mes_anterior,
                       COUNT(*) FILTER (WHERE tipo = 'PROYECTO'
                                          AND fecha_publicacion >= current_date - 30) AS proyectos_30d,
+                      COUNT(*) FILTER (WHERE tipo = 'SENTENCIA'
+                                         AND fecha_publicacion >= current_date - 30) AS sentencias_30d,
                       COUNT(*) FILTER (WHERE tipo = 'DNU'
                                          AND fecha_publicacion >= date_trunc('year', current_date)) AS dnu_anio
                     FROM norma
@@ -83,6 +85,7 @@ async def dashboard() -> DashboardStats:
             mes=int(rec.mes or 0),
             mes_anterior=int(rec.mes_anterior or 0),
             proyectos_30d=int(rec.proyectos_30d or 0),
+            sentencias_30d=int(rec.sentencias_30d or 0),
             dnu_anio=int(rec.dnu_anio or 0),
         ),
     )

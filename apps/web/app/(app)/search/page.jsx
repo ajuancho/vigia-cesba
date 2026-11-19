@@ -4,7 +4,8 @@ import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { api } from '@/lib/api';
 import { TIPOS_NORMA, TIPOS_CABA, SECTORES, FUENTES } from '@/lib/constants';
-import { Search as SearchIcon, SlidersHorizontal, ArrowRight } from 'lucide-react';
+import { Search as SearchIcon, SlidersHorizontal, ArrowRight, X } from 'lucide-react';
+import { detectarFuente } from '@/lib/fuentes';
 import FadeIn from '@/components/FadeIn';
 
 const TIPO_DOT_COLORS = {
@@ -26,9 +27,24 @@ function SearchView() {
   const [results, setResults] = useState([]);
   const [total, setTotal] = useState(0);
   const [touched, setTouched] = useState(false);
+  const [ignorarDeteccion, setIgnorarDeteccion] = useState(false);
+
+  // "vivienda boletín oficial": el nombre de la fuente se aplica como filtro y
+  // se quita del texto (las normas no dicen "boletín oficial" en su contenido).
+  const det = detectarFuente(query);
+  const usarDeteccion = Boolean(det.fuente) && !ignorarDeteccion && (!fuente || fuente === det.fuente);
+  const fuenteEfectiva = fuente || (usarDeteccion ? det.fuente : '');
+  const texto = usarDeteccion ? det.texto : query;
+
+  useEffect(() => { if (!det.fuente) setIgnorarDeteccion(false); }, [det.fuente]);
+
+  const elegirFuente = (key) => {
+    setFuente(key);
+    if (!key && det.fuente) setIgnorarDeteccion(true);
+  };
 
   useEffect(() => {
-    const active = query || tipo || sector || fuente;
+    const active = texto || tipo || sector || fuenteEfectiva;
     if (!active) {
       setResults([]);
       setTotal(0);
@@ -38,12 +54,12 @@ function SearchView() {
     setTouched(true);
     const t = setTimeout(() => {
       api
-        .search({ q: query, tipo, sector, fuente, limit: 50 })
+        .search({ q: texto, tipo, sector, fuente: fuenteEfectiva, limit: 50 })
         .then((r) => { setResults(r.hits || []); setTotal(r.total || 0); })
         .catch(() => setResults([]));
     }, 250);
     return () => clearTimeout(t);
-  }, [query, tipo, sector, fuente]);
+  }, [texto, tipo, sector, fuenteEfectiva]);
 
   return (
     <div className="max-w-4xl mx-auto">
@@ -78,7 +94,7 @@ function SearchView() {
       </FadeIn>
 
       {showFilters && (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-5 animate-slide-up">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5 animate-slide-up">
           <div>
             <label className="eyebrow text-[9px] block mb-1">Tipo</label>
             <select value={tipo} onChange={(e) => setTipo(e.target.value)} className={SELECT_CLS}>
@@ -93,14 +109,34 @@ function SearchView() {
               {SECTORES.map((s) => <option key={s} value={s}>{s}</option>)}
             </select>
           </div>
-          <div>
-            <label className="eyebrow text-[9px] block mb-1">Fuente</label>
-            <select value={fuente} onChange={(e) => setFuente(e.target.value)} className={SELECT_CLS}>
-              <option value="">Todas</option>
-              {Object.entries(FUENTES).map(([key, label]) => <option key={key} value={key}>{label}</option>)}
-            </select>
-          </div>
         </div>
+      )}
+
+      {/* Fuente: siempre a la vista */}
+      <div className="flex flex-wrap items-center gap-2 mb-3" role="group" aria-label="Fuente">
+        {[['', 'Todas'], ...Object.entries(FUENTES)].map(([key, label]) => {
+          const on = fuenteEfectiva === key;
+          return (
+            <button key={key || 'todas'} type="button" onClick={() => elegirFuente(key)} aria-pressed={on}
+              className={`text-[12px] px-3 min-h-9 rounded-full border transition-colors ${
+                on ? 'bg-carbon text-white border-carbon' : 'bg-white text-text-secondary border-border-medium hover:border-cian'
+              }`}>
+              {label}
+            </button>
+          );
+        })}
+      </div>
+      {usarDeteccion && !fuente && (
+        <p className="flex flex-wrap items-center gap-2 text-[12px] text-text-tertiary mb-3" role="status">
+          <span className="inline-flex items-center gap-1.5 pl-3 pr-1.5 min-h-8 rounded-full bg-lima text-carbon font-semibold">
+            Fuente: {FUENTES[det.fuente]}
+            <button type="button" onClick={() => setIgnorarDeteccion(true)} aria-label="Quitar el filtro de fuente y buscar esas palabras"
+              className="inline-flex items-center justify-center w-6 h-6 rounded-full hover:bg-carbon/10">
+              <X size={13} />
+            </button>
+          </span>
+          <span>detectada en tu búsqueda{det.texto ? <> · buscando «{det.texto}»</> : ''}</span>
+        </p>
       )}
 
       <p className="text-[11px] text-text-tertiary mb-2 font-mono">

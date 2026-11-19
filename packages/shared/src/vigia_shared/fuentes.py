@@ -11,6 +11,9 @@ Lo usan el buscador, las alertas y el feed para filtrar por fuente.
 """
 from __future__ import annotations
 
+import re
+import unicodedata
+
 SECCION_LEGISLATURA = "Legislatura"
 SECCION_TSJ = "Tribunal Superior"
 
@@ -33,6 +36,59 @@ def fuente_sql(fuente: str, alias: str = "") -> str:
         externas = ", ".join(f"'{s}'" for s in SECCIONES_EXTERNAS.values())
         return f"({col} IS NULL OR {col} NOT IN ({externas}))"
     raise ValueError(f"fuente desconocida: {fuente}")
+
+
+# Frases que nombran una fuente (sin tildes, en minúscula; las más largas primero).
+_FRASES_FUENTE: list[tuple[str, str]] = [
+    ("boletin oficial de la ciudad de buenos aires", "boletin"),
+    ("boletin oficial de la ciudad", "boletin"),
+    ("boletin oficial", "boletin"),
+    ("bocba", "boletin"),
+    ("boletin", "boletin"),
+    ("legislatura portena", "legislatura"),
+    ("legislatura de la ciudad", "legislatura"),
+    ("legislatura", "legislatura"),
+    ("tribunal superior de justicia", "tsj"),
+    ("tribunal superior", "tsj"),
+    ("tsj", "tsj"),
+    ("sentencias", "tsj"),
+]
+_CONECTORES = "en|del|de|la|el|los|las|por|y|o"
+
+
+def _sin_tildes(s: str) -> str:
+    return "".join(c for c in unicodedata.normalize("NFD", s) if unicodedata.category(c) != "Mn")
+
+
+def quitar_fuentes(texto: str) -> tuple[list[str], str]:
+    """Detecta nombres de fuente en un texto de búsqueda y los quita.
+
+    "vivienda boletín oficial" → (["boletin"], "vivienda"). Las fuentes no
+    aparecen en el texto de las normas, así que buscarlas como palabras no
+    devuelve nada: se aplican como filtro. Se llevan también los conectores
+    que las preceden ("vivienda en el Boletín Oficial" → "vivienda").
+    """
+    plano = _sin_tildes(texto).lower()
+    if len(plano) != len(texto):  # caracteres combinados: se trabaja sobre la versión plana
+        texto = plano
+    encontradas: list[str] = []
+    cortes: list[tuple[int, int]] = []
+    for frase, fuente in _FRASES_FUENTE:
+        patron = rf"(?:(?<!\w)(?:{_CONECTORES})\s+)*(?<![\w-]){re.escape(frase)}(?!\w)"
+        for m in re.finditer(patron, plano):
+            if any(a < m.end() and m.start() < b for a, b in cortes):
+                continue
+            cortes.append((m.start(), m.end()))
+            if fuente not in encontradas:
+                encontradas.append(fuente)
+    if not cortes:
+        return [], texto.strip()
+    partes, prev = [], 0
+    for a, b in sorted(cortes):
+        partes.append(texto[prev:a])
+        prev = b
+    partes.append(texto[prev:])
+    return encontradas, re.sub(r"\s+", " ", " ".join(partes)).strip()
 
 
 def fuentes_sql(fuentes: list[str], alias: str = "") -> str | None:

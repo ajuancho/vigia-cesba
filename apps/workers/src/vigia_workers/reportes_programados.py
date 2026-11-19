@@ -113,11 +113,17 @@ def render_reporte(
         + f'<p style="margin:6px 0 0;font-size:11px;color:{gris}">Texto generado con IA a partir de las cifras del reporte.</p></div>'
         if analisis else ""
     )
+    n_org = ag["organismos_distintos"]
+    if n_org == 1 and ag["por_organismo"]:
+        rotulo_org = _esc(ag["por_organismo"][0]["valor"]).upper()
+    else:
+        rotulo_org = f"{n_org} ORGANISMOS"
+    # Con 1 o 2 organismos el ranking no aporta: el dato ya está en el rótulo.
+    tops = (top("ORGANISMOS", ag["por_organismo"]) if n_org > 2 else "") + top("TIPOS", ag["por_tipo"])
     cuerpo = (
         f'<p style="margin:0;font-size:34px;line-height:38px;font-weight:700;color:{carbon}">{_fmt_num(total)}</p>'
-        f'<p style="margin:2px 0 18px;font-size:11px;font-weight:600;letter-spacing:.12em;color:{gris}">PUBLICACIONES · {ag["organismos_distintos"]} ORGANISMOS</p>'
-        f'<table style="width:100%;border-collapse:collapse;margin:0 0 18px"><tr>'
-        f'{top("ORGANISMOS", ag["por_organismo"])}{top("TIPOS", ag["por_tipo"])}</tr></table>'
+        f'<p style="margin:2px 0 18px;font-size:11px;font-weight:600;letter-spacing:.12em;color:{gris}">PUBLICACIONES · {rotulo_org}</p>'
+        f'<table style="width:100%;border-collapse:collapse;margin:0 0 18px"><tr>{tops}</tr></table>'
         f'<table style="width:100%;border-collapse:collapse">{filas_html}</table>{resto}'
         f'{analisis_html}'
         f'<p style="margin:22px 0 0">{boton(f"{WEB_BASE_URL}/reportes?r={int(reporte_id)}", "Abrir en el monitor")}</p>'

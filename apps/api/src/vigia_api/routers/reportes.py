@@ -1,6 +1,6 @@
 """Reportes sobre el corpus normativo (JWT requerido, solo usuarios logueados).
 
-Un reporte es una consulta con filtros (sección del boletín, tipo de
+Un reporte es una consulta con filtros (fuente, sección del boletín, tipo de
 procedimiento, etapa, organismo, período, texto) que se muestra como listado
 ordenable o como análisis (agregados para gráficos + texto opcional con IA).
 Los reportes guardados persisten la configuración, no los resultados.
@@ -27,6 +27,7 @@ from vigia_api.core.db import get_sessionmaker
 from vigia_api.core.scope import jurisdiccion_scope
 from vigia_api.core.security import WorkspaceContext, require_active_plan
 from vigia_api.services import ai
+from vigia_shared.fuentes import FUENTES, SECCIONES_EXTERNAS, quitar_fuentes
 from vigia_shared.models import Reporte
 from vigia_shared.reportes import (
     CSV_MAX,
@@ -54,7 +55,8 @@ def _require_real_workspace(ctx: WorkspaceContext) -> None:
 
 
 class Filtros(BaseModel):
-    secciones: list[str] = []
+    fuentes: list[Literal["boletin", "legislatura", "tsj"]] = []
+    secciones: list[str] = []  # secciones del Boletín Oficial
     tipos: list[str] = []
     etapas: list[str] = []
     organismos: list[str] = []
@@ -156,7 +158,19 @@ class AnalisisOut(BaseModel):
 
 def _where(f: Filtros) -> tuple[str, dict[str, Any]]:
     """WHERE + params para los filtros del constructor (con scope de jurisdicción)."""
-    return build_where(f.model_dump(), jurisdiccion=jurisdiccion_scope())
+    return build_where(_migrar(f).model_dump(), jurisdiccion=jurisdiccion_scope())
+
+
+def _migrar(f: Filtros) -> Filtros:
+    """Reportes guardados antes de separar fuente y sección: 'Legislatura' y
+    'Tribunal Superior' venían como secciones; pasan a ser fuentes."""
+    externas = {v: k for k, v in SECCIONES_EXTERNAS.items()}
+    movidas = [externas[s] for s in f.secciones if s in externas]
+    if not movidas:
+        return f
+    secciones = [s for s in f.secciones if s not in externas]
+    fuentes = list(dict.fromkeys([*f.fuentes, *movidas, *(["boletin"] if secciones else [])]))
+    return f.model_copy(update={"fuentes": fuentes, "secciones": secciones})
 
 
 def _filas_sql(where: str, orden: str) -> str:
@@ -175,12 +189,16 @@ async def _agregados(session, where: str, params: dict[str, Any]) -> tuple[int, 
 @router.get("/opciones", response_model=Opciones)
 async def opciones(
     ctx: Annotated[WorkspaceContext, Depends(require_active_plan)],
+    fuentes: Annotated[list[str] | None, Query()] = None,
     secciones: Annotated[list[str] | None, Query()] = None,
 ) -> Opciones:
-    """Valores disponibles para los filtros. `secciones` acota tipos/etapas/organismos."""
+    """Valores disponibles para los filtros. `secciones` son solo las del Boletín;
+    `fuentes` + `secciones` acotan tipos/etapas/organismos."""
     _require_real_workspace(ctx)
+    fuentes_ok = [x for x in (fuentes or []) if x in FUENTES]
     where_all, params_all = _where(Filtros())
-    where_sec, params_sec = _where(Filtros(secciones=secciones or []))
+    where_bol, params_bol = _where(Filtros(fuentes=["boletin"]))
+    where_sec, params_sec = _where(Filtros(fuentes=fuentes_ok, secciones=secciones or []))
     Session = get_sessionmaker()
     async with Session() as session:
         async def conteo(expr: str, where: str, params: dict, limit: int) -> list[Conteo]:
@@ -202,7 +220,7 @@ async def opciones(
             )
         ).one()
         return Opciones(
-            secciones=await conteo("bora_seccion", where_all, params_all, 50),
+            secciones=await conteo("bora_seccion", where_bol, params_bol, 50),
             tipos=await conteo(TIPO_EXPR, where_sec, params_sec, 60),
             etapas=await conteo(ETAPA_EXPR, where_sec, params_sec, 20),
             organismos=await conteo("organismo", where_sec, params_sec, 300),
@@ -303,21 +321,26 @@ _SYSTEM_INTERPRETAR = (
     "Convertís pedidos de reportes sobre el Boletín Oficial de la Ciudad de Buenos Aires "
     "en filtros para un constructor de reportes. Respondés SOLO un objeto JSON, sin texto "
     "alrededor, con esta forma:\n"
-    '{"filtros": {"secciones": [], "tipos": [], "etapas": [], "organismos": [], '
+    '{"filtros": {"fuentes": [], "secciones": [], "tipos": [], "etapas": [], "organismos": [], '
     '"desde": null, "hasta": null, "texto": null}, "formato": "analisis", '
     '"orden": "fecha_desc", "explicacion": ""}\n'
     "Reglas:\n"
-    "- secciones, tipos, etapas y organismos: usá SOLO valores copiados textualmente de las "
-    "listas disponibles que te paso. Lista vacía = sin restricción.\n"
-    "- Licitaciones, compras y contrataciones están en la sección 'Licitaciones'; su tipo de "
+    "- fuentes: 'boletin' (Boletín Oficial), 'legislatura' (expedientes de la Legislatura) y "
+    "'tsj' (sentencias del Tribunal Superior de Justicia). Si el pedido nombra una fuente "
+    "('boletín oficial', 'boletín', 'legislatura', 'tribunal superior', 'TSJ') va acá, NUNCA en "
+    "'texto'. Lista vacía = todas.\n"
+    "- secciones (solo del Boletín Oficial; implican fuentes=['boletin']), tipos, etapas y "
+    "organismos: usá SOLO valores copiados textualmente de las listas disponibles que te paso. "
+    "Lista vacía = sin restricción.\n"
+    "- Licitaciones, compras y contrataciones están en la sección 'Licitaciones' del Boletín; su tipo de "
     "procedimiento va en 'tipos' (p.ej. 'Licitación Obra Pública') y la etapa (llamado, "
     "preadjudicación, adjudicación…) en 'etapas'.\n"
-    "- Proyectos, expedientes e iniciativas de legisladores están en la sección 'Legislatura'; "
+    "- Proyectos, expedientes e iniciativas de legisladores son la fuente 'legislatura'; "
     "su tipo va en 'tipos' (p.ej. 'Proyecto de ley', 'Proyecto de resolución') y su estado de "
     "trámite o 'Sancionado' en 'etapas'. El organismo es siempre la Legislatura: no lo uses "
     "para filtrar por autor; si piden un legislador, poné su apellido en 'texto'.\n"
-    "- Sentencias, fallos y jurisprudencia del Tribunal Superior de Justicia están en la sección "
-    "'Tribunal Superior'; la materia (secretaría, p.ej. 'Asuntos Laborales') va en 'tipos' y el "
+    "- Sentencias, fallos y jurisprudencia del Tribunal Superior de Justicia son la fuente "
+    "'tsj'; la materia (secretaría, p.ej. 'Asuntos Laborales') va en 'tipos' y el "
     "tema principal o tipo de recurso en 'etapas'. Partes o carátula ('ART', 'GCBA') van en 'texto'.\n"
     "- desde/hasta: fechas ISO (AAAA-MM-DD) calculadas a partir de la fecha de hoy que te paso. "
     "'el último año' = hoy menos 365 días. Sin período en el pedido = null.\n"
@@ -389,13 +412,14 @@ async def interpretar(
             ).all()
             return [str(r[0]) for r in rows]
 
-        secciones = await valores("bora_seccion", 50)
+        secciones = [s for s in await valores("bora_seccion", 50) if s not in SECCIONES_EXTERNAS.values()]
         tipos = await valores(TIPO_EXPR, 80)
         etapas = await valores(ETAPA_EXPR, 20)
         organismos = await valores("organismo", 300)
 
     contexto = {
         "hoy": Date.today().isoformat(),
+        "fuentes": FUENTES,
         "secciones": secciones,
         "tipos": tipos,
         "etapas": etapas,
@@ -412,15 +436,20 @@ async def interpretar(
 
     f = data.get("filtros") if isinstance(data.get("filtros"), dict) else {}
     descartados: list[str] = []
-    texto = f.get("texto")
+    # Un nombre de fuente en el texto ("subte boletín oficial") es un filtro, no palabras a buscar.
+    fuentes_texto, texto = quitar_fuentes(str(f.get("texto") or ""))
+    fuentes_ia = [x for x in (f.get("fuentes") if isinstance(f.get("fuentes"), list) else []) if x in FUENTES]
+    secciones_ok = _canon(f.get("secciones"), secciones, descartados)
+    fuentes = list(dict.fromkeys([*fuentes_ia, *fuentes_texto, *(["boletin"] if secciones_ok else [])]))
     filtros = Filtros(
-        secciones=_canon(f.get("secciones"), secciones, descartados),
+        fuentes=fuentes,
+        secciones=secciones_ok,
         tipos=_canon(f.get("tipos"), tipos, descartados),
         etapas=_canon(f.get("etapas"), etapas, descartados),
         organismos=_canon(f.get("organismos"), organismos, descartados),
         desde=_fecha(f.get("desde")),
         hasta=_fecha(f.get("hasta")),
-        texto=str(texto).strip()[:200] if texto else None,
+        texto=texto[:200] if texto else None,
     )
     formato = data.get("formato") if data.get("formato") in ("listado", "analisis") else "analisis"
     orden = data.get("orden") if data.get("orden") in ORDEN_SQL else "fecha_desc"

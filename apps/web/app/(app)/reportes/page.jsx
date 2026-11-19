@@ -6,9 +6,10 @@ import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid,
 } from 'recharts';
 import {
-  FileBarChart, Play, Save, Download, Printer, Sparkles, Trash2, Plus, X, ExternalLink, Lock, Wand2, CalendarClock,
+  FileBarChart, Play, Save, Download, Printer, Sparkles, Trash2, Plus, X, ExternalLink, Lock, Wand2, CalendarClock, Info, ChevronDown,
 } from 'lucide-react';
 import { authedFetch, authedFetchBlob, AUTH_ENABLED } from '@/lib/authClient';
+import { FUENTES } from '@/lib/constants';
 
 // Traduce los errores de la API a algo accionable para quien usa el módulo.
 function mensajeError(e) {
@@ -38,66 +39,89 @@ const PERIODOS = [
   { label: 'Todo', dias: null },
 ];
 
+const OPCIONES_FUENTE = Object.entries(FUENTES).map(([valor, label]) => ({ valor, label }));
+// Antes de separar fuente y sección, Legislatura y Tribunal Superior eran "secciones".
+const SECCION_A_FUENTE = { Legislatura: 'legislatura', 'Tribunal Superior': 'tsj' };
+
 // Puntos de partida frecuentes; el usuario los ajusta después.
 const PLANTILLAS = [
   {
-    nombre: 'Licitaciones de obra pública · último año',
+    nombre: 'Obra pública',
+    descripcion: 'Licitaciones de obra pública del último año: volumen, organismos y etapas.',
     config: () => ({
-      filtros: { secciones: ['Licitaciones'], tipos: ['Licitación Obra Pública'], desde: haceDias(365) },
+      filtros: { fuentes: ['boletin'], secciones: ['Licitaciones'], tipos: ['Licitación Obra Pública'], desde: haceDias(365) },
       formato: 'analisis', orden: 'fecha_desc',
     }),
   },
   {
-    nombre: 'Adjudicaciones · últimos 6 meses',
+    nombre: 'Adjudicaciones',
+    descripcion: 'Qué se adjudicó en los últimos 6 meses, agrupado por organismo.',
     config: () => ({
-      filtros: { secciones: ['Licitaciones'], etapas: ['Adjudicación'], desde: haceDias(182) },
+      filtros: { fuentes: ['boletin'], secciones: ['Licitaciones'], etapas: ['Adjudicación'], desde: haceDias(182) },
       formato: 'analisis', orden: 'organismo',
     }),
   },
   {
-    nombre: 'Proyectos de ley de la Legislatura · último año',
+    nombre: 'Contrataciones directas',
+    descripcion: 'Listado de las contrataciones directas del último año, para descargar.',
     config: () => ({
-      filtros: { secciones: ['Legislatura'], tipos: ['Proyecto de ley'], desde: haceDias(365) },
-      formato: 'analisis', orden: 'fecha_desc',
-    }),
-  },
-  {
-    nombre: 'Sentencias del Tribunal Superior · últimos 6 meses',
-    config: () => ({
-      filtros: { secciones: ['Tribunal Superior'], desde: haceDias(182) },
-      formato: 'analisis', orden: 'fecha_desc',
-    }),
-  },
-  {
-    nombre: 'Contrataciones directas · último año',
-    config: () => ({
-      filtros: { secciones: ['Licitaciones'], tipos: ['Contratación Directa'], desde: haceDias(365) },
+      filtros: { fuentes: ['boletin'], secciones: ['Licitaciones'], tipos: ['Contratación Directa'], desde: haceDias(365) },
       formato: 'listado', orden: 'fecha_desc',
+    }),
+  },
+  {
+    nombre: 'Proyectos de ley',
+    descripcion: 'Proyectos de ley presentados en la Legislatura en el último año.',
+    config: () => ({
+      filtros: { fuentes: ['legislatura'], tipos: ['Proyecto de ley'], desde: haceDias(365) },
+      formato: 'analisis', orden: 'fecha_desc',
+    }),
+  },
+  {
+    nombre: 'Sentencias del Tribunal Superior',
+    descripcion: 'Fallos de los últimos 6 meses por materia y tipo de recurso.',
+    config: () => ({
+      filtros: { fuentes: ['tsj'], desde: haceDias(182) },
+      formato: 'analisis', orden: 'fecha_desc',
     }),
   },
 ];
 
+const FORMATOS = [
+  { valor: 'analisis', titulo: 'Análisis con gráficos', texto: 'Totales, evolución por mes, organismos, tipos y etapas, con un análisis escrito por IA opcional.' },
+  { valor: 'listado', titulo: 'Listado', texto: 'Solo la tabla de publicaciones, ordenada como elijas y lista para descargar en CSV.' },
+];
+
 const CONFIG_VACIA = {
-  filtros: { secciones: ['Licitaciones'], tipos: [], etapas: [], organismos: [], desde: haceDias(365), hasta: null, texto: '' },
+  filtros: { fuentes: ['boletin'], secciones: ['Licitaciones'], tipos: [], etapas: [], organismos: [], desde: haceDias(365), hasta: null, texto: '' },
   formato: 'analisis',
   orden: 'fecha_desc',
 };
 
 function normalizar(config) {
   const f = config.filtros || {};
+  const viejas = (f.secciones || []).filter((s) => SECCION_A_FUENTE[s]);
+  const secciones = (f.secciones || []).filter((s) => !SECCION_A_FUENTE[s]);
+  const fuentes = [...new Set([
+    ...(f.fuentes || []), ...viejas.map((s) => SECCION_A_FUENTE[s]), ...(secciones.length ? ['boletin'] : []),
+  ])];
   return {
     formato: config.formato || 'analisis',
     orden: config.orden || 'fecha_desc',
     filtros: {
-      secciones: f.secciones || [], tipos: f.tipos || [], etapas: f.etapas || [],
+      fuentes, secciones, tipos: f.tipos || [], etapas: f.etapas || [],
       organismos: f.organismos || [], desde: f.desde || null, hasta: f.hasta || null, texto: f.texto || '',
     },
   };
 }
 
+// Opciones de filtro como botones. Sin cantidades (ruido con decenas de opciones);
+// lo seleccionado se muestra siempre, aunque ya no esté entre las opciones.
 function Chips({ opciones, seleccion, onToggle, max = 14 }) {
   const [todas, setTodas] = useState(false);
-  const visibles = todas ? opciones : opciones.slice(0, max);
+  const huerfanas = seleccion.filter((v) => !opciones.some((o) => o.valor === v)).map((valor) => ({ valor }));
+  const lista = [...huerfanas, ...opciones];
+  const visibles = todas ? lista : lista.slice(0, max);
   return (
     <div className="flex flex-wrap gap-1.5">
       {visibles.map((o) => {
@@ -112,13 +136,13 @@ function Chips({ opciones, seleccion, onToggle, max = 14 }) {
               on ? 'bg-petroleo text-white border-petroleo' : 'bg-white text-text-secondary border-border-medium hover:border-cian'
             }`}
           >
-            {o.valor} <span className={on ? 'text-white/80' : 'text-text-tertiary'}>· {fmt(o.cantidad)}</span>
+            {o.label || o.valor}
           </button>
         );
       })}
-      {opciones.length > max && (
-        <button type="button" onClick={() => setTodas((v) => !v)} className="text-[12px] text-celeste font-semibold px-2 min-h-8">
-          {todas ? 'ver menos' : `ver ${opciones.length - max} más`}
+      {lista.length > max && (
+        <button type="button" onClick={() => setTodas((v) => !v)} className="text-[12px] text-magenta-profundo font-semibold px-2 min-h-8">
+          {todas ? 'ver menos' : `ver ${lista.length - max} más`}
         </button>
       )}
     </div>
@@ -134,6 +158,19 @@ function Campo({ label, ayuda, children }) {
       {children}
     </div>
   );
+}
+
+// Resumen de una línea de los filtros (se ve con el panel plegado).
+function resumirFiltros(f) {
+  const partes = [];
+  partes.push(f.fuentes.length ? f.fuentes.map((x) => FUENTES[x]).join(' + ') : 'Todas las fuentes');
+  if (f.secciones.length) partes.push(f.secciones.join(', '));
+  if (f.tipos.length) partes.push(f.tipos.length === 1 ? f.tipos[0] : `${f.tipos.length} tipos`);
+  if (f.etapas.length) partes.push(f.etapas.length === 1 ? f.etapas[0] : `${f.etapas.length} etapas`);
+  if (f.organismos.length) partes.push(f.organismos.length === 1 ? f.organismos[0] : `${f.organismos.length} organismos`);
+  if (f.desde || f.hasta) partes.push(`${f.desde ? `desde ${fmtFecha(f.desde)}` : ''}${f.desde && f.hasta ? ' ' : ''}${f.hasta ? `hasta ${fmtFecha(f.hasta)}` : ''}`);
+  else partes.push('todo el período');
+  return partes.join(' · ');
 }
 
 function ChartTooltip({ active, payload, label }) {
@@ -174,8 +211,9 @@ function SinSesion() {
         <Lock size={28} strokeWidth={1.75} className="text-petroleo" />
         <h3 className="text-[17px] font-bold tracking-[0.06em] uppercase text-petroleo">Disponible con sesión iniciada</h3>
         <p className="text-[14px] text-text-secondary leading-relaxed">
-          Los reportes permiten compilar y analizar la información del Boletín Oficial —por ejemplo, todas las
-          licitaciones de obra pública del último año— y están disponibles solo para usuarios con sesión iniciada.
+          Los reportes permiten compilar y analizar lo publicado en el Boletín Oficial, la Legislatura y el Tribunal
+          Superior —por ejemplo, todas las licitaciones de obra pública del último año— y están disponibles solo para
+          usuarios con sesión iniciada.
         </p>
         {AUTH_ENABLED ? (
           <button onClick={() => signIn('google', { callbackUrl: '/reportes' })} className="btn-celeste w-fit min-h-11 px-5 text-[12px] font-bold">
@@ -209,11 +247,18 @@ export default function ReportesView() {
   const [interpretando, setInterpretando] = useState(false);
   const [interpretacion, setInterpretacion] = useState(null); // {explicacion, descartados}
   const [pedidoErr, setPedidoErr] = useState('');
+  const [filtrosAbiertos, setFiltrosAbiertos] = useState(false);
+  const [ayudaPalabras, setAyudaPalabras] = useState(false);
   const [err, setErr] = useState('');
 
   const f = config.filtros;
   const setFiltro = (k, v) => setConfig((c) => ({ ...c, filtros: { ...c.filtros, [k]: v } }));
   const toggle = (k) => (v) => setFiltro(k, f[k].includes(v) ? f[k].filter((x) => x !== v) : [...f[k], v]);
+  // Sin Boletín no hay secciones del Boletín.
+  const toggleFuente = (v) => setConfig((c) => {
+    const fuentes = c.filtros.fuentes.includes(v) ? c.filtros.fuentes.filter((x) => x !== v) : [...c.filtros.fuentes, v];
+    return { ...c, filtros: { ...c.filtros, fuentes, secciones: fuentes.includes('boletin') ? c.filtros.secciones : [] } };
+  });
 
   const run = useCallback(async (fn) => {
     setErr('');
@@ -238,14 +283,15 @@ export default function ReportesView() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [deepLink, guardados]);
 
-  const seccionesKey = f.secciones.join('|');
+  const opcionesKey = `${f.fuentes.join('|')}/${f.secciones.join('|')}`;
   useEffect(() => {
     if (!connected) return;
     const qs = new URLSearchParams();
-    f.secciones.forEach((s) => qs.append('secciones', s));
+    f.fuentes.forEach((x) => qs.append('fuentes', x));
+    f.secciones.forEach((x) => qs.append('secciones', x));
     run(() => authedFetch(jwt, `/reportes/opciones?${qs}`)).then((o) => o && setOpciones(o));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [connected, jwt, seccionesKey, run]);
+  }, [connected, jwt, opcionesKey, run]);
 
   const body = useMemo(() => ({
     ...config,
@@ -309,6 +355,7 @@ export default function ReportesView() {
     try {
       const r = await authedFetch(jwt, '/reportes/interpretar', { method: 'POST', body: JSON.stringify({ pedido: pedido.trim() }) });
       setInterpretacion({ explicacion: r.explicacion, descartados: r.descartados || [] });
+      setFiltrosAbiertos(true);
       abrir(r.config);
     } catch (e) {
       setInterpretacion(null);
@@ -348,19 +395,23 @@ export default function ReportesView() {
           <p className="eyebrow mb-1 print:hidden"><span className="eyebrow-num">MONITOR / REPORTES</span><span className="ml-2">Compilación y análisis</span></p>
           <div className="title-rule flex flex-col gap-1">
             <h2 className="display-section text-text-primary">{actual?.nombre || <>Reportes <em>a medida</em></>}</h2>
-            <p className="text-[15px] text-text-tertiary">compilá, ordená y analizá lo publicado en el boletín oficial de la ciudad</p>
+            <p className="text-[15px] text-text-tertiary">compilá, ordená y analizá lo publicado en el boletín oficial, la legislatura y el tribunal superior</p>
           </div>
         </div>
       </FadeIn>
 
       {status === 'loading' ? null : !connected ? <SinSesion /> : (
         <>
-          {/* Pedido en lenguaje natural */}
+          {/* Paso 1 · Qué buscás: pedido en lenguaje natural + palabras clave */}
           <FadeIn delay={40}>
-            <section className="bg-marca relative overflow-hidden rounded-lg text-white p-5 md:p-6 mb-6 print:hidden" aria-label="Pedir un reporte en lenguaje natural">
-              <div className="relative flex flex-col gap-3">
-                <label htmlFor="pedido-reporte" className="flex items-center gap-2 text-[13px] font-bold tracking-[0.06em] uppercase">
-                  <Wand2 size={18} strokeWidth={1.75} /> Pedí el reporte con tus palabras
+            <section className="bg-marca rounded-lg text-white p-5 md:p-6 mb-4 print:hidden flex flex-col gap-4" aria-label="Qué buscás">
+              <h3 className="flex items-center gap-3 text-[15px] font-bold">
+                <span className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-lima text-carbon text-[13px] font-bold shrink-0">1</span>
+                ¿Qué buscás?
+              </h3>
+              <div className="flex flex-col gap-2">
+                <label htmlFor="pedido-reporte" className="flex items-center gap-2 text-[12px] font-semibold tracking-[0.1em] uppercase text-white/85">
+                  <Wand2 size={15} strokeWidth={1.75} /> Pedilo con tus palabras
                 </label>
                 <textarea
                   id="pedido-reporte"
@@ -374,10 +425,10 @@ export default function ReportesView() {
                 />
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <p className="text-[12px] text-white/85 max-w-xl">
-                    La IA lo traduce a los filtros de abajo y genera el reporte. Podés revisar y ajustar los filtros después.
+                    La IA completa las palabras clave y los filtros, y genera el reporte. Después podés ajustar todo.
                   </p>
                   <button type="button" onClick={interpretar} disabled={interpretando || pedido.trim().length < 3}
-                    className="inline-flex items-center gap-2 min-h-11 px-5 rounded bg-white text-petroleo text-[12px] font-bold uppercase tracking-[0.06em] hover:bg-humo disabled:opacity-60">
+                    className="inline-flex items-center gap-2 min-h-11 px-5 rounded bg-lima text-carbon text-[12px] font-bold uppercase tracking-[0.06em] hover:brightness-95 disabled:opacity-60">
                     <Sparkles size={15} /> {interpretando ? 'Interpretando…' : 'Armar reporte'}
                   </button>
                 </div>
@@ -385,12 +436,36 @@ export default function ReportesView() {
                   <p role="alert" className="text-[13px] bg-white text-status-red rounded px-3 py-2">{pedidoErr}</p>
                 )}
                 {interpretacion && !pedidoErr && (
-                  <div className="text-[13px] bg-white/15 border border-white/30 rounded px-3 py-2 flex flex-col gap-1" role="status">
+                  <div className="text-[13px] bg-white/10 border border-white/30 rounded px-3 py-2 flex flex-col gap-1" role="status">
                     {interpretacion.explicacion && <p><span className="font-semibold">Entendí:</span> {interpretacion.explicacion}</p>}
                     {interpretacion.descartados.length > 0 && (
                       <p className="text-white/85">No encontré en la base: {interpretacion.descartados.join(', ')}. Revisá los filtros.</p>
                     )}
                   </div>
+                )}
+              </div>
+              <div className="flex flex-col gap-2 pt-4 border-t border-white/20">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <label htmlFor="palabras-clave" className="text-[12px] font-semibold tracking-[0.1em] uppercase text-white/85">
+                    Palabras clave <span className="normal-case tracking-normal font-normal text-white/70">— buscan en el título, el objeto y el organismo</span>
+                  </label>
+                  <button type="button" onClick={() => setAyudaPalabras((v) => !v)} aria-expanded={ayudaPalabras} aria-controls="ayuda-palabras"
+                    className="inline-flex items-center gap-1 text-[12px] text-white/85 hover:text-white min-h-8">
+                    <Info size={14} /> cómo buscar
+                  </button>
+                </div>
+                <input id="palabras-clave" value={f.texto} onChange={(e) => setFiltro('texto', e.target.value)}
+                  onKeyDown={(e) => { if (e.key === 'Enter') generar(); }}
+                  placeholder='p. ej. hospital, "residuos peligrosos" o pavimentación -bacheo'
+                  className="h-10 px-3 rounded bg-white text-[14px] text-text-secondary placeholder-text-tertiary focus:outline-none focus:ring-2 focus:ring-verde-vital" />
+                {ayudaPalabras && (
+                  <p id="ayuda-palabras" className="text-[12px] leading-relaxed text-white/85">
+                    Varias palabras: tienen que aparecer todas (<code className="text-lima">limpieza hospital</code>).
+                    Frase exacta entre comillas (<code className="text-lima">"residuos peligrosos"</code>).
+                    Alternativas con <code className="text-lima">or</code> (<code className="text-lima">ascensores or escaleras</code>).
+                    Excluir con un guion (<code className="text-lima">-bacheo</code>). Incluye plurales y variantes.
+                    La fuente (boletín, legislatura, tribunal) se elige en los filtros.
+                  </p>
                 )}
               </div>
             </section>
@@ -399,22 +474,25 @@ export default function ReportesView() {
           {/* Plantillas y guardados */}
           <FadeIn delay={60}>
             <div className="flex flex-col gap-3 mb-6 print:hidden">
-              <div className="flex flex-wrap items-center gap-2">
-                <span className="eyebrow mr-1">Empezar desde</span>
-                {PLANTILLAS.map((p) => (
-                  <button key={p.nombre} type="button" onClick={() => abrir(p.config())}
-                    className="text-[12px] px-3 min-h-9 rounded border border-border-medium bg-white text-petroleo font-medium hover:border-cian transition-colors">
-                    {p.nombre}
-                  </button>
-                ))}
-                <button type="button" onClick={() => { setConfig(CONFIG_VACIA); setActual(null); setResultado(null); setItems([]); setAnalisis(''); }}
-                  className="text-[12px] px-3 min-h-9 rounded text-celeste font-semibold inline-flex items-center gap-1.5">
-                  <Plus size={14} /> Nuevo
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <span className="eyebrow">O empezá desde un reporte frecuente</span>
+                <button type="button" onClick={() => { setConfig(CONFIG_VACIA); setActual(null); setResultado(null); setItems([]); setAnalisis(''); setInterpretacion(null); }}
+                  className="text-[12px] px-3 min-h-9 rounded text-magenta-profundo font-semibold inline-flex items-center gap-1.5">
+                  <Plus size={14} /> Empezar de cero
                 </button>
               </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+                {PLANTILLAS.map((p) => (
+                  <button key={p.nombre} type="button" onClick={() => { setFiltrosAbiertos(true); abrir(p.config()); }}
+                    className="text-left card p-4 flex flex-col gap-1.5 hover:border-cian transition-colors">
+                    <span className="text-[13px] font-bold text-text-primary">{p.nombre}</span>
+                    <span className="text-[12px] leading-snug text-text-tertiary">{p.descripcion}</span>
+                  </button>
+                ))}
+              </div>
               {guardados.length > 0 && (
-                <div className="flex flex-wrap items-center gap-2">
-                  <span className="eyebrow mr-1">Guardados</span>
+                <div className="flex flex-wrap items-center gap-2 pt-1">
+                  <span className="eyebrow mr-1">Tus reportes guardados</span>
                   {guardados.map((g) => (
                     <span key={g.id} className={`inline-flex items-center rounded border text-[12px] ${actual?.id === g.id ? 'border-petroleo bg-petroleo text-white' : 'border-border-medium bg-white text-text-secondary'}`}>
                       <button type="button" onClick={() => abrir(g.config, { id: g.id, nombre: g.nombre })} className="px-3 min-h-9 inline-flex items-center gap-1.5">
@@ -430,125 +508,147 @@ export default function ReportesView() {
             </div>
           </FadeIn>
 
-          {/* Constructor */}
+          {/* Pasos 2 y 3 */}
           <FadeIn delay={100}>
-            <section className="card card-accent p-5 md:p-6 mb-8 flex flex-col gap-6 print:hidden" aria-label="Configuración del reporte">
-              <Campo label="Sección del boletín">
-                <Chips opciones={opciones?.secciones || []} seleccion={f.secciones} onToggle={toggle('secciones')} />
-              </Campo>
-              <Campo label="Tipo" ayuda="procedimiento o tipo de norma; vacío = todos">
-                <Chips opciones={opciones?.tipos || []} seleccion={f.tipos} onToggle={toggle('tipos')} />
-              </Campo>
-              {(opciones?.etapas?.length ?? 0) > 0 && (
-                <Campo label="Etapa" ayuda="licitaciones: llamado, adjudicación… · legislatura: estado o sancionado · tribunal: tema principal">
-                  <Chips opciones={opciones.etapas} seleccion={f.etapas} onToggle={toggle('etapas')} />
-                </Campo>
-              )}
-              <Campo label="Organismos" ayuda="vacío = todos">
-                <div className="flex flex-wrap items-center gap-1.5">
-                  {f.organismos.map((o) => (
-                    <span key={o} className="inline-flex items-center gap-1 text-[12px] px-2.5 min-h-8 rounded bg-petroleo text-white">
-                      {o}
-                      <button type="button" onClick={() => setFiltro('organismos', f.organismos.filter((x) => x !== o))} aria-label={`Quitar ${o}`}><X size={12} /></button>
+            <section className="card card-accent mb-8 print:hidden" aria-label="Configuración del reporte">
+              {/* Paso 2 · Filtros (plegable) */}
+              <div className="p-5 md:p-6 flex flex-col gap-5">
+                <button type="button" onClick={() => setFiltrosAbiertos((v) => !v)} aria-expanded={filtrosAbiertos} aria-controls="panel-filtros"
+                  className="flex items-start justify-between gap-4 text-left w-full">
+                  <span className="flex flex-col gap-1.5 min-w-0">
+                    <span className="flex items-center gap-3 text-[15px] font-bold text-text-primary">
+                      <span className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-lima text-carbon text-[13px] font-bold shrink-0">2</span>
+                      Ajustá los filtros
                     </span>
-                  ))}
-                  <label className="flex-1 min-w-[220px]">
-                    <span className="sr-only">Agregar organismo</span>
-                    <input list="reportes-organismos" value={orgDraft} onChange={(e) => setOrgDraft(e.target.value)}
-                      onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addOrganismo(orgDraft); } }}
-                      onBlur={() => orgDraft && addOrganismo(orgDraft)}
-                      placeholder="Escribí y elegí un organismo"
-                      className="w-full h-10 px-3 rounded border border-border-medium bg-white text-[13px] focus:outline-none focus:border-cian" />
-                    <datalist id="reportes-organismos">
-                      {(opciones?.organismos || []).map((o) => <option key={o.valor} value={o.valor}>{fmt(o.cantidad)}</option>)}
-                    </datalist>
-                  </label>
-                </div>
-              </Campo>
-              <div className="grid grid-cols-1 xl:grid-cols-[3fr_2fr] gap-6">
-                <Campo label="Período">
-                  <div className="flex flex-wrap items-center gap-2">
-                    {PERIODOS.map((p) => (
-                      <button key={p.label} type="button" onClick={() => setConfig((c) => ({ ...c, filtros: { ...c.filtros, desde: p.dias ? haceDias(p.dias) : null, hasta: null } }))}
-                        aria-pressed={periodoActivo === p}
-                        className={`text-[12px] px-3 min-h-9 rounded border ${periodoActivo === p ? 'bg-petroleo text-white border-petroleo' : 'bg-white border-border-medium text-text-secondary hover:border-cian'}`}>
-                        {p.label}
-                      </button>
-                    ))}
-                    <label className="flex items-center gap-1.5 text-[12px] text-text-tertiary">desde
-                      <input type="date" value={f.desde || ''} onChange={(e) => setFiltro('desde', e.target.value || null)} className="h-9 px-2 rounded border border-border-medium bg-white text-[12px] text-text-secondary" />
-                    </label>
-                    <label className="flex items-center gap-1.5 text-[12px] text-text-tertiary">hasta
-                      <input type="date" value={f.hasta || ''} onChange={(e) => setFiltro('hasta', e.target.value || null)} className="h-9 px-2 rounded border border-border-medium bg-white text-[12px] text-text-secondary" />
-                    </label>
+                    {!filtrosAbiertos && <span className="text-[13px] text-text-tertiary pl-10">{resumirFiltros(f)}</span>}
+                  </span>
+                  <span className="inline-flex items-center gap-1 text-[12px] font-semibold text-magenta-profundo shrink-0 min-h-8">
+                    {filtrosAbiertos ? 'Plegar' : 'Ver y editar'} <ChevronDown size={15} className={`transition-transform ${filtrosAbiertos ? 'rotate-180' : ''}`} />
+                  </span>
+                </button>
+                {filtrosAbiertos && (
+                  <div id="panel-filtros" className="flex flex-col gap-6 md:pl-10">
+                    <Campo label="Fuente" ayuda="vacío = todas">
+                      <Chips opciones={OPCIONES_FUENTE} seleccion={f.fuentes} onToggle={toggleFuente} />
+                    </Campo>
+                    {f.fuentes.includes('boletin') && (
+                      <Campo label="Secciones del Boletín" ayuda="vacío = todas">
+                        <Chips opciones={opciones?.secciones || []} seleccion={f.secciones} onToggle={toggle('secciones')} />
+                      </Campo>
+                    )}
+                    <Campo label="Tipo" ayuda="procedimiento, tipo de norma, de expediente o materia; vacío = todos">
+                      <Chips opciones={opciones?.tipos || []} seleccion={f.tipos} onToggle={toggle('tipos')} />
+                    </Campo>
+                    {((opciones?.etapas?.length ?? 0) > 0 || f.etapas.length > 0) && (
+                      <Campo label="Etapa" ayuda="licitaciones: llamado, adjudicación… · legislatura: estado o sancionado · tribunal: tema principal">
+                        <Chips opciones={opciones?.etapas || []} seleccion={f.etapas} onToggle={toggle('etapas')} />
+                      </Campo>
+                    )}
+                    <Campo label="Organismos" ayuda="vacío = todos">
+                      <div className="flex flex-wrap items-center gap-1.5">
+                        {f.organismos.map((o) => (
+                          <span key={o} className="inline-flex items-center gap-1 text-[12px] px-2.5 min-h-8 rounded bg-petroleo text-white">
+                            {o}
+                            <button type="button" onClick={() => setFiltro('organismos', f.organismos.filter((x) => x !== o))} aria-label={`Quitar ${o}`}><X size={12} /></button>
+                          </span>
+                        ))}
+                        <label className="flex-1 min-w-[220px]">
+                          <span className="sr-only">Agregar organismo</span>
+                          <input list="reportes-organismos" value={orgDraft} onChange={(e) => setOrgDraft(e.target.value)}
+                            onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addOrganismo(orgDraft); } }}
+                            onBlur={() => orgDraft && addOrganismo(orgDraft)}
+                            placeholder="Escribí y elegí un organismo"
+                            className="w-full h-10 px-3 rounded border border-border-medium bg-white text-[13px] focus:outline-none focus:border-cian" />
+                          <datalist id="reportes-organismos">
+                            {(opciones?.organismos || []).map((o) => <option key={o.valor} value={o.valor} />)}
+                          </datalist>
+                        </label>
+                      </div>
+                    </Campo>
+                    <Campo label="Período">
+                      <div className="flex flex-wrap items-center gap-2">
+                        {PERIODOS.map((p) => (
+                          <button key={p.label} type="button" onClick={() => setConfig((c) => ({ ...c, filtros: { ...c.filtros, desde: p.dias ? haceDias(p.dias) : null, hasta: null } }))}
+                            aria-pressed={periodoActivo === p}
+                            className={`text-[12px] px-3 min-h-9 rounded border ${periodoActivo === p ? 'bg-petroleo text-white border-petroleo' : 'bg-white border-border-medium text-text-secondary hover:border-cian'}`}>
+                            {p.label}
+                          </button>
+                        ))}
+                        <label className="flex items-center gap-1.5 text-[12px] text-text-tertiary">desde
+                          <input type="date" value={f.desde || ''} onChange={(e) => setFiltro('desde', e.target.value || null)} className="h-9 px-2 rounded border border-border-medium bg-white text-[12px] text-text-secondary" />
+                        </label>
+                        <label className="flex items-center gap-1.5 text-[12px] text-text-tertiary">hasta
+                          <input type="date" value={f.hasta || ''} onChange={(e) => setFiltro('hasta', e.target.value || null)} className="h-9 px-2 rounded border border-border-medium bg-white text-[12px] text-text-secondary" />
+                        </label>
+                      </div>
+                    </Campo>
                   </div>
-                </Campo>
-                <Campo label="Palabras clave" ayuda="filtra por palabras; no es un pedido a la IA">
-                  <input value={f.texto} onChange={(e) => setFiltro('texto', e.target.value)}
-                    onKeyDown={(e) => { if (e.key === 'Enter') generar(); }}
-                    placeholder='p. ej. hospital, "residuos peligrosos" o pavimentación -bacheo'
-                    aria-describedby="ayuda-palabras"
-                    className="h-10 px-3 rounded border border-border-medium bg-white text-[13px] focus:outline-none focus:border-cian" />
-                  <p id="ayuda-palabras" className="text-[12px] leading-relaxed text-text-tertiary">
-                    Busca en el título, el objeto y el organismo. Varias palabras: tienen que aparecer todas
-                    (<code className="text-petroleo">limpieza hospital</code>). Frase exacta entre comillas
-                    (<code className="text-petroleo">"residuos peligrosos"</code>). Alternativas con <code className="text-petroleo">or</code>
-                    (<code className="text-petroleo">ascensores or escaleras</code>). Excluir con un guion
-                    (<code className="text-petroleo">-bacheo</code>). Incluye plurales y variantes. Para pedir el reporte con tus
-                    palabras usá la caja de arriba.
-                  </p>
-                </Campo>
+                )}
               </div>
-              <div className="flex flex-wrap items-end justify-between gap-4 pt-4 border-t border-border-light">
-                <div className="flex flex-wrap gap-6">
-                  <Campo label="Formato">
-                    <div className="flex rounded border border-border-medium overflow-hidden w-fit" role="group">
-                      {[['analisis', 'Análisis con gráficos'], ['listado', 'Listado']].map(([v, l]) => (
-                        <button key={v} type="button" onClick={() => setConfig((c) => ({ ...c, formato: v }))} aria-pressed={config.formato === v}
-                          className={`text-[12px] px-3 min-h-9 ${config.formato === v ? 'bg-petroleo text-white' : 'bg-white text-text-secondary'}`}>{l}</button>
-                      ))}
-                    </div>
-                  </Campo>
+
+              {/* Paso 3 · Cómo lo querés */}
+              <div className="p-5 md:p-6 flex flex-col gap-5 border-t border-border-light">
+                <h3 className="flex items-center gap-3 text-[15px] font-bold text-text-primary">
+                  <span className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-lima text-carbon text-[13px] font-bold shrink-0">3</span>
+                  ¿Cómo lo querés?
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:pl-10" role="radiogroup" aria-label="Formato del reporte">
+                  {FORMATOS.map((fo) => {
+                    const on = config.formato === fo.valor;
+                    return (
+                      <button key={fo.valor} type="button" role="radio" aria-checked={on}
+                        onClick={() => setConfig((c) => ({ ...c, formato: fo.valor }))}
+                        className={`text-left rounded-lg border-2 p-4 flex flex-col gap-1 transition-colors ${on ? 'border-carbon bg-humo' : 'border-border-medium bg-white hover:border-cian'}`}>
+                        <span className="flex items-center gap-2 text-[14px] font-bold text-text-primary">
+                          <span className={`w-4 h-4 rounded-full border-2 ${on ? 'border-carbon bg-lima' : 'border-border-medium'}`} aria-hidden="true" />
+                          {fo.titulo}
+                        </span>
+                        <span className="text-[12px] leading-snug text-text-tertiary pl-6">{fo.texto}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+                <div className="flex flex-wrap items-end justify-between gap-4 md:pl-10">
                   <Campo label="Orden">
                     <select value={config.orden} onChange={(e) => setConfig((c) => ({ ...c, orden: e.target.value }))}
-                      className="h-9 px-2 rounded border border-border-medium bg-white text-[12px] text-text-secondary">
+                      className="h-10 px-2 rounded border border-border-medium bg-white text-[13px] text-text-secondary">
                       <option value="fecha_desc">Más recientes primero</option>
                       <option value="fecha_asc">Más antiguas primero</option>
                       <option value="organismo">Por organismo</option>
                       <option value="tipo">Por tipo</option>
                     </select>
                   </Campo>
+                  <div className="flex flex-wrap gap-2">
+                    <button type="button" onClick={() => generar()} disabled={cargando}
+                      className="btn-celeste inline-flex items-center gap-2 min-h-11 px-5 text-[12px] font-bold disabled:opacity-50">
+                      <Play size={15} /> {cargando ? 'Generando…' : 'Generar reporte'}
+                    </button>
+                    <button type="button" onClick={guardar}
+                      className="inline-flex items-center gap-2 min-h-11 px-4 rounded border border-petroleo text-petroleo text-[12px] font-semibold uppercase tracking-[0.06em] hover:bg-humo">
+                      <Save size={15} /> Guardar
+                    </button>
+                  </div>
                 </div>
-                <div className="flex flex-wrap gap-2">
-                  <button type="button" onClick={() => generar()} disabled={cargando}
-                    className="btn-celeste inline-flex items-center gap-2 min-h-11 px-5 text-[12px] font-bold disabled:opacity-50">
-                    <Play size={15} /> {cargando ? 'Generando…' : 'Generar reporte'}
-                  </button>
-                  <button type="button" onClick={guardar}
-                    className="inline-flex items-center gap-2 min-h-11 px-4 rounded border border-petroleo text-petroleo text-[12px] font-semibold uppercase tracking-[0.06em] hover:bg-humo">
-                    <Save size={15} /> Guardar
-                  </button>
-                </div>
+                {actual && guardados.find((g) => g.id === actual.id) ? (
+                  <ProgramacionReporte
+                    key={actual.id}
+                    reporte={guardados.find((g) => g.id === actual.id)}
+                    jwt={jwt}
+                    emailDefault={session?.user?.email}
+                    mensajeError={mensajeError}
+                    onCambio={(r) => setGuardados((prev) => prev.map((g) => (g.id === r.id ? r : g)))}
+                  />
+                ) : (
+                  <p className="border-t border-border-light pt-4 text-[12px] text-text-tertiary inline-flex items-center gap-2">
+                    <CalendarClock size={14} strokeWidth={1.75} /> Guardá el reporte para programar su envío periódico por email.
+                  </p>
+                )}
+                {err && (
+                  <p role="alert" className="text-[13px] text-status-red bg-[rgba(180,35,24,0.06)] border border-[rgba(180,35,24,0.25)] rounded px-3 py-2">
+                    {err}
+                  </p>
+                )}
               </div>
-              {actual && guardados.find((g) => g.id === actual.id) ? (
-                <ProgramacionReporte
-                  key={actual.id}
-                  reporte={guardados.find((g) => g.id === actual.id)}
-                  jwt={jwt}
-                  emailDefault={session?.user?.email}
-                  mensajeError={mensajeError}
-                  onCambio={(r) => setGuardados((prev) => prev.map((g) => (g.id === r.id ? r : g)))}
-                />
-              ) : (
-                <p className="border-t border-border-light pt-4 text-[12px] text-text-tertiary inline-flex items-center gap-2">
-                  <CalendarClock size={14} strokeWidth={1.75} /> Guardá el reporte para programar su envío periódico por email.
-                </p>
-              )}
-              {err && (
-                <p role="alert" className="text-[13px] text-status-red bg-[rgba(180,35,24,0.06)] border border-[rgba(180,35,24,0.25)] rounded px-3 py-2">
-                  {err}
-                </p>
-              )}
             </section>
           </FadeIn>
 
@@ -558,7 +658,11 @@ export default function ReportesView() {
               <div className="flex flex-wrap items-end justify-between gap-4">
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-6">
                   <div><p className="text-[38px] font-bold leading-none text-petroleo tabular-nums">{fmt(resultado.total)}</p><p className="eyebrow mt-1.5">publicaciones</p></div>
-                  <div><p className="text-[38px] font-bold leading-none text-petroleo tabular-nums">{fmt(ag.organismos_distintos)}</p><p className="eyebrow mt-1.5">organismos</p></div>
+                  {ag.organismos_distintos === 1 && ag.por_organismo[0] ? (
+                    <div className="col-span-2 sm:col-span-1"><p className="text-[17px] font-bold text-petroleo mt-3 leading-snug">{ag.por_organismo[0].valor}</p><p className="eyebrow mt-1.5">organismo</p></div>
+                  ) : (
+                    <div><p className="text-[38px] font-bold leading-none text-petroleo tabular-nums">{fmt(ag.organismos_distintos)}</p><p className="eyebrow mt-1.5">organismos</p></div>
+                  )}
                   <div><p className="text-[17px] font-bold text-petroleo mt-3">{fmtFecha(ag.desde)} — {fmtFecha(ag.hasta)}</p><p className="eyebrow mt-1.5">período con datos</p></div>
                 </div>
                 <div className="flex flex-wrap gap-2 print:hidden">
@@ -587,13 +691,21 @@ export default function ReportesView() {
                       </BarChart>
                     </ResponsiveContainer>
                   </div>
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <BarrasHorizontales titulo="Organismos con más publicaciones" datos={ag.por_organismo} />
-                    <div className="flex flex-col gap-6">
+                  {/* Con 1 o 2 organismos el ranking no aporta: el dato ya está arriba. */}
+                  {ag.organismos_distintos > 2 ? (
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                      <BarrasHorizontales titulo="Organismos con más publicaciones" datos={ag.por_organismo} />
+                      <div className="flex flex-col gap-6">
+                        <BarrasHorizontales titulo="Por tipo" datos={ag.por_tipo.slice(0, 8)} />
+                        <BarrasHorizontales titulo="Por etapa" datos={ag.por_etapa} />
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                       <BarrasHorizontales titulo="Por tipo" datos={ag.por_tipo.slice(0, 8)} />
                       <BarrasHorizontales titulo="Por etapa" datos={ag.por_etapa} />
                     </div>
-                  </div>
+                  )}
 
                   <div className="card p-5 md:p-6 break-inside-avoid">
                     <div className="flex flex-wrap items-center justify-between gap-3 mb-3">
