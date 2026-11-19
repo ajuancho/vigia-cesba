@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { Newspaper, Search, Bell, ArrowRight, BarChart3, FileBarChart, Landmark, Scale } from 'lucide-react';
 import FadeIn from '@/components/FadeIn';
+import BarrasMarca from '@/components/BarrasMarca';
 
 export const revalidate = 300;
 
@@ -62,25 +63,20 @@ export default async function Landing() {
 
   return (
     <div className="min-h-screen flex flex-col bg-white">
-      {/* ── Hero: gradiente institucional + trama ── */}
-      <header className="grad-institucional relative overflow-hidden text-white">
-        <div className="trama" />
-        <div className="blob w-[520px] h-[520px] -right-32 -top-40 bg-[rgba(0,250,185,0.28)]" />
-        <div className="blob w-[420px] h-[420px] right-64 -bottom-56 bg-[rgba(78,131,251,0.35)]" />
+      {/* ── Hero: superficie carbón (versión negativa del logo) + las cuatro barras ── */}
+      <header className="bg-marca relative overflow-hidden text-white">
+        <BarrasMarca alto={420} ancho={72} gap={20} className="absolute right-6 md:right-16 -bottom-6 opacity-95 hidden md:inline-flex" />
 
         <nav className="relative max-w-6xl mx-auto px-5 md:px-10 pt-6 flex items-center justify-between gap-3">
           <Link href="/" className="flex items-center gap-3.5 text-white">
-            <img src="/brand/cesba-logo-blanco.png" alt="CESBA — Consejo Económico y Social de la Ciudad de Buenos Aires" width={64} height={64} className="w-14 h-14 md:w-16 md:h-16" />
-            <span className="flex flex-col gap-0.5 border-l border-white/30 pl-3.5">
-              <span className="text-[14px] md:text-[15px] font-bold tracking-[0.06em]">MONITOR BOCBA</span>
-              <span className="hidden sm:block text-[12px] text-white/85">normativa de la ciudad</span>
-            </span>
+            <img src="/brand/nuevosbaires-logo-blanco.svg" alt="nuevosBAires" width={169} height={36} className="h-8 md:h-9 w-auto" />
+            <span className="hidden sm:block border-l border-white/30 pl-3.5 text-[13px] font-medium text-white/85">monitor normativo</span>
           </Link>
           <div className="flex items-center gap-2">
             <Link href="/auth/signin" className="btn-ghost-invert hidden sm:inline-flex items-center min-h-11 px-4 text-[12px] font-semibold">
               Iniciar sesión
             </Link>
-            <Link href="/feed" className="btn-celeste inline-flex items-center gap-2 min-h-11 px-5 text-[12px] font-bold">
+            <Link href="/feed" className="btn-lima inline-flex items-center gap-2 min-h-11 px-5 text-[13px]">
               Entrar <ArrowRight size={16} />
             </Link>
           </div>
@@ -88,15 +84,15 @@ export default async function Landing() {
 
         <div className="relative max-w-6xl mx-auto px-5 md:px-10 pt-20 pb-24 md:pt-28 md:pb-28 flex flex-col gap-7">
           <FadeIn>
-            <p className="text-[11px] md:text-[12px] font-medium tracking-[0.14em] text-white/85">
-              CONSEJO ECONÓMICO Y SOCIAL DE LA CIUDAD DE BUENOS AIRES
+            <p className="text-[12px] font-medium tracking-[0.14em] text-white/85">
+              MONITOR NORMATIVO · NUEVOSBAIRES
             </p>
           </FadeIn>
           <FadeIn delay={80}>
             <div className="title-rule-vital flex flex-col gap-4">
               <h1 className="display-hero max-w-4xl">La normativa porteña, al día</h1>
-              <p className="text-[19px] md:text-[23px] font-light leading-snug">
-                monitor interno del boletín oficial, la legislatura y el tribunal superior de la ciudad
+              <p className="text-[19px] md:text-[23px] font-normal leading-snug text-white/90">
+                boletín oficial, legislatura y tribunal superior de la ciudad de buenos aires
               </p>
             </div>
           </FadeIn>
@@ -109,7 +105,7 @@ export default async function Landing() {
           </FadeIn>
           <FadeIn delay={240}>
             <div className="flex flex-wrap gap-3">
-              <Link href="/feed" className="btn-celeste inline-flex items-center gap-2.5 min-h-12 px-6 text-[13px] font-bold">
+              <Link href="/feed" className="btn-lima inline-flex items-center gap-2.5 min-h-12 px-6 text-[14px]">
                 Ver el boletín de hoy <ArrowRight size={18} />
               </Link>
               <Link href="#plataforma" className="btn-ghost-invert inline-flex items-center min-h-12 px-6 text-[13px] font-semibold">
@@ -137,7 +133,6 @@ export default async function Landing() {
 
       {/* ── Módulos ── */}
       <section id="plataforma" className="relative overflow-hidden scroll-mt-16">
-        <div className="trama-clara" />
         <div className="relative max-w-6xl mx-auto px-5 md:px-10 py-16 md:py-24 flex flex-col gap-10 md:gap-12">
           <FadeIn>
             <div className="title-rule flex flex-col gap-2">
@@ -148,9 +143,9 @@ export default async function Landing() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {MODULES.map(({ icon: Icon, title, desc, href }, i) => (
               <FadeIn key={title} delay={i * 70} className="h-full">
-                <Link href={href} className="card card-accent group h-full flex flex-col gap-3.5 px-6 py-7 shadow-[0_4px_14px_rgba(21,59,112,0.10)] hover:shadow-[0_18px_48px_rgba(21,59,112,0.16)] transition-shadow">
+                <Link href={href} className="card card-accent card-hover group h-full flex flex-col gap-3.5 px-6 py-7 transition-shadow">
                   <Icon size={28} strokeWidth={1.75} className="text-petroleo" />
-                  <h3 className="text-[16px] font-bold tracking-[0.06em] uppercase text-petroleo">{title}</h3>
+                  <h3 className="text-[18px] font-bold text-petroleo">{title}</h3>
                   <p className="text-[14px] leading-relaxed text-text-secondary flex-1">{desc}</p>
                   <span className="text-[12px] font-semibold tracking-[0.06em] uppercase text-celeste inline-flex items-center gap-1.5">
                     Abrir <ArrowRight size={14} className="group-hover:translate-x-0.5 transition-transform" />
@@ -167,10 +162,10 @@ export default async function Landing() {
         <div className="max-w-6xl mx-auto px-5 md:px-10 py-16 md:py-22 flex flex-wrap gap-8 items-center justify-between">
           <FadeIn>
             <div className="flex flex-col gap-2 max-w-2xl">
-              <h2 className="text-[24px] md:text-[29px] font-bold tracking-[0.04em] uppercase text-petroleo leading-tight">
+              <h2 className="text-[26px] md:text-[32px] font-bold tracking-[-0.01em] text-petroleo leading-tight">
                 La Ciudad publica. Vos te enterás.
               </h2>
-              <p className="text-[16px] md:text-[17px] text-text-tertiary">herramienta interna del cesba · acceso con cuenta institucional</p>
+              <p className="text-[16px] md:text-[17px] text-text-tertiary">monitor normativo de nuevosBAires · acceso con tu cuenta</p>
             </div>
           </FadeIn>
           <Link href="/auth/signin" className="btn-celeste inline-flex items-center min-h-12 px-6 text-[13px] font-bold">
@@ -179,10 +174,10 @@ export default async function Landing() {
         </div>
       </section>
 
-      {/* ── Footer institucional ── */}
-      <footer className="bg-azul-profundo text-white mt-auto">
+      {/* ── Footer ── */}
+      <footer className="bg-marca text-white mt-auto">
         <div className="max-w-6xl mx-auto px-5 md:px-10 pt-10 flex flex-wrap gap-8 justify-between items-start">
-          <img src="/brand/cesba-logo-blanco.png" alt="CESBA" width={72} height={72} className="w-[72px] h-[72px]" />
+          <img src="/brand/nuevosbaires-logo-blanco.svg" alt="nuevosBAires" width={188} height={40} className="h-10 w-auto" />
           <div className="flex flex-wrap gap-12 text-[13px] leading-[1.9]">
             <div className="flex flex-col">
               <span className="text-[12px] font-semibold tracking-[0.14em] text-white/70 mb-1">PLATAFORMA</span>
@@ -210,8 +205,8 @@ export default async function Landing() {
         </p>
         <div className="mt-5 border-t border-white/30">
           <div className="max-w-6xl mx-auto px-5 md:px-10 min-h-11 py-2 flex flex-wrap gap-2 items-center justify-between text-[12px] tracking-[0.06em]">
-            <a href="https://www.cesba.gob.ar" target="_blank" rel="noopener noreferrer" className="font-semibold hover:underline">www.cesba.gob.ar</a>
-            <span className="text-white/85">CONSEJO ECONÓMICO Y SOCIAL DE LA CIUDAD DE BUENOS AIRES</span>
+            <a href="https://nuevosbaires.com.ar" target="_blank" rel="noopener noreferrer" className="font-semibold hover:underline">nuevosbaires.com.ar</a>
+            <a href="mailto:contacto@nuevosbaires.com.ar" className="text-white/85 hover:underline">contacto@nuevosbaires.com.ar</a>
           </div>
         </div>
       </footer>

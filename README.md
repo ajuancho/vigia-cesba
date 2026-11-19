@@ -1,14 +1,14 @@
-<h1 align="center">Monitor Normativo CABA — CESBA</h1>
+<h1 align="center">Monitor Normativo · nuevosBAires</h1>
 
 <p align="center">
   <strong>La normativa porteña, al día.</strong><br>
-  Monitoreo del Boletín Oficial de la Ciudad de Buenos Aires (BOCBA) — indexado,
-  resumido en lenguaje claro y con alertas por email.
+  Monitoreo del Boletín Oficial, la Legislatura y el Tribunal Superior de Justicia de la
+  Ciudad de Buenos Aires — indexado, con búsqueda, alertas por email y reportes.
 </p>
 
 <p align="center">
-  <sub>Herramienta interna del <a href="https://www.cesba.gob.ar">CESBA</a> — Consejo Económico
-  y Social de la Ciudad de Buenos Aires.</sub>
+  <sub>Un proyecto de <a href="https://nuevosbaires.com.ar">nuevosBAires</a> ·
+  <a href="mailto:contacto@nuevosbaires.com.ar">contacto@nuevosbaires.com.ar</a></sub>
 </p>
 
 ---
@@ -22,7 +22,7 @@ una plataforma open source de inteligencia legislativa y regulatoria desarrollad
 > El trabajo original — la arquitectura completa, los conectores, el pipeline de ingesta,
 > el sistema de alertas, el frontend y todo el diseño — fue creado por Colossus Lab y se
 > distribuye bajo Licencia MIT. Esta versión únicamente **adapta Vigía para el Boletín
-> Oficial de la Ciudad de Buenos Aires** y lo rebrandea para uso interno del CESBA.
+> Oficial de la Ciudad de Buenos Aires** y lo rebrandea como el Monitor Normativo de nuevosBAires.
 >
 > **Todo el crédito por la base técnica corresponde a Colossus Lab.**
 > Repositorio original: **https://github.com/colossus-lab/vigia**
@@ -43,12 +43,13 @@ y te avisa cuando algo que te importa se publica.
 
 Esta adaptación se enfoca **exclusivamente en la jurisdicción CABA**:
 
-- **Fuente única:** la [API REST oficial del BOCBA](https://api-restboletinoficial.buenosaires.gob.ar)
-  (en lugar de las ocho fuentes nacionales del proyecto original).
+- **Fuentes porteñas:** la [API REST oficial del BOCBA](https://api-restboletinoficial.buenosaires.gob.ar),
+  los expedientes de la Legislatura y las sentencias del Tribunal Superior de Justicia
+  (en lugar de las fuentes nacionales del proyecto original).
 - **Scope automático:** todas las consultas se acotan a `jurisdiccion = CABA` vía la
   variable `VIGIA_JURISDICCION_SCOPE`, sin filtros manuales en el frontend.
-- **Branding CESBA:** paleta institucional GCBA, identidad del Consejo y módulos acotados
-  a lo porteño (sin tracker de DNU nacionales ni radar societario).
+- **Marca nuevosBAires:** identidad del [design system de Nuevos Baires](https://claude.ai/artifact/KvHv7P7aQxvDVuC5uXXUse)
+  (carbón, lima, magenta, turquesa, lavanda; Rethink Sans) y módulos acotados a lo porteño.
 
 ---
 
@@ -90,4 +91,4 @@ Guía de despliegue de esta instancia: [`infra/DEPLOY-CESBA.md`](infra/DEPLOY-CE
 Distribuido bajo [Licencia MIT](LICENSE) — **Copyright (c) 2026 Colossus Lab**.
 
 Esta adaptación conserva la licencia y el copyright originales conforme exige la MIT.
-Las modificaciones para CESBA se publican bajo los mismos términos.
+Las modificaciones para nuevosBAires se publican bajo los mismos términos.

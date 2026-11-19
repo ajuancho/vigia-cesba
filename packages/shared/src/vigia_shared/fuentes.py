@@ -1,4 +1,4 @@
-"""Fuentes de la instancia CESBA y cómo distinguirlas en la tabla `norma`.
+"""Fuentes de la instancia nuevosBAires y cómo distinguirlas en la tabla `norma`.
 
 - ``boletin``: normas del Boletín Oficial CABA (cualquier `bora_seccion` que
   no sea de otra fuente, o sin sección).

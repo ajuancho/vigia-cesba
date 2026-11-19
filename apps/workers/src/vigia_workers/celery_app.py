@@ -49,7 +49,7 @@ celery_app.conf.update(
     enable_utc=False,
     beat_schedule={
         # ─────────────────────────────────────────────────────────────────
-        # Instancia CESBA — solo BOCBA (Boletín Oficial CABA).
+        # Instancia nuevosBAires — fuentes de la Ciudad (Boletín Oficial CABA).
         # Las tasks nacionales (InfoLEG, BORA, HCDN, Senado, BCRA, bicameral,
         # consultas públicas) están deshabilitadas en este fork: no aplican al
         # corpus porteño y sus fuentes no están configuradas. El código sigue

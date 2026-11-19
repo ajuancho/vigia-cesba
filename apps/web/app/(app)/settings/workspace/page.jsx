@@ -8,7 +8,7 @@ import { API_BASE } from '@/lib/api';
 
 function inviteMessage(wsName, token) {
   const link = `${location.origin}/auth/invite?token=${token}`;
-  return `Te invito a "${wsName}" en el Monitor BOCBA del CESBA, el monitor de la normativa porteña. Aceptá acá: ${link}`;
+  return `Te invito a "${wsName}" en el Monitor Normativo de nuevosBAires, el monitor de la normativa porteña. Aceptá acá: ${link}`;
 }
 
 export default function WorkspaceSettings() {

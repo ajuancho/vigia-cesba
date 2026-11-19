@@ -74,10 +74,15 @@ El web se redeploya solo con cada push (Vercel Git integration). Runbook complet
 
 ## Diseño / UX
 
-Tema OpenArg calcado de `../Open Arg/openarg_frontend` (spec: `designNuevaOpenArgTheme.md` ahí):
-dark cinematic `#06090F/#0D1117`, celeste `#74ACDF` + sol `#F6B40E`, tints rgba para badges,
-franja-bandera, Familjen Grotesk para headlines, JetBrains Mono para datos, FadeIn on-scroll
-con `prefers-reduced-motion`. El `<em>` en títulos display va en sol itálica.
+Instancia **nuevosBAires** ("Monitor Normativo · nuevosBAires"). Tema del design system
+"Nuevos Baires" (https://claude.ai/artifact/KvHv7P7aQxvDVuC5uXXUse): base clara, carbón
+`#1D1D1B`, cuatro colores de marca en el orden de las barras del isotipo — lima `#D3D93A`,
+magenta `#E62580`, turquesa `#4DB4B0`, lavanda `#8F82BA` — y Rethink Sans. Marca plana: sin
+degradés ni tramas; superficie de marca = `.bg-marca` (carbón) y recurso gráfico =
+`components/BarrasMarca.jsx`. Contraste: los colores de marca son rellenos con texto carbón
+(magenta → `magenta-profundo` `#C21C6B` para texto chico). En `globals.css` los nombres
+heredados (`petroleo`, `cian`, `celeste`, `verde-vital`…) están re-mapeados a esta paleta.
+Emails: marco común en `vigia_shared/email_marca.py`.
 
 ## Roadmap pendiente
 

@@ -93,7 +93,7 @@ function Formulario({ inicial, onGuardar, onCancelar, guardando }) {
           Destinatarios <span className="normal-case tracking-normal font-normal text-text-tertiary">— hasta 10, separados por coma</span>
         </span>
         <input value={destDraft} onChange={(e) => setDestDraft(e.target.value)}
-          placeholder="nombre@cesba.gob.ar, otra@cesba.gob.ar"
+          placeholder="nombre@nuevosbaires.com.ar, otra@nuevosbaires.com.ar"
           className="h-10 px-3 rounded border border-border-medium bg-white text-[13px] focus:outline-none focus:border-cian" />
         {invalidos.length > 0 && <span className="text-[12px] text-status-red">No parecen correos válidos: {invalidos.join(', ')}</span>}
         {destinatarios.length > 10 && <span className="text-[12px] text-status-red">Máximo 10 destinatarios.</span>}

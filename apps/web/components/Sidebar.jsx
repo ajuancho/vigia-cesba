@@ -21,21 +21,16 @@ export default function Sidebar({ open, onClose }) {
       {open && <div className="fixed inset-0 bg-navy-950/30 z-40 lg:hidden" onClick={onClose} />}
 
       <aside
-        className={`grad-institucional print:hidden fixed top-0 left-0 h-full w-60 text-white z-50 flex flex-col overflow-hidden transition-transform duration-200 lg:translate-x-0 ${
+        className={`bg-marca print:hidden fixed top-0 left-0 h-full w-60 text-white z-50 flex flex-col overflow-hidden transition-transform duration-200 lg:translate-x-0 ${
           open ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
-        <div className="trama" />
-
         {/* Logo */}
         <div className="relative px-5 py-5 border-b border-white/25">
           <div className="flex items-center justify-between">
-            <Link href="/" className="flex items-center gap-3">
-              <img src="/brand/cesba-logo-blanco.png" alt="CESBA" width={48} height={48} className="w-12 h-12 shrink-0" />
-              <div>
-                <p className="text-[13px] font-bold tracking-[0.06em] leading-tight">MONITOR BOCBA</p>
-                <p className="text-[11px] text-white/85 leading-tight mt-0.5">normativa porteña</p>
-              </div>
+            <Link href="/" className="flex flex-col gap-1.5">
+              <img src="/brand/nuevosbaires-logo-blanco.svg" alt="nuevosBAires" width={160} height={34} className="h-[30px] w-auto" />
+              <span className="text-[11px] font-medium tracking-[0.14em] text-white/85">MONITOR NORMATIVO</span>
             </Link>
             <button onClick={onClose} aria-label="Cerrar menú" className="lg:hidden p-1 text-white/85 hover:text-white">
               <X size={18} />
@@ -55,7 +50,7 @@ export default function Sidebar({ open, onClose }) {
                 aria-current={isActive ? 'page' : undefined}
                 className={`flex items-center gap-3 px-3.5 min-h-11 rounded text-[12px] uppercase tracking-[0.06em] transition-colors ${
                   isActive
-                    ? 'bg-white text-petroleo font-bold'
+                    ? 'bg-lima text-carbon font-bold'
                     : 'text-white font-medium hover:bg-white/15'
                 }`}
               >
@@ -68,8 +63,8 @@ export default function Sidebar({ open, onClose }) {
 
         {/* Footer */}
         <div className="relative px-5 py-4 border-t border-white/25 space-y-1">
-          <a href="https://www.cesba.gob.ar" target="_blank" rel="noopener noreferrer" className="block text-[11px] font-semibold tracking-[0.06em] text-white hover:underline">
-            www.cesba.gob.ar
+          <a href="https://nuevosbaires.com.ar" target="_blank" rel="noopener noreferrer" className="block text-[11px] font-semibold text-white hover:underline">
+            nuevosbaires.com.ar
           </a>
           <p className="text-[10px] text-white/85 leading-relaxed">
             Basado en{' '}

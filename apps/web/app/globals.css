@@ -1,62 +1,71 @@
 @import "tailwindcss";
 
 /* ============================================================
-   Monitor Normativo CABA — Design System
-   Identidad CESBA 2026: base clara, petróleo + cian, gradiente
-   institucional, trama hexagonal. Tokens del "CESBA Design System".
-   Herramienta interna del CESBA
+   Monitor Normativo · nuevosBAires — Design System
+   Identidad nuevosBAires (Brandsheet + "Nuevos Baires Design System"):
+   base clara, carbón #1D1D1B, cuatro colores de marca (lima, magenta,
+   turquesa, lavanda) en el orden de las barras del isotipo, Rethink Sans.
+   Marca plana: sin degradés ni tramas.
    ============================================================ */
 
 @theme {
-  /* ── CESBA ──────────────────────────────────────────────── */
-  --color-petroleo: #18596C;
-  --color-cian: #18A6C2;
-  --color-cian-hover: #14879E;
-  --color-cian-press: #116E80;
-  --color-azul-profundo: #153B70;
-  --color-verde-vital: #00FAB9;
-  --color-humo: #F4F7F8;
-  --color-nube: #E4EBED;
+  /* ── nuevosBAires ───────────────────────────────────────── */
+  --color-carbon: #1D1D1B;
+  --color-lima: #D3D93A;
+  --color-magenta: #E62580;
+  --color-magenta-profundo: #C21C6B;
+  --color-turquesa: #4DB4B0;
+  --color-lavanda: #8F82BA;
+  --color-humo: #F4F4F1;
+  --color-nube: #E4E4DF;
 
-  /* Nombres legacy de Vigía, re-mapeados a CESBA. `celeste` es el acento
-     para texto/íconos: usa el cian "press" para pasar contraste 4.5:1 sobre
-     blanco; el cian pleno (#18A6C2) queda para rellenos y barras. */
-  --color-celeste: #116E80;
-  --color-celeste-bright: #18596C;
-  --color-celeste-muted: #18A6C2;
-  --color-sol: #153B70;
-  --color-sol-bright: #116E80;
+  /* Nombres heredados (CESBA/Vigía) re-mapeados a nuevosBAires para no
+     tocar cada pantalla: `petroleo` = carbón (títulos), `cian` = magenta
+     (rellenos y acentos), `celeste` = magenta profundo (texto/íconos con
+     contraste ≥4.5:1 sobre blanco), `verde-vital` = lima (acento sobre
+     fondo oscuro), `azul-profundo` = carbón. */
+  --color-petroleo: #1D1D1B;
+  --color-cian: #E62580;
+  --color-cian-hover: #C21C6B;
+  --color-cian-press: #A0175A;
+  --color-azul-profundo: #1D1D1B;
+  --color-verde-vital: #D3D93A;
+
+  --color-celeste: #C21C6B;
+  --color-celeste-bright: #1D1D1B;
+  --color-celeste-muted: #E62580;
+  --color-sol: #1D1D1B;
+  --color-sol-bright: #C21C6B;
 
   /* ── Surfaces ── */
   --color-bg-primary: #FFFFFF;   /* cards / surface */
-  --color-bg-secondary: #F4F7F8; /* page background (humo) */
-  --color-bg-tertiary: #EDF2F4;  /* hover */
+  --color-bg-secondary: #F4F4F1; /* page background (humo) */
+  --color-bg-tertiary: #EDEDE8;  /* hover */
 
-  --color-border-light: #E4EBED;
-  --color-border-medium: #C9D4D8;
+  --color-border-light: #E4E4DF;
+  --color-border-medium: #C8C8C2;
 
-  --color-text-primary: #18596C;   /* títulos y énfasis (petróleo) */
-  --color-text-secondary: #2A3438; /* cuerpo */
-  --color-text-tertiary: #5B6267;  /* notas, metadata */
+  --color-text-primary: #1D1D1B;   /* títulos y énfasis (carbón) */
+  --color-text-secondary: #2A2A28; /* cuerpo */
+  --color-text-tertiary: #5C5C57;  /* notas, metadata (6,7:1) */
 
   /* navy-* = superficies elevadas (tooltips, menús) */
-  --color-navy-950: #0C1214;
+  --color-navy-950: #000000;
   --color-navy-900: #FFFFFF;
-  --color-navy-800: #F4F7F8;
+  --color-navy-800: #F4F4F1;
   --color-navy-700: #FFFFFF;
-  --color-navy-600: #E4EBED;
+  --color-navy-600: #E4E4DF;
 
-  --color-inst-blue: #18A6C2;
-  --color-inst-accent: #18A6C2;
+  --color-inst-blue: #E62580;
+  --color-inst-accent: #E62580;
 
-  --color-status-green: #0F7A62;
-  --color-status-amber: #0079DC;
+  --color-status-green: #2E7D79;
+  --color-status-amber: #8A8F1F;
   --color-status-red: #B42318;
 
-  /* Gotham es licenciada: Montserrat es el sustituto del design system */
-  --font-sans: 'Montserrat', 'Gotham', Calibri, 'Helvetica Neue', Arial, sans-serif;
-  --font-mono: 'Montserrat', 'Gotham', Calibri, 'Helvetica Neue', Arial, sans-serif;
-  --font-display: 'Montserrat', 'Gotham', Calibri, 'Helvetica Neue', Arial, sans-serif;
+  --font-sans: 'Rethink Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: 'Rethink Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-display: 'Rethink Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
 }
 
 @layer base {
@@ -72,7 +81,7 @@
   }
 
   ::selection {
-    background-color: rgba(24, 166, 194, 0.22);
+    background-color: rgba(211, 217, 58, 0.45);
   }
 
   ::-webkit-scrollbar {
@@ -84,12 +93,12 @@
   }
 
   ::-webkit-scrollbar-thumb {
-    background: #C9D4D8;
+    background: #C8C8C2;
     border-radius: 4px;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    background: #93989E;
+    background: #93938D;
   }
 
   select, input, textarea {
@@ -97,19 +106,18 @@
   }
 
   :focus-visible {
-    outline: 1px solid var(--color-cian);
-    outline-offset: 1px;
-    box-shadow: 0 0 0 3px rgba(50, 180, 238, 0.24);
+    outline: 2px solid var(--color-magenta-profundo);
+    outline-offset: 2px;
   }
 
   h1, h2, h3 {
     font-family: var(--font-display);
-    letter-spacing: 0.01em;
+    letter-spacing: -0.01em;
   }
 
   h1 em, h2 em, h3 em {
     font-style: normal;
-    color: var(--color-cian-hover);
+    color: var(--color-magenta-profundo);
   }
 
   /* Números siempre tabulares (no saltan al animar) */
@@ -119,151 +127,150 @@
 }
 
 @layer utilities {
-  /* Card CESBA: blanca, hairline, radio 8, sombra azulada */
+  /* Card nuevosBAires: blanca, hairline, radio 8, plana */
   .card {
     background: var(--color-bg-primary);
     border: 1px solid var(--color-border-light);
     border-radius: 8px;
-    box-shadow: 0 1px 2px rgba(21, 59, 112, 0.08);
   }
 
   .card-hover:hover {
     border-color: var(--color-border-medium);
-    box-shadow: 0 4px 14px rgba(21, 59, 112, 0.10);
+    box-shadow: 0 1px 3px rgba(29, 29, 27, 0.12);
   }
 
-  /* Card con banda de acento de 3px arriba (nunca borde izquierdo) */
+  /* Card con la franja de las cuatro barras arriba (nunca borde izquierdo) */
   .card-accent {
-    border-top: 3px solid var(--color-cian);
+    position: relative;
+    overflow: hidden;
   }
 
-  /* Franja superior: cian pleno */
+  .card-accent::before {
+    content: '';
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 4px;
+    background: linear-gradient(90deg,
+      var(--color-lima) 0 25%, var(--color-magenta) 25% 50%,
+      var(--color-turquesa) 50% 75%, var(--color-lavanda) 75% 100%);
+  }
+
+  /* Franja superior: las cuatro barras de la marca, en orden */
   .flag-stripe {
-    height: 3px;
-    background: var(--color-cian);
+    height: 4px;
+    background: linear-gradient(90deg,
+      var(--color-lima) 0 25%, var(--color-magenta) 25% 50%,
+      var(--color-turquesa) 50% 75%, var(--color-lavanda) 75% 100%);
   }
 
-  /* Superficies de marca */
-  .grad-institucional {
-    background: linear-gradient(180deg, #1B9FC7 0%, #153B70 100%);
-  }
-
-  .trama {
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    background-image: url('/brand/trama-blanca.svg');
-    background-size: 120px 69.28px;
-    opacity: 0.10;
-  }
-
-  .trama-clara {
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    background-image: url('/brand/trama-petroleo.svg');
-    background-size: 120px 69.28px;
-    opacity: 0.06;
-  }
-
-  .blob {
-    position: absolute;
-    border-radius: 50%;
-    filter: blur(72px);
-    pointer-events: none;
+  /* Superficie de marca: carbón, como la versión negativa del logo */
+  .bg-marca {
+    background: var(--color-carbon);
   }
 
   /* Barra vertical de acento junto a los títulos */
   .title-rule {
-    border-left: 4px solid var(--color-cian);
+    border-left: 4px solid var(--color-magenta);
     padding-left: 16px;
   }
 
   .title-rule-vital {
-    border-left: 6px solid var(--color-verde-vital);
+    border-left: 6px solid var(--color-lima);
     padding-left: 20px;
   }
 
-  /* Tints para badges/chips: escala fría, distinguibles por luminosidad */
+  /* Tints para badges/chips: colores de marca con texto legible.
+     Lima, turquesa y lavanda llevan texto carbón; magenta, magenta profundo. */
   .tint-red {
-    background: rgba(21, 59, 112, 0.10);
-    color: #153B70;
-    border-color: rgba(21, 59, 112, 0.40);
+    background: rgba(230, 37, 128, 0.12);
+    color: #A0175A;
+    border-color: rgba(230, 37, 128, 0.45);
   }
 
   .tint-amber {
-    background: rgba(0, 121, 220, 0.08);
-    color: #005FAD;
-    border-color: rgba(0, 121, 220, 0.35);
+    background: rgba(211, 217, 58, 0.35);
+    color: #1D1D1B;
+    border-color: rgba(160, 165, 30, 0.55);
   }
 
   .tint-green {
-    background: rgba(24, 89, 108, 0.10);
-    color: #18596C;
-    border-color: rgba(24, 89, 108, 0.35);
+    background: rgba(77, 180, 176, 0.22);
+    color: #1D1D1B;
+    border-color: rgba(77, 180, 176, 0.65);
   }
 
   .tint-blue {
-    background: rgba(24, 166, 194, 0.10);
-    color: #116E80;
-    border-color: rgba(24, 166, 194, 0.40);
+    background: rgba(143, 130, 186, 0.22);
+    color: #1D1D1B;
+    border-color: rgba(143, 130, 186, 0.65);
   }
 
   .tint-purple {
-    background: rgba(78, 131, 251, 0.10);
-    color: #2F5FC4;
-    border-color: rgba(78, 131, 251, 0.35);
+    background: #FFFFFF;
+    color: #C21C6B;
+    border-color: rgba(194, 28, 107, 0.55);
   }
 
   .tint-cyan {
-    background: rgba(84, 187, 199, 0.14);
-    color: #1D6670;
-    border-color: rgba(84, 187, 199, 0.45);
+    background: #FFFFFF;
+    color: #1D1D1B;
+    border-color: #4DB4B0;
   }
 
   .tint-gray {
-    background: rgba(112, 119, 124, 0.08);
-    color: #5B6267;
-    border-color: rgba(112, 119, 124, 0.30);
+    background: rgba(92, 92, 87, 0.08);
+    color: #5C5C57;
+    border-color: rgba(92, 92, 87, 0.30);
   }
 
   .tint-pink {
-    background: rgba(0, 178, 209, 0.10);
-    color: #0B6577;
-    border-color: rgba(0, 178, 209, 0.40);
+    background: rgba(230, 37, 128, 0.06);
+    color: #A0175A;
+    border-color: rgba(230, 37, 128, 0.30);
   }
 
   .tint-orange {
-    background: rgba(0, 250, 185, 0.16);
-    color: #0A6450;
-    border-color: rgba(0, 196, 150, 0.45);
+    background: #FFFFFF;
+    color: #1D1D1B;
+    border-color: #A0A51E;
   }
 
-  /* CTA primario: cian; hover/press oscurecen, sin escalar */
+  /* CTA primario: carbón con texto blanco (17,9:1); hover negro */
   .btn-celeste {
-    background: var(--color-cian);
+    background: var(--color-carbon);
     color: #FFFFFF;
     border-radius: 4px !important;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    transition: background-color 0.16s cubic-bezier(.2, 0, .2, 1);
+    font-weight: 600;
+    transition: background-color 0.16s ease, color 0.16s ease;
   }
 
   .btn-celeste:hover {
-    background: var(--color-cian-hover);
+    background: #000000;
   }
 
   .btn-celeste:active {
-    background: var(--color-cian-press);
+    background: #000000;
+  }
+
+  /* CTA de acento: lima con texto carbón (11,1:1), para fondos oscuros */
+  .btn-lima {
+    background: var(--color-lima);
+    color: var(--color-carbon);
+    border-radius: 4px;
+    font-weight: 600;
+    transition: background-color 0.16s ease;
+  }
+
+  .btn-lima:hover {
+    background: #E2E86A;
   }
 
   .btn-ghost-invert {
     color: #FFFFFF;
     border: 1px solid rgba(255, 255, 255, 0.28);
     border-radius: 4px;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    transition: background-color 0.16s cubic-bezier(.2, 0, .2, 1);
+    font-weight: 600;
+    transition: background-color 0.16s ease;
   }
 
   .btn-ghost-invert:hover {
@@ -278,30 +285,28 @@
     animation: slideUp 0.24s cubic-bezier(0, 0, .24, 1) forwards;
   }
 
-  /* ── Tipografía (regla del manual: título en MAYÚSCULAS y bold,
-     bajada en minúsculas y sin bold) ─────────────────────────── */
+  /* ── Tipografía: Rethink Sans, títulos en Bold y en minúsculas, como
+     "nuevos" (liviano) + "BAires" (negrita) del logo ──────────────── */
 
   .display-hero {
     font-family: var(--font-display);
     font-weight: 700;
-    font-size: clamp(2.4rem, 6vw, 4.25rem);
-    line-height: 1.02;
-    letter-spacing: 0.03em;
-    text-transform: uppercase;
+    font-size: clamp(2.5rem, 6vw, 4.25rem);
+    line-height: 1.04;
+    letter-spacing: -0.02em;
     text-wrap: balance;
   }
 
   .display-section {
     font-family: var(--font-display);
     font-weight: 700;
-    font-size: clamp(1.4rem, 2.6vw, 2.1rem);
-    line-height: 1.14;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
+    font-size: clamp(1.5rem, 2.6vw, 2.1rem);
+    line-height: 1.15;
+    letter-spacing: -0.01em;
     text-wrap: balance;
   }
 
-  /* El <em> de los títulos pasa a cian, sin itálica */
+  /* El <em> de los títulos va en magenta profundo, sin itálica */
   .display-hero em, .display-section em {
     font-style: normal;
     color: var(--color-cian-hover);
@@ -327,18 +332,8 @@
     color: var(--color-celeste);
   }
 
-  .gradient-text {
-    background: linear-gradient(180deg, #1B9FC7 0%, #153B70 100%);
-    background-clip: text;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-  }
-
-  .gradient-text-sol {
-    background: linear-gradient(180deg, #1B9FC7 0%, #153B70 100%);
-    background-clip: text;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+  .gradient-text, .gradient-text-sol {
+    color: var(--color-magenta-profundo);
   }
 
   /* ── Motion: reveal on-scroll (componente FadeIn) — calmo, sin rebote ── */

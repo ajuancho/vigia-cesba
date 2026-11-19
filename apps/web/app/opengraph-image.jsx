@@ -1,10 +1,10 @@
 import { ImageResponse } from 'next/og';
 
-/* Imagen OpenGraph (1200×630) — identidad CESBA: gradiente institucional,
-   título en mayúsculas bold con bajada en minúsculas, barra de acento vital
-   y la línea de pie institucional. */
+/* Imagen OpenGraph (1200×630) — identidad nuevosBAires: fondo carbón (versión
+   negativa del logo), las cuatro barras del isotipo, título en Rethink Sans
+   Bold y la línea de pie con el sitio. */
 
-export const alt = 'Monitor BOCBA — La normativa porteña, al día. Herramienta del CESBA.';
+export const alt = 'Monitor Normativo · nuevosBAires — La normativa porteña, al día.';
 export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
 
@@ -16,11 +16,18 @@ async function loadFont(path) {
   return res.arrayBuffer();
 }
 
+// Barras del isotipo: lima, magenta, turquesa, lavanda (alturas desiguales).
+const BARRAS = [
+  { color: '#D3D93A', alto: 520 },
+  { color: '#E62580', alto: 322 },
+  { color: '#4DB4B0', alto: 416 },
+  { color: '#8F82BA', alto: 218 },
+];
+
 export default async function OpengraphImage() {
-  const [bold, light, medium] = await Promise.all([
-    loadFont('montserrat@latest/latin-700-normal.ttf'),
-    loadFont('montserrat@latest/latin-300-normal.ttf'),
-    loadFont('montserrat@latest/latin-500-normal.ttf'),
+  const [bold, regular] = await Promise.all([
+    loadFont('rethink-sans@latest/latin-700-normal.ttf'),
+    loadFont('rethink-sans@latest/latin-400-normal.ttf'),
   ]);
 
   return new ImageResponse(
@@ -31,27 +38,37 @@ export default async function OpengraphImage() {
           height: '100%',
           display: 'flex',
           flexDirection: 'column',
-          backgroundImage: 'linear-gradient(180deg, #1B9FC7 0%, #153B70 100%)',
+          backgroundColor: '#1D1D1B',
           color: '#FFFFFF',
-          fontFamily: 'Montserrat',
+          fontFamily: 'Rethink Sans',
+          position: 'relative',
         }}
       >
+        {/* Barras de la marca, ancladas abajo a la derecha */}
+        <div style={{ position: 'absolute', right: 80, bottom: 72, display: 'flex', alignItems: 'flex-end', gap: 22 }}>
+          {BARRAS.map((b) => (
+            <div key={b.color} style={{ width: 78, height: b.alto, backgroundColor: b.color }} />
+          ))}
+        </div>
+
         {/* Cuerpo */}
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '0 88px' }}>
-          <div style={{ display: 'flex', fontWeight: 500, fontSize: 20, letterSpacing: 3, color: 'rgba(255,255,255,0.86)', marginBottom: 36 }}>
-            CONSEJO ECONÓMICO Y SOCIAL DE LA CIUDAD DE BUENOS AIRES
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '0 88px', maxWidth: 780 }}>
+          <div style={{ display: 'flex', fontSize: 24, letterSpacing: 4, color: 'rgba(255,255,255,0.86)', marginBottom: 36 }}>
+            MONITOR NORMATIVO · NUEVOSBAIRES
           </div>
           <div style={{ display: 'flex', alignItems: 'stretch' }}>
-            <div style={{ width: 10, backgroundColor: '#00FAB9', marginRight: 32 }} />
+            <div style={{ width: 10, backgroundColor: '#D3D93A', marginRight: 32 }} />
             <div style={{ display: 'flex', flexDirection: 'column' }}>
-              <span style={{ fontWeight: 700, fontSize: 84, lineHeight: 1.02, letterSpacing: 2 }}>LA NORMATIVA PORTEÑA,</span>
-              <span style={{ fontWeight: 700, fontSize: 84, lineHeight: 1.02, letterSpacing: 2 }}>AL DÍA</span>
-              <span style={{ fontWeight: 300, fontSize: 34, marginTop: 22 }}>boletín oficial, legislatura y tribunal superior de la ciudad</span>
+              <span style={{ fontWeight: 700, fontSize: 88, lineHeight: 1.02, letterSpacing: -2 }}>La normativa porteña,</span>
+              <span style={{ fontWeight: 700, fontSize: 88, lineHeight: 1.02, letterSpacing: -2 }}>al día</span>
+              <span style={{ fontWeight: 400, fontSize: 32, marginTop: 22, color: 'rgba(255,255,255,0.86)' }}>
+                boletín oficial, legislatura y tribunal superior
+              </span>
             </div>
           </div>
         </div>
 
-        {/* Pie institucional */}
+        {/* Pie */}
         <div
           style={{
             display: 'flex',
@@ -60,22 +77,20 @@ export default async function OpengraphImage() {
             padding: '0 88px',
             height: 72,
             borderTop: '1px solid rgba(255,255,255,0.28)',
-            fontWeight: 500,
-            fontSize: 20,
-            letterSpacing: 2,
+            fontSize: 22,
+            backgroundColor: '#1D1D1B',
           }}
         >
-          <span>www.cesba.gob.ar</span>
-          <span style={{ fontWeight: 700 }}>MONITOR BOCBA · CESBA</span>
+          <span style={{ fontWeight: 700 }}>nuevosBAires</span>
+          <span>nuevosbaires.com.ar</span>
         </div>
       </div>
     ),
     {
       ...size,
       fonts: [
-        { name: 'Montserrat', data: bold, weight: 700, style: 'normal' },
-        { name: 'Montserrat', data: light, weight: 300, style: 'normal' },
-        { name: 'Montserrat', data: medium, weight: 500, style: 'normal' },
+        { name: 'Rethink Sans', data: bold, weight: 700, style: 'normal' },
+        { name: 'Rethink Sans', data: regular, weight: 400, style: 'normal' },
       ],
     }
   );

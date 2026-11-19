@@ -7,6 +7,7 @@ import { useSearchParams } from 'next/navigation';
 import { Bell, Users, History, ArrowLeft } from 'lucide-react';
 import { AUTH_ENABLED } from '@/lib/authClient';
 import FadeIn from '@/components/FadeIn';
+import BarrasMarca from '@/components/BarrasMarca';
 
 const BENEFITS = [
   { icon: Bell, text: 'Alertas por keyword y sector, con digest por email' },
@@ -32,20 +33,19 @@ function SignInInner() {
 
   return (
     <div className="min-h-screen flex flex-wrap bg-white">
-      {/* Marca: gradiente institucional + trama */}
-      <section className="grad-institucional relative overflow-hidden text-white flex-[1_1_480px] min-h-[380px] p-8 md:p-12 flex flex-col justify-between gap-12">
-        <div className="trama" />
-        <div className="blob w-[460px] h-[460px] -left-36 -bottom-44 bg-[rgba(0,250,185,0.26)]" />
+      {/* Marca: superficie carbón + las cuatro barras */}
+      <section className="bg-marca relative overflow-hidden text-white flex-[1_1_480px] min-h-[380px] p-8 md:p-12 flex flex-col justify-between gap-12">
+        <BarrasMarca alto={300} ancho={52} gap={14} className="absolute right-8 -bottom-4 hidden md:inline-flex" />
         <Link href="/" className="relative w-fit">
-          <img src="/brand/cesba-logo-blanco.png" alt="CESBA — Consejo Económico y Social de la Ciudad de Buenos Aires" width={96} height={96} className="w-20 h-20 md:w-24 md:h-24" />
+          <img src="/brand/nuevosbaires-logo-blanco.svg" alt="nuevosBAires" width={225} height={48} className="h-10 md:h-12 w-auto" />
         </Link>
         <div className="relative title-rule-vital flex flex-col gap-3">
-          <p className="display-hero !text-[clamp(2rem,4vw,3.25rem)]">Monitor BOCBA</p>
-          <p className="text-[17px] md:text-[19px] font-light text-white/85">la normativa porteña, al día</p>
+          <p className="display-hero !text-[clamp(2rem,4vw,3.25rem)]">Monitor Normativo</p>
+          <p className="text-[17px] md:text-[19px] text-white/85">la normativa porteña, al día</p>
         </div>
-        <p className="relative text-[11px] md:text-[12px] tracking-[0.06em] text-white/85">
-          CONSEJO ECONÓMICO Y SOCIAL DE LA CIUDAD DE BUENOS AIRES
-        </p>
+        <a href="https://nuevosbaires.com.ar" target="_blank" rel="noopener noreferrer" className="relative w-fit text-[12px] font-semibold text-white/85 hover:underline">
+          nuevosbaires.com.ar
+        </a>
       </section>
 
       {/* Acceso */}
@@ -99,7 +99,7 @@ function SignInInner() {
             )}
 
             <div className="flex flex-wrap items-center justify-between gap-2 pt-5 border-t border-border-light text-[12px]">
-              <a href="https://www.cesba.gob.ar" target="_blank" rel="noopener noreferrer" className="font-semibold tracking-[0.06em] text-petroleo hover:underline">www.cesba.gob.ar</a>
+              <a href="https://nuevosbaires.com.ar" target="_blank" rel="noopener noreferrer" className="font-semibold text-petroleo hover:underline">nuevosbaires.com.ar</a>
               <Link href="/" className="flex items-center gap-1 text-text-tertiary hover:text-petroleo transition-colors">
                 <ArrowLeft size={12} /> Volver al inicio
               </Link>

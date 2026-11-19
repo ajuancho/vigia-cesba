@@ -1,15 +1,15 @@
 // Vocabulario de dominio (espejo de packages/shared/constants.py).
 export const TIPOS_NORMA = {
-  DNU: { label: 'DNU', color: '#153B70', description: 'Decreto de Necesidad y Urgencia' },
-  DECRETO: { label: 'Decreto', color: '#0079DC', description: 'Decreto del Poder Ejecutivo' },
-  LEY: { label: 'Ley', color: '#18596C', description: 'Ley sancionada por el Congreso' },
-  RESOLUCION: { label: 'Resolución', color: '#18A6C2', description: 'Resolución ministerial' },
-  DISPOSICION: { label: 'Disposición', color: '#4E83FB', description: 'Disposición administrativa' },
-  PROYECTO: { label: 'Proyecto', color: '#54BBC7', description: 'Expediente de la Legislatura porteña' },
-  SENTENCIA: { label: 'Sentencia', color: '#2F5FC4', description: 'Resolución del Tribunal Superior de Justicia' },
-  COMUNICACION: { label: 'Comunicación', color: '#00B2D1', description: 'Comunicación del BCRA (serie A)' },
-  CONSULTA: { label: 'Consulta', color: '#7FB8C9', description: 'Consulta pública / anteproyecto en consulta' },
-  OTRA: { label: 'Otra', color: '#93989E', description: 'Otra norma' },
+  DNU: { label: 'DNU', color: '#A0175A', description: 'Decreto de Necesidad y Urgencia' },
+  DECRETO: { label: 'Decreto', color: '#4DB4B0', description: 'Decreto del Poder Ejecutivo' },
+  LEY: { label: 'Ley', color: '#1D1D1B', description: 'Ley sancionada por el Congreso' },
+  RESOLUCION: { label: 'Resolución', color: '#E62580', description: 'Resolución ministerial' },
+  DISPOSICION: { label: 'Disposición', color: '#8F82BA', description: 'Disposición administrativa' },
+  PROYECTO: { label: 'Proyecto', color: '#D3D93A', description: 'Expediente de la Legislatura porteña' },
+  SENTENCIA: { label: 'Sentencia', color: '#5C5C57', description: 'Resolución del Tribunal Superior de Justicia' },
+  COMUNICACION: { label: 'Comunicación', color: '#6E6E68', description: 'Comunicación del BCRA (serie A)' },
+  CONSULTA: { label: 'Consulta', color: '#B4B4AE', description: 'Consulta pública / anteproyecto en consulta' },
+  OTRA: { label: 'Otra', color: '#93938D', description: 'Otra norma' },
 };
 
 export const JURISDICCIONES = [

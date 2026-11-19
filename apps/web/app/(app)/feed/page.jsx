@@ -19,9 +19,9 @@ const TIPO_TINT = {
 };
 
 const TIPO_DOT = {
-  DNU: '#153B70', DECRETO: '#0079DC', LEY: '#18596C', RESOLUCION: '#18A6C2',
-  DISPOSICION: '#4E83FB', PROYECTO: '#54BBC7', COMUNICACION: '#00B2D1',
-  CONSULTA: '#7FB8C9', OTRA: '#93989E',
+  DNU: '#A0175A', DECRETO: '#4DB4B0', LEY: '#1D1D1B', RESOLUCION: '#E62580',
+  DISPOSICION: '#8F82BA', PROYECTO: '#D3D93A', COMUNICACION: '#6E6E68',
+  CONSULTA: '#B4B4AE', OTRA: '#93938D',
 };
 
 const IMPACTO_TINT = { alto: 'tint-red', medio: 'tint-amber', bajo: 'tint-gray' };
@@ -69,11 +69,11 @@ function ActivityStrip() {
           <div className="flex-1 min-w-[260px] max-w-xl">
             <ResponsiveContainer width="100%" height={72}>
               <BarChart data={data} margin={{ top: 4, bottom: 0, left: 0, right: 0 }}>
-                <XAxis dataKey="semana" tick={{ fill: '#5B6267', fontSize: 9 }} axisLine={false} tickLine={false} interval="preserveStartEnd" />
-                <Tooltip content={<WeekTooltip />} cursor={{ fill: 'rgba(24, 166, 194, 0.07)' }} />
+                <XAxis dataKey="semana" tick={{ fill: '#5C5C57', fontSize: 9 }} axisLine={false} tickLine={false} interval="preserveStartEnd" />
+                <Tooltip content={<WeekTooltip />} cursor={{ fill: 'rgba(230, 37, 128, 0.07)' }} />
                 <Bar dataKey="total" radius={[2, 2, 0, 0]} animationDuration={900}>
                   {data.map((_, i) => (
-                    <Cell key={i} fill={i >= data.length - 1 ? '#0079DC' : '#18A6C2'} fillOpacity={i >= data.length - 1 ? 0.9 : 0.55} />
+                    <Cell key={i} fill={i >= data.length - 1 ? '#4DB4B0' : '#E62580'} fillOpacity={i >= data.length - 1 ? 0.9 : 0.55} />
                   ))}
                 </Bar>
               </BarChart>
@@ -266,7 +266,7 @@ function FeedView() {
     <div className="max-w-4xl mx-auto">
       <FadeIn>
         <div className="mb-7 pt-2">
-          <p className="eyebrow mb-1"><span className="eyebrow-num">BOCBA / FEED</span><span className="ml-2">Lo último publicado</span></p>
+          <p className="eyebrow mb-1"><span className="eyebrow-num">MONITOR / FEED</span><span className="ml-2">Lo último publicado</span></p>
           <h2 className="display-section text-text-primary mb-1">Boletín <em>del día</em></h2>
           <p className="text-[13px] text-text-tertiary font-mono">boletín oficial de la ciudad · actualización diaria</p>
         </div>

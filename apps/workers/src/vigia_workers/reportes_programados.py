@@ -23,6 +23,7 @@ from typing import Any
 from sqlalchemy import text
 
 from vigia_shared.db import session_scope
+from vigia_shared.email_marca import BORDE, CARBON, GRIS, MAGENTA_PROFUNDO, boton, marco
 from vigia_shared.reportes import (
     CSV_MAX,
     SYSTEM_ANALISIS,
@@ -72,21 +73,21 @@ def render_reporte(
     *, reporte_id: int, nombre: str, periodo: str, total: int, ag: dict[str, Any],
     filas: list[dict[str, Any]], analisis: str | None,
 ) -> str:
-    """HTML del email con la identidad CESBA (claro, petróleo + cian)."""
-    petroleo, cian, gris, borde = "#18596C", "#18A6C2", "#5B6267", "#E4EBED"
+    """HTML del email con la identidad nuevosBAires (vigia_shared.email_marca)."""
+    carbon, gris, borde, link = CARBON, GRIS, BORDE, MAGENTA_PROFUNDO
 
     def top(titulo: str, datos: list[dict[str, Any]]) -> str:
         if not datos:
             return ""
         items = "".join(
-            f'<tr><td style="padding:4px 0;font-size:13px;color:#2A3438">{_esc(d["valor"])}</td>'
-            f'<td style="padding:4px 0;font-size:13px;color:{petroleo};font-weight:700;text-align:right">'
+            f'<tr><td style="padding:4px 0;font-size:13px;color:{carbon}">{_esc(d["valor"])}</td>'
+            f'<td style="padding:4px 0;font-size:13px;color:{carbon};font-weight:700;text-align:right">'
             f'{_fmt_num(d["cantidad"])}</td></tr>'
             for d in datos[:5]
         )
         return (
             f'<td style="vertical-align:top;padding:0 12px 0 0;width:50%">'
-            f'<p style="margin:0 0 6px;font-size:11px;font-weight:700;letter-spacing:.08em;color:{petroleo}">{titulo}</p>'
+            f'<p style="margin:0 0 6px;font-size:11px;font-weight:600;letter-spacing:.1em;color:{gris}">{titulo}</p>'
             f'<table style="width:100%;border-collapse:collapse">{items}</table></td>'
         )
 
@@ -95,8 +96,8 @@ def render_reporte(
         f'<td style="padding:8px 8px 8px 0;border-top:1px solid {borde};font-size:12px;color:{gris};vertical-align:top">{_esc(f["tipo"])}'
         f'{"<br>" + _esc(f["etapa"]) if f["etapa"] else ""}</td>'
         f'<td style="padding:8px 0;border-top:1px solid {borde};font-size:13px;vertical-align:top">'
-        + (f'<a href="{_esc(f["url"])}" style="color:{petroleo};font-weight:600;text-decoration:none">{_esc(f["objeto"] or f["titulo"])}</a>'
-           if f["url"] else f'<span style="color:{petroleo};font-weight:600">{_esc(f["objeto"] or f["titulo"])}</span>')
+        + (f'<a href="{_esc(f["url"])}" style="color:{link};font-weight:600;text-decoration:none">{_esc(f["objeto"] or f["titulo"])}</a>'
+           if f["url"] else f'<span style="color:{carbon};font-weight:600">{_esc(f["objeto"] or f["titulo"])}</span>')
         + f'<br><span style="font-size:12px;color:{gris}">{_esc(f["organismo"])}</span></td></tr>'
         for f in filas
     )
@@ -105,32 +106,26 @@ def render_reporte(
         if total > len(filas) else ""
     )
     analisis_html = (
-        f'<div style="margin:22px 0 0;padding:16px;background:#F4F7F8;border-radius:8px">'
-        f'<p style="margin:0 0 8px;font-size:11px;font-weight:700;letter-spacing:.08em;color:{petroleo}">ANÁLISIS</p>'
-        + "".join(f'<p style="margin:0 0 8px;font-size:13px;line-height:1.55;color:#2A3438">{_esc(p)}</p>'
+        f'<div style="margin:22px 0 0;padding:16px;background:#F4F4F1;border-radius:8px">'
+        f'<p style="margin:0 0 8px;font-size:11px;font-weight:600;letter-spacing:.1em;color:{gris}">ANÁLISIS</p>'
+        + "".join(f'<p style="margin:0 0 8px;font-size:13px;line-height:1.55;color:{carbon}">{_esc(p)}</p>'
                   for p in analisis.split("\n") if p.strip())
         + f'<p style="margin:6px 0 0;font-size:11px;color:{gris}">Texto generado con IA a partir de las cifras del reporte.</p></div>'
         if analisis else ""
     )
-    return (
-        f'<div style="font-family:Montserrat,Arial,sans-serif;background:#FFFFFF;max-width:640px;border:1px solid {borde};border-radius:8px;overflow:hidden">'
-        f'<div style="background:linear-gradient(180deg,#1B9FC7 0%,#153B70 100%);background-color:#153B70;padding:22px 24px;color:#FFFFFF">'
-        f'<p style="margin:0 0 6px;font-size:11px;letter-spacing:.14em">MONITOR BOCBA · REPORTE PROGRAMADO</p>'
-        f'<p style="margin:0;font-size:20px;font-weight:700;letter-spacing:.04em;text-transform:uppercase">{_esc(nombre)}</p>'
-        f'<p style="margin:4px 0 0;font-size:13px;color:rgba(255,255,255,.86)">{_esc(periodo)}</p></div>'
-        f'<div style="padding:22px 24px;border-top:3px solid {cian}">'
-        f'<p style="margin:0;font-size:34px;font-weight:700;color:{petroleo}">{_fmt_num(total)}</p>'
-        f'<p style="margin:2px 0 18px;font-size:11px;font-weight:600;letter-spacing:.14em;color:{gris}">PUBLICACIONES · {ag["organismos_distintos"]} ORGANISMOS</p>'
+    cuerpo = (
+        f'<p style="margin:0;font-size:34px;line-height:38px;font-weight:700;color:{carbon}">{_fmt_num(total)}</p>'
+        f'<p style="margin:2px 0 18px;font-size:11px;font-weight:600;letter-spacing:.12em;color:{gris}">PUBLICACIONES · {ag["organismos_distintos"]} ORGANISMOS</p>'
         f'<table style="width:100%;border-collapse:collapse;margin:0 0 18px"><tr>'
         f'{top("ORGANISMOS", ag["por_organismo"])}{top("TIPOS", ag["por_tipo"])}</tr></table>'
         f'<table style="width:100%;border-collapse:collapse">{filas_html}</table>{resto}'
         f'{analisis_html}'
-        f'<p style="margin:22px 0 0"><a href="{WEB_BASE_URL}/reportes?r={int(reporte_id)}" '
-        f'style="display:inline-block;background:{cian};color:#FFFFFF;font-weight:700;font-size:13px;letter-spacing:.06em;'
-        f'padding:11px 20px;border-radius:4px;text-decoration:none">ABRIR EN EL MONITOR</a></p></div>'
-        f'<div style="padding:12px 24px;border-top:1px solid {borde};font-size:11px;color:{gris}">'
-        f'www.cesba.gob.ar · Consejo Económico y Social de la Ciudad de Buenos Aires<br>'
-        f'Recibís este email porque alguien de tu equipo programó este reporte en el monitor.</div></div>'
+        f'<p style="margin:22px 0 0">{boton(f"{WEB_BASE_URL}/reportes?r={int(reporte_id)}", "Abrir en el monitor")}</p>'
+    )
+    return marco(
+        web_base_url=WEB_BASE_URL, rotulo="MONITOR NORMATIVO · REPORTE PROGRAMADO",
+        titulo=nombre, subtitulo=periodo, cuerpo=cuerpo,
+        motivo="Recibís este email porque alguien de tu equipo programó este reporte en el monitor.",
     )
 
 

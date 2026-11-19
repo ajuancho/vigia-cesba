@@ -128,9 +128,9 @@ async def _match_all(notify: bool = True) -> dict[str, Any]:
         if not items:
             continue
         subject = (
-            "Vigía — 1 nueva norma para tus alertas"
+            "Monitor Normativo — 1 novedad para tus alertas"
             if len(items) == 1
-            else f"Vigía — {len(items)} nuevas normas para tus alertas"
+            else f"Monitor Normativo — {len(items)} novedades para tus alertas"
         )
         send_email(
             to=email,

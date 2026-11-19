@@ -11,19 +11,19 @@ import { TrendingUp, TrendingDown, Minus } from 'lucide-react';
 import FadeIn from '@/components/FadeIn';
 import CountUp from '@/components/CountUp';
 
-const COLORS = ['#18A6C2', '#0079DC', '#18596C', '#4E83FB', '#153B70', '#9FD6E2', '#00C49A', '#93989E'];
+const COLORS = ['#E62580', '#4DB4B0', '#1D1D1B', '#8F82BA', '#A0175A', '#F2A6C9', '#D3D93A', '#93938D'];
 
-// Orden y color editorial por tipo (paleta CESBA).
+// Orden y color editorial por tipo (paleta nuevosBAires).
 const SERIE_TIPOS = [
-  { key: 'RESOLUCION', color: '#18A6C2' },
-  { key: 'PROYECTO', color: '#54BBC7' },
-  { key: 'DISPOSICION', color: '#4E83FB' },
-  { key: 'DECRETO', color: '#0079DC' },
-  { key: 'LEY', color: '#18596C' },
-  { key: 'DNU', color: '#153B70' },
-  { key: 'COMUNICACION', color: '#00B2D1' },
-  { key: 'CONSULTA', color: '#7FB8C9' },
-  { key: 'OTRA', color: '#93989E' },
+  { key: 'RESOLUCION', color: '#E62580' },
+  { key: 'PROYECTO', color: '#D3D93A' },
+  { key: 'DISPOSICION', color: '#8F82BA' },
+  { key: 'DECRETO', color: '#4DB4B0' },
+  { key: 'LEY', color: '#1D1D1B' },
+  { key: 'DNU', color: '#A0175A' },
+  { key: 'COMUNICACION', color: '#6E6E68' },
+  { key: 'CONSULTA', color: '#B4B4AE' },
+  { key: 'OTRA', color: '#93938D' },
 ];
 
 function Delta({ actual, anterior }) {
@@ -100,7 +100,7 @@ export default function DashboardView() {
       {/* Header editorial */}
       <FadeIn>
         <div className="mb-10 pt-2">
-          <Eyebrow num="BOCBA / DATA">Inteligencia regulatoria</Eyebrow>
+          <Eyebrow num="MONITOR / DATA">Inteligencia regulatoria</Eyebrow>
           <h2 className="display-section text-text-primary mb-1">
             El pulso de la <em>normativa</em>
           </h2>
@@ -145,15 +145,15 @@ export default function DashboardView() {
             <AreaChart data={totalSerie} margin={{ left: -10, right: 4 }}>
               <defs>
                 <linearGradient id="fillTotal" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#18A6C2" stopOpacity={0.35} />
-                  <stop offset="100%" stopColor="#18A6C2" stopOpacity={0.02} />
+                  <stop offset="0%" stopColor="#E62580" stopOpacity={0.35} />
+                  <stop offset="100%" stopColor="#E62580" stopOpacity={0.02} />
                 </linearGradient>
               </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(24, 166, 194, 0.08)" vertical={false} />
-              <XAxis dataKey="mes" tick={{ fill: '#5B6267', fontSize: 10 }} axisLine={false} tickLine={false} interval="preserveStartEnd" />
-              <YAxis tick={{ fill: '#5B6267', fontSize: 10 }} axisLine={false} tickLine={false} />
+              <CartesianGrid strokeDasharray="3 3" stroke="rgba(230, 37, 128, 0.08)" vertical={false} />
+              <XAxis dataKey="mes" tick={{ fill: '#5C5C57', fontSize: 10 }} axisLine={false} tickLine={false} interval="preserveStartEnd" />
+              <YAxis tick={{ fill: '#5C5C57', fontSize: 10 }} axisLine={false} tickLine={false} />
               <Tooltip content={<ChartTooltip />} />
-              <Area type="monotone" dataKey="total" name="Total" stroke="#18A6C2" strokeWidth={2} fill="url(#fillTotal)" animationDuration={1200} />
+              <Area type="monotone" dataKey="total" name="Total" stroke="#E62580" strokeWidth={2} fill="url(#fillTotal)" animationDuration={1200} />
             </AreaChart>
           </ResponsiveContainer>
         </FadeIn>
@@ -233,11 +233,11 @@ export default function DashboardView() {
           <FadeIn delay={120}>
             <ResponsiveContainer width="100%" height={240}>
               <BarChart data={dnuHist} margin={{ left: -14, right: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="rgba(24, 166, 194, 0.08)" vertical={false} />
-                <XAxis dataKey="anio" tick={{ fill: '#5B6267', fontSize: 9 }} axisLine={false} tickLine={false} interval={3} />
-                <YAxis tick={{ fill: '#5B6267', fontSize: 10 }} axisLine={false} tickLine={false} />
-                <Tooltip content={<ChartTooltip />} cursor={{ fill: 'rgba(24, 166, 194, 0.06)' }} />
-                <Bar dataKey="cantidad" name="DNU" fill="#153B70" radius={[3, 3, 0, 0]} animationDuration={1100} />
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(230, 37, 128, 0.08)" vertical={false} />
+                <XAxis dataKey="anio" tick={{ fill: '#5C5C57', fontSize: 9 }} axisLine={false} tickLine={false} interval={3} />
+                <YAxis tick={{ fill: '#5C5C57', fontSize: 10 }} axisLine={false} tickLine={false} />
+                <Tooltip content={<ChartTooltip />} cursor={{ fill: 'rgba(230, 37, 128, 0.06)' }} />
+                <Bar dataKey="cantidad" name="DNU" fill="#A0175A" radius={[3, 3, 0, 0]} animationDuration={1100} />
               </BarChart>
             </ResponsiveContainer>
           </FadeIn>

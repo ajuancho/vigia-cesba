@@ -87,7 +87,7 @@ export default function LegislaturaView() {
     <div className="max-w-4xl mx-auto">
       <FadeIn>
         <div className="mb-7 pt-2">
-          <p className="eyebrow mb-1"><span className="eyebrow-num">BOCBA / LEGISLATURA</span><span className="ml-2">Expedientes parlamentarios</span></p>
+          <p className="eyebrow mb-1"><span className="eyebrow-num">MONITOR / LEGISLATURA</span><span className="ml-2">Expedientes parlamentarios</span></p>
           <div className="title-rule flex flex-col gap-1">
             <h2 className="display-section text-text-primary">Legislatura <em>porteña</em></h2>
             <p className="text-[15px] text-text-tertiary">proyectos y expedientes ingresados, con su estado actual · actualización diaria</p>

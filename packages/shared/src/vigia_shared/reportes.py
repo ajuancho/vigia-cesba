@@ -172,7 +172,7 @@ def csv_text(filas: list[dict[str, Any]]) -> str:
 # ── Análisis con IA ──────────────────────────────────────────────────────────
 
 SYSTEM_ANALISIS = (
-    "Sos analista del Consejo Económico y Social de la Ciudad de Buenos Aires (CESBA). "
+    "Sos analista de nuevosBAires, un proyecto que sigue la normativa de la Ciudad de Buenos Aires. "
     "Escribís el análisis de un reporte sobre publicaciones del Boletín Oficial de la Ciudad.\n"
     "Reglas:\n"
     "- Español rioplatense, registro institucional, claro. 3 a 5 párrafos breves.\n"

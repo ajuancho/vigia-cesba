@@ -89,7 +89,7 @@ export default function TribunalView() {
     <div className="max-w-4xl mx-auto">
       <FadeIn>
         <div className="mb-7 pt-2">
-          <p className="eyebrow mb-1"><span className="eyebrow-num">BOCBA / TSJ</span><span className="ml-2">Jurisprudencia</span></p>
+          <p className="eyebrow mb-1"><span className="eyebrow-num">MONITOR / TSJ</span><span className="ml-2">Jurisprudencia</span></p>
           <div className="title-rule flex flex-col gap-1">
             <h2 className="display-section text-text-primary">Tribunal <em>Superior</em></h2>
             <p className="text-[15px] text-text-tertiary">sentencias y resoluciones del tribunal superior de justicia de la ciudad · actualización diaria</p>

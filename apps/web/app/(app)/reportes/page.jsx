@@ -345,7 +345,7 @@ export default function ReportesView() {
     <div className="max-w-6xl mx-auto">
       <FadeIn>
         <div className="mb-8 pt-2 print:mb-4">
-          <p className="eyebrow mb-1 print:hidden"><span className="eyebrow-num">BOCBA / REPORTES</span><span className="ml-2">Compilación y análisis</span></p>
+          <p className="eyebrow mb-1 print:hidden"><span className="eyebrow-num">MONITOR / REPORTES</span><span className="ml-2">Compilación y análisis</span></p>
           <div className="title-rule flex flex-col gap-1">
             <h2 className="display-section text-text-primary">{actual?.nombre || <>Reportes <em>a medida</em></>}</h2>
             <p className="text-[15px] text-text-tertiary">compilá, ordená y analizá lo publicado en el boletín oficial de la ciudad</p>
@@ -357,8 +357,7 @@ export default function ReportesView() {
         <>
           {/* Pedido en lenguaje natural */}
           <FadeIn delay={40}>
-            <section className="grad-institucional relative overflow-hidden rounded-lg text-white p-5 md:p-6 mb-6 print:hidden" aria-label="Pedir un reporte en lenguaje natural">
-              <div className="trama" />
+            <section className="bg-marca relative overflow-hidden rounded-lg text-white p-5 md:p-6 mb-6 print:hidden" aria-label="Pedir un reporte en lenguaje natural">
               <div className="relative flex flex-col gap-3">
                 <label htmlFor="pedido-reporte" className="flex items-center gap-2 text-[13px] font-bold tracking-[0.06em] uppercase">
                   <Wand2 size={18} strokeWidth={1.75} /> Pedí el reporte con tus palabras
@@ -580,11 +579,11 @@ export default function ReportesView() {
                     <h3 className="text-[13px] font-bold tracking-[0.06em] uppercase text-petroleo mb-4">Publicaciones por mes</h3>
                     <ResponsiveContainer width="100%" height={220}>
                       <BarChart data={porMes} margin={{ top: 4, right: 8, bottom: 0, left: -12 }}>
-                        <CartesianGrid strokeDasharray="3 3" stroke="#E4EBED" vertical={false} />
-                        <XAxis dataKey="mes" tick={{ fill: '#5B6267', fontSize: 11 }} axisLine={false} tickLine={false} interval="preserveStartEnd" />
-                        <YAxis tick={{ fill: '#5B6267', fontSize: 11 }} axisLine={false} tickLine={false} allowDecimals={false} />
-                        <Tooltip content={<ChartTooltip />} cursor={{ fill: 'rgba(24, 166, 194, 0.08)' }} />
-                        <Bar dataKey="cantidad" fill="#18A6C2" radius={[2, 2, 0, 0]} isAnimationActive={false} />
+                        <CartesianGrid strokeDasharray="3 3" stroke="#E4E4DF" vertical={false} />
+                        <XAxis dataKey="mes" tick={{ fill: '#5C5C57', fontSize: 11 }} axisLine={false} tickLine={false} interval="preserveStartEnd" />
+                        <YAxis tick={{ fill: '#5C5C57', fontSize: 11 }} axisLine={false} tickLine={false} allowDecimals={false} />
+                        <Tooltip content={<ChartTooltip />} cursor={{ fill: 'rgba(230, 37, 128, 0.08)' }} />
+                        <Bar dataKey="cantidad" fill="#E62580" radius={[2, 2, 0, 0]} isAnimationActive={false} />
                       </BarChart>
                     </ResponsiveContainer>
                   </div>
